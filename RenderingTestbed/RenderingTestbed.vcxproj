@@ -63,12 +63,15 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\..\..\..\libraries\opengl.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(ProjectDir)Include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -81,6 +84,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -110,6 +114,49 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Renderer\Camera.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\OpenGLShader.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\OpenGLRenderMesh.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\OpenGLRenderModel.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\OpenGLRenderer.cpp" />
+    <ClCompile Include="src\Renderer\LayerPass.cpp" />
+    <ClCompile Include="src\Renderer\ScreenSpacePass.cpp" />
+    <ClCompile Include="src\Models\ModelInstance.cpp" />
+    <ClCompile Include="src\Renderer\Renderer.cpp" />
+    <ClCompile Include="src\Models\ModelLoader.cpp" />
+    <ClCompile Include="src\Util\FileUtils.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\Shaders\Shader.cpp" />
+    <ClCompile Include="src\Models\Material.cpp" />
+    <ClCompile Include="src\Models\Mesh.cpp" />
+    <ClCompile Include="src\Models\Model.cpp" />
+    <ClCompile Include="src\Util\StringUtils.cpp" />
+    <ClCompile Include="src\Renderer\TextureBuffer.cpp" />
+    <ClCompile Include="src\Models\Vertex.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\Renderer\Camera.h" />
+    <ClInclude Include="Include\Util\FileUtils.h" />
+    <ClInclude Include="Include\Models\Material.h" />
+    <ClInclude Include="Include\Models\Mesh.h" />
+    <ClInclude Include="Include\Models\Model.h" />
+    <ClInclude Include="Include\Shaders\Shader.h" />
+    <ClInclude Include="Include\Models\ModelLoader.h" />
+    <ClInclude Include="Include\Util\StringUtils.h" />
+    <ClInclude Include="Include\Renderer\Renderer.h" />
+    <ClInclude Include="Include\Models\ModelInstance.h" />
+    <ClInclude Include="Include\Renderer\ScreenSpacePass.h" />
+    <ClInclude Include="Include\Renderer\LayerPass.h" />
+    <ClInclude Include="Include\Renderer\TextureBuffer.h" />
+    <ClInclude Include="Include\Models\Vertex.h" />
+    <ClInclude Include="Include\Renderer\OpenGL\OpenGLRenderer.h" />
+    <ClInclude Include="Include\Renderer\OpenGL\OpenGLRenderModel.h" />
+    <ClInclude Include="Include\Renderer\OpenGL\OpenGLRenderMesh.h" />
+    <ClInclude Include="Include\Renderer\OpenGL\OpenGLShader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Shaders\colour.frag" />
+    <None Include="src\Shaders\colour.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
