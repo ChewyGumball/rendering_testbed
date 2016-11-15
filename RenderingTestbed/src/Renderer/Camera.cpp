@@ -5,13 +5,18 @@
 
 
 Camera::Camera(glm::vec3 position, glm::vec3 target, glm::vec3 up, float fov, float aspectRatio) 
-	: m_transform(glm::lookAt(position, target, up)), m_projection(glm::perspective(fov, aspectRatio, 0.1f, 10000.0f))
+	: m_position(position), m_transform(glm::lookAt(position, target, up)), m_projection(glm::perspective(fov, aspectRatio, 0.1f, 10000.0f))
 {
 }
 
 
 Camera::~Camera()
 {
+}
+
+glm::vec3 Camera::position() const
+{
+	return m_position;
 }
 
 glm::mat4 Camera::transform() const

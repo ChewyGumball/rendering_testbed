@@ -67,10 +67,15 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\..\..\..\libraries\opengl.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(ProjectDir)Include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(ProjectDir)Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LIB_DIR)\glew-1.13.0\lib\Release\x64;$(LIB_DIR)/glfw-3.3.0\x64\debug\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -107,13 +112,20 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>glfw3dll.lib;glew32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\lib\SimpleFileWatcher\FileWatcher.cpp" />
+    <ClCompile Include="src\lib\SimpleFileWatcher\FileWatcherLinux.cpp" />
+    <ClCompile Include="src\lib\SimpleFileWatcher\FileWatcherOSX.cpp" />
+    <ClCompile Include="src\lib\SimpleFileWatcher\FileWatcherWin32.cpp" />
+    <ClCompile Include="src\Renderer\PointLight.cpp" />
     <ClCompile Include="src\Renderer\Camera.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\OpenGLShader.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\OpenGLRenderMesh.cpp" />
@@ -135,6 +147,11 @@
     <ClCompile Include="src\Models\Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcher.h" />
+    <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcherImpl.h" />
+    <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcherLinux.h" />
+    <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcherOSX.h" />
+    <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcherWin32.h" />
     <ClInclude Include="Include\Renderer\Camera.h" />
     <ClInclude Include="Include\Util\FileUtils.h" />
     <ClInclude Include="Include\Models\Material.h" />
@@ -153,10 +170,13 @@
     <ClInclude Include="Include\Renderer\OpenGL\OpenGLRenderModel.h" />
     <ClInclude Include="Include\Renderer\OpenGL\OpenGLRenderMesh.h" />
     <ClInclude Include="Include\Renderer\OpenGL\OpenGLShader.h" />
+    <ClInclude Include="Include\Renderer\PointLight.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Shaders\colour.frag" />
     <None Include="src\Shaders\colour.vert" />
+    <None Include="src\Shaders\normal.frag" />
+    <None Include="src\Shaders\normal.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

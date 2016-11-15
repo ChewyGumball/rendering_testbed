@@ -81,6 +81,21 @@
     <ClCompile Include="src\Renderer\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\PointLight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\SimpleFileWatcher\FileWatcher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\SimpleFileWatcher\FileWatcherLinux.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\SimpleFileWatcher\FileWatcherOSX.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\SimpleFileWatcher\FileWatcherWin32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Models\Model.h">
@@ -137,9 +152,29 @@
     <ClInclude Include="Include\Renderer\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Renderer\PointLight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcherImpl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcherLinux.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcherOSX.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcherWin32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Shaders\colour.frag" />
     <None Include="src\Shaders\colour.vert" />
+    <None Include="src\Shaders\normal.frag" />
+    <None Include="src\Shaders\normal.vert" />
   </ItemGroup>
 </Project>

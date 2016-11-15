@@ -9,8 +9,10 @@
 #include <Models\ModelInstance.h>
 #include <Models\Mesh.h>
 #include <Renderer\Camera.h>
+#include <Models/ModelLoader.h>
 
 #include <Util\FileUtils.h>
+#include <random>
 
 int width = 800;
 int height = 800;
@@ -24,80 +26,65 @@ std::shared_ptr<Shader> colourShader()
 		);
 }
 
+std::shared_ptr<Shader> phongShader()
+{
+	return std::make_shared<Shader>(
+		R"(F:\Users\Ben\Documents\Projects\RenderingTestbed\RenderingTestbed\src\Shaders\normal.vert)",
+		R"(F:\Users\Ben\Documents\Projects\RenderingTestbed\RenderingTestbed\src\Shaders\normal.frag)",
+		true
+		);
+}
+
+std::shared_ptr<Mesh> buddha()
+{
+	return ModelLoader::loadOBJFile(R"(F:\Users\Ben\Desktop\buddha.obj)");
+}
+
 std::shared_ptr<Mesh> cube()
 {
+	return ModelLoader::loadOBJFile(R"(F:\Users\Ben\Desktop\cube.obj)");
+}
 
-	std::vector < Vertex > vertices = {
-		//front
-		Vertex(glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f)),
-		Vertex(glm::vec3(0.5f, -0.5f,  0.5f), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f)),
-		Vertex(glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f)),
-		Vertex(glm::vec3(0.5f,  0.5f,  0.5f), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f)),
-		Vertex(glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f)),
-		Vertex(glm::vec3(0.5f, -0.5f,  0.5f), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f)),
+std::vector<std::shared_ptr<ModelInstance>> makeLotsOfCubes()
+{
+	Model model(cube(), colourShader());
 
-		//top
-		Vertex(glm::vec3(0.5f,  0.5f,  0.5f), glm::vec4(1.0f, 0.0f, 1.0f, 1.0f)),
-		Vertex(glm::vec3(0.5f,  0.5f, -0.5f), glm::vec4(1.0f, 0.0f, 1.0f, 1.0f)),
-		Vertex(glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec4(1.0f, 0.0f, 1.0f, 1.0f)),
-		Vertex(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec4(1.0f, 0.0f, 1.0f, 1.0f)),
-		Vertex(glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec4(1.0f, 0.0f, 1.0f, 1.0f)),
-		Vertex(glm::vec3(0.5f,  0.5f, -0.5f), glm::vec4(1.0f, 0.0f, 1.0f, 1.0f)),
+	std::vector<std::shared_ptr<ModelInstance>> instances;
 
-		//left
-		Vertex(glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec4(0.0f, 1.0f, 1.0f, 1.0f)),
-		Vertex(glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec4(0.0f, 1.0f, 1.0f, 1.0f)),
-		Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec4(0.0f, 1.0f, 1.0f, 1.0f)),
-		Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec4(0.0f, 1.0f, 1.0f, 1.0f)),
-		Vertex(glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec4(0.0f, 1.0f, 1.0f, 1.0f)),
-		Vertex(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec4(0.0f, 1.0f, 1.0f, 1.0f)),
+	std::default_random_engine generator;
+	std::uniform_real_distribution<float> distribution(-30, 30);
 
-		//right
-		Vertex(glm::vec3(0.5f, -0.5f,  0.5f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)),
-		Vertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)),
-		Vertex(glm::vec3(0.5f,  0.5f,  0.5f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)),
-		Vertex(glm::vec3(0.5f,  0.5f,  0.5f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)),
-		Vertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)),
-		Vertex(glm::vec3(0.5f,  0.5f, -0.5f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)),
+	for (int i = 0; i < 30; i++)
+	{
+		for (int j = 0; j < 30; j++)
+		{
+			std::shared_ptr<ModelInstance> instance = std::make_shared<ModelInstance>(model);
+			instance->translate(glm::vec3(distribution(generator), distribution(generator), distribution(generator)));
+			instance->rotate(glm::vec3(1, 0, 0), distribution(generator));
+			instance->rotate(glm::vec3(0, 1, 0), distribution(generator));
+			instances.push_back(instance);
+		}
+	}
 
-		//back
-		Vertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)),
-		Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)),
-		Vertex(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)),
-		Vertex(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)),
-		Vertex(glm::vec3(0.5f,  0.5f, -0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)),
-		Vertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)),
+	return instances;
+}
 
-		//bottom
-		Vertex(glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)),
-		Vertex(glm::vec3(0.5f, -0.5f,  0.5f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)),
-		Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)),
-		Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)),
-		Vertex(glm::vec3(0.5f, -0.5f,  0.5f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)),
-		Vertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)),
-	};
+std::vector<std::shared_ptr<ModelInstance>> makeBuddha()
+{
+	std::vector<std::shared_ptr<ModelInstance>> instances;
+	Model model(buddha(), phongShader());
+	instances.push_back(std::make_shared<ModelInstance>(model));
 
-	std::vector<int> indices = {
-		0,1,2,
-		3,4,5,
+	return instances;
+}
 
-		6,7,8,
-		9,10,11,
+std::vector<std::shared_ptr<ModelInstance>> makeCube()
+{
+	std::vector<std::shared_ptr<ModelInstance>> instances;
+	Model model(cube(), phongShader());
+	instances.push_back(std::make_shared<ModelInstance>(model));
 
-		12,13,14,
-		15,16,17,
-
-		18,19,20,
-		21,22,23,
-
-		24,25,26,
-		27,28,29,
-
-		30,31,32,
-		33,34,35
-	};
-
-	return std::make_shared<Mesh>(vertices, indices);
+	return instances;
 }
 
 int main(int argc, char *argv[])
@@ -139,33 +126,44 @@ int main(int argc, char *argv[])
 
 	OpenGLRenderer renderer;
 
-	Model model(cube(), colourShader());
-	std::shared_ptr<ModelInstance> instance = std::make_shared<ModelInstance>(model);
-	std::shared_ptr<ModelInstance> instance2 = std::make_shared<ModelInstance>(model);
+	//auto instances = makeLotsOfCubes();
+	auto instances = makeBuddha();
+	for (auto instance : instances)
+	{
+		renderer.addModelInstance(instance);
+	}
 
-	instance->rotate(glm::vec3(1, 0, 0), 45);
-	instance->rotate(glm::vec3(0, 0, 1), 45);
+	renderer.addPointLight(PointLight(glm::vec3(1, 1, -1), glm::vec3(0.5, 0.2, 0.9)));
+	renderer.addPointLight(PointLight(glm::vec3(-1, 1, -1), glm::vec3(0, 0.4, 0.1)));
 
-	instance2->scale(glm::vec3(0.75f, 0.5, 1));
-	instance2->translate(glm::vec3(2, 0, 0));
-	instance2->rotate(glm::vec3(1, 0, 0), 45);
-
-	renderer.addModelInstance(instance);
-	renderer.addModelInstance(instance2);
-
-	Camera c(glm::vec3(0, 0, -5), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), 90.0, 1.0f);
+	Camera c(glm::vec3(1, 1, -1), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), 45.0, 1.0f);
 
 	double lastTime = glfwGetTime();
+	double cumulative = 0;
+	int frames = 0;
 	while (!glfwWindowShouldClose(window))
 	{
 		double currentTime = glfwGetTime();
-		instance->rotate(glm::vec3(0, 1, 0), 1 * (currentTime - lastTime));
-		instance2->rotate(glm::vec3(0, 1, 0), 1 * (currentTime - lastTime));
+		Util::File::MonitorFiles();
+		for (auto instance : instances)
+		{
+			instance->rotate(glm::vec3(0, 1, 0), 0.7 * (currentTime - lastTime));
+			//instance->rotate(glm::vec3(1, 1, 0), 1 * (currentTime - lastTime));
+			//instance->rotate(glm::vec3(0, 1, 0), 0.3 * (currentTime - lastTime));
+		}
 		glfwPollEvents();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		renderer.draw(c);
 		glfwSwapBuffers(window);
+		cumulative += currentTime - lastTime;
 		lastTime = currentTime;
+		frames++;
+		if (cumulative >= 1)
+		{
+			std::printf("%d frames\n", frames);
+			cumulative = 0;
+			frames = 0;
+		}
 	}
 
 	glfwTerminate();

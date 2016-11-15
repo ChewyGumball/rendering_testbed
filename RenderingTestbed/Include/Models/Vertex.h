@@ -31,14 +31,14 @@ class Vertex
 	glm::vec2 textureCoodinate;
 
 public:
-	Vertex(glm::vec3 position);
-	Vertex(glm::vec3 position, glm::vec3 normal);
-	Vertex(glm::vec3 position, glm::vec2 textureCoodinate);
-	Vertex(glm::vec3 position, glm::vec4 colour);
-	Vertex(glm::vec3 position, glm::vec3 normal, glm::vec4 colour); 
-	Vertex(glm::vec3 position, glm::vec3 normal, glm::vec2 textureCoodinate);
-	Vertex(glm::vec3 position, glm::vec2 textureCoodinate, glm::vec4 colour);
-	Vertex(glm::vec3 position, glm::vec3 normal, glm::vec2 textureCoodinate, glm::vec4 colour);
+	Vertex(const glm::vec3& position);
+	Vertex(const glm::vec3& position, const glm::vec3& normal);
+	Vertex(const glm::vec3& position, const glm::vec2& textureCoodinate);
+	Vertex(const glm::vec3& position, const glm::vec4& colour);
+	Vertex(const glm::vec3& position, const glm::vec3& normal, const glm::vec4& colour);
+	Vertex(const glm::vec3& position, const glm::vec3& normal, const glm::vec2& textureCoodinate);
+	Vertex(const glm::vec3& position, const glm::vec2& textureCoodinate, const glm::vec4& colour);
+	Vertex(const glm::vec3& position, const glm::vec3& normal, const glm::vec2& textureCoodinate, const glm::vec4& colour);
 	~Vertex();
 
 	int size() const;

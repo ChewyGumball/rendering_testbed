@@ -119,33 +119,33 @@ void Vertex::append(std::vector<float>& data) const
 	}
 }
 
-Vertex::Vertex(glm::vec3 position) : format(VertexFormats::Position), position(position)
+Vertex::Vertex(const glm::vec3& position) : format(VertexFormats::Position), position(position)
 {}
 
-Vertex::Vertex(glm::vec3 position, glm::vec3 normal) : format(VertexFormats::Position_Normal), position(position), normal(normal)
+Vertex::Vertex(const glm::vec3& position, const glm::vec3& normal) : format(VertexFormats::Position_Normal), position(position), normal(normal)
 {
 }
 
-Vertex::Vertex(glm::vec3 position, glm::vec2 textureCoodinate) : format(VertexFormats::Position_Texture), position(position), textureCoodinate(textureCoodinate)
+Vertex::Vertex(const glm::vec3& position, const glm::vec2& textureCoodinate) : format(VertexFormats::Position_Texture), position(position), textureCoodinate(textureCoodinate)
 {
 }
 
-Vertex::Vertex(glm::vec3 position, glm::vec4 colour) : format(VertexFormats::Position_Colour), position(position), colour(colour)
+Vertex::Vertex(const glm::vec3& position, const glm::vec4& colour) : format(VertexFormats::Position_Colour), position(position), colour(colour)
 {
 }
 
-Vertex::Vertex(glm::vec3 position, glm::vec3 normal, glm::vec4 colour) : format(VertexFormats::Position_Normal_Colour), position(position), normal(normal), colour(colour)
+Vertex::Vertex(const glm::vec3& position, const glm::vec3& normal, const glm::vec4& colour) : format(VertexFormats::Position_Normal_Colour), position(position), normal(normal), colour(colour)
 {
 }
 
-Vertex::Vertex(glm::vec3 position, glm::vec3 normal, glm::vec2 textureCoodinate) : format(VertexFormats::Position_Normal_Texture), position(position), normal(normal), textureCoodinate(textureCoodinate)
+Vertex::Vertex(const glm::vec3& position, const glm::vec3& normal, const glm::vec2& textureCoodinate) : format(VertexFormats::Position_Normal_Texture), position(position), normal(normal), textureCoodinate(textureCoodinate)
 {
 }
 
-Vertex::Vertex(glm::vec3 position, glm::vec2 textureCoodinate, glm::vec4 colour) : format(VertexFormats::Position_Texture_Colour), position(position), textureCoodinate(textureCoodinate), colour(colour)
+Vertex::Vertex(const glm::vec3& position, const glm::vec2& textureCoodinate, const glm::vec4& colour) : format(VertexFormats::Position_Texture_Colour), position(position), textureCoodinate(textureCoodinate), colour(colour)
 {
 }
 
-Vertex::Vertex(glm::vec3 position, glm::vec3 normal, glm::vec2 textureCoodinate, glm::vec4 colour) : format(VertexFormats::Position_Normal_Texture_Colour), position(position), normal(normal), textureCoodinate(textureCoodinate), colour(colour)
+Vertex::Vertex(const glm::vec3& position, const glm::vec3& normal, const glm::vec2& textureCoodinate, const glm::vec4& colour) : format(VertexFormats::Position_Normal_Texture_Colour), position(position), normal(normal), textureCoodinate(textureCoodinate), colour(colour)
 {
 }

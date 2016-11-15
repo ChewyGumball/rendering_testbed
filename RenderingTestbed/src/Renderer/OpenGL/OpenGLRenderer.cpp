@@ -2,10 +2,22 @@
 
 #include <utility>
 
+#include "Util/StringUtils.h"
+
 #include "Models/ModelInstance.h";
 #include "Models/Model.h";
 #include "Models/Mesh.h";
 #include "Renderer/Camera.h";
+
+void OpenGLRenderer::addLightUniforms(OpenGLShader & shader)
+{
+	for (int i = 0; i < lights.size(); i++)
+	{
+		PointLight& light = lights[i];
+		shader.setUniform3f(Util::String::Format("pointLights[%d].position", i), light.position());
+		shader.setUniform3f(Util::String::Format("pointLights[%d].intensity", i), light.intensity());
+	}
+}
 
 OpenGLRenderer::OpenGLRenderer()
 {
@@ -35,6 +47,11 @@ void OpenGLRenderer::addModelInstance(std::shared_ptr<const ModelInstance> model
 
 	modelInstances[modelInstance->model()->id()].emplace_back(modelInstance);
 	buffersNeedingUpdates.insert(modelInstance->model()->id());
+}
+
+void OpenGLRenderer::addPointLight(PointLight light)
+{
+	lights.push_back(light);
 }
 
 void OpenGLRenderer::draw(const Camera & c)
@@ -74,6 +91,8 @@ void OpenGLRenderer::draw(const Camera & c)
 		shader.bind();
 		shader.setUniformMatrix4f("view", c.transform());
 		shader.setUniformMatrix4f("projection", c.projection());
+		shader.setUniform3f("cameraPosition", c.position());
+		addLightUniforms(shader);
 		meshes[model.meshID].draw(instanceList.second.size());
 	}
 }

@@ -1,9 +1,10 @@
 #pragma once
+#include <memory>
 #include <string>
 
 #include "Models/Mesh.h"
 
 namespace ModelLoader
 {
-	Mesh loadOBJFile(std::string& filename);
+	std::shared_ptr<Mesh> loadOBJFile(std::string filename);
 }

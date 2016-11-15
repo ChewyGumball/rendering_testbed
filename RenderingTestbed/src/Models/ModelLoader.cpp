@@ -9,7 +9,7 @@
 namespace {
 	//OBJ Indexes that are negative are offsets from the end of the list
 	template<typename T>
-	T objIndexFind(std::vector<T> objs, int index)
+	const T& objIndexFind(std::vector<T>& objs, int index)
 	{
 		if (index < 0)
 		{
@@ -25,31 +25,30 @@ namespace {
 
 namespace ModelLoader
 {
-	Mesh loadOBJFile(std::string& filename)
+	std::shared_ptr<Mesh> loadOBJFile(std::string filename)
 	{
 		std::vector<glm::vec3> positions;
 		std::vector<glm::vec3> normals;
 		std::vector<glm::vec2> textureCoordinates;
 
-		std::vector<std::string> lines = Util::File::ReadLines(filename);
 
 		std::vector<int> indices;
 		std::vector<Vertex> vertices;
 
-		for (std::string& line : lines)
+		Util::File::ProcessLines(filename, [&](const std::string& line)
 		{
 			std::vector<std::string> elements = Util::String::Split(line, ' ');
 			if (elements[0] == "v")
 			{
-				positions.push_back(glm::vec3(std::stof(elements[1]), std::stof(elements[2]), std::stof(elements[3])));
+				positions.emplace_back(std::stof(elements[1]), std::stof(elements[2]), std::stof(elements[3]));
 			}
 			else if (elements[0] == "vt")
 			{
-				textureCoordinates.push_back(glm::vec2(std::stof(elements[1]), std::stof(elements[2])));
+				textureCoordinates.emplace_back(std::stof(elements[1]), std::stof(elements[2]));
 			}
 			else if (elements[0] == "vn")
 			{
-				normals.push_back(glm::vec3(std::stof(elements[1]), std::stof(elements[2]), std::stof(elements[3])));
+				normals.emplace_back(std::stof(elements[1]), std::stof(elements[2]), std::stof(elements[3]));
 			}
 			else if (elements[0] == "f")
 			{
@@ -93,7 +92,9 @@ namespace ModelLoader
 					}
 					else if (hasNormals)
 					{
-						vertices.emplace_back(objIndexFind(positions, vertexIndex), objIndexFind(textureCoordinates, textureIndex));
+						const glm::vec3& p = objIndexFind(positions, vertexIndex);
+						const glm::vec3& n = objIndexFind(normals, normalIndex);
+						vertices.emplace_back(p, n);
 					}
 					else
 					{
@@ -101,8 +102,8 @@ namespace ModelLoader
 					}
 				}
 			}
-		}
+		});
 
-		return Mesh(vertices, indices);
+		return std::make_shared<Mesh>(vertices, indices);
 	}
 }

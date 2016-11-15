@@ -2,13 +2,16 @@
 
 #include <iostream>
 #include <unordered_map>
+#include <unordered_set>
+#include <thread>
 
 #include <glm/gtc/type_ptr.hpp>
+
+#include <lib/SimpleFileWatcher/FileWatcher/FileWatcher.h>
 
 #include "Util/FileUtils.h"
 
 namespace {
-
 	std::unordered_map<GLenum, std::string> enumNames = {
 		{GL_VERTEX_SHADER, "VERTEX"},
 		{GL_FRAGMENT_SHADER, "FRAGMENT"}
@@ -77,13 +80,31 @@ Shader::Shader(std::string& vertexSource, std::string& fragmentSource) : program
 {
 }
 
-Shader::Shader(std::string& vertexFilename, std::string& fragmentFilename, bool monitorFiles) : Shader(Util::File::ReadWholeFile(vertexFilename), Util::File::ReadWholeFile(fragmentFilename))
+Shader::Shader(std::string vertexFilename, std::string fragmentFilename, bool monitorFiles) 
+	: programHandle(createProgram(Util::File::ReadWholeFile(vertexFilename), Util::File::ReadWholeFile(fragmentFilename))),
+	vertexFilename(vertexFilename), fragmentFilename(fragmentFilename)
 {
+	if (monitorFiles)
+	{
+		Util::File::WatchForChanges(vertexFilename, [=]() { reloadFromFiles(); });
+		Util::File::WatchForChanges(fragmentFilename, [=]() { reloadFromFiles(); });
+	}
 }
 
 
 Shader::~Shader()
 {
+}
+
+void Shader::setUniform1i(const std::string & uniformName, int data) const
+{
+	GLint location = glGetUniformLocation(programHandle, uniformName.c_str());
+	if (location == -1)
+	{
+		std::cout << "Could not find uniform '" << uniformName << "' in shader!" << std::endl;
+		return;
+	}
+	glUniform1i(location, data);
 }
 
 
@@ -133,10 +154,21 @@ void Shader::setUniformMatrix4f(const std::string & uniformName, glm::mat4 data)
 
 void Shader::bind() const
 {
+	if (needsToReload)
+	{
+		programHandle = createProgram(Util::File::ReadWholeFile(vertexFilename), Util::File::ReadWholeFile(fragmentFilename));
+		needsToReload = false;
+	}
+
 	glUseProgram(programHandle);
 }
 
 std::size_t Shader::id() const
 {
 	return m_id;
+}
+
+void Shader::reloadFromFiles()
+{
+	needsToReload = true;
 }
