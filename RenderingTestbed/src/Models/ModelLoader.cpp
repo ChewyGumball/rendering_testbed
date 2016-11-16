@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <glm/glm.hpp>
+#include <fstream>
+#include <iostream>
 
 #include "Util/FileUtils.h"
 #include "Util/StringUtils.h"
@@ -34,7 +36,7 @@ namespace ModelLoader
 
 		std::vector<int> indices;
 		std::vector<Vertex> vertices;
-
+		VertexFormat format(0);
 		Util::File::ProcessLines(filename, [&](const std::string& line)
 		{
 			std::vector<std::string> elements = Util::String::Split(line, ' ');
@@ -83,27 +85,53 @@ namespace ModelLoader
 					{
 						if (hasNormals)
 						{
+							format = VertexFormats::Position_Normal_Texture;
 							vertices.emplace_back(objIndexFind(positions, vertexIndex), objIndexFind(normals, normalIndex), objIndexFind(textureCoordinates, textureIndex));
 						}
 						else
 						{
+							format = VertexFormats::Position_Texture;
 							vertices.emplace_back(objIndexFind(positions, vertexIndex), objIndexFind(textureCoordinates, textureIndex));
 						}
 					}
 					else if (hasNormals)
 					{
+						format = VertexFormats::Position_Normal;
 						const glm::vec3& p = objIndexFind(positions, vertexIndex);
 						const glm::vec3& n = objIndexFind(normals, normalIndex);
 						vertices.emplace_back(p, n);
 					}
 					else
 					{
+						format = VertexFormats::Position;
 						vertices.emplace_back(objIndexFind(positions, vertexIndex));
 					}
 				}
 			}
 		});
 
-		return std::make_shared<Mesh>(vertices, indices);
+		return std::make_shared<Mesh>(format, Vertex::flatten(format,vertices), indices);
+	}
+	std::shared_ptr<Mesh> loadBinFile(std::string filename)
+	{
+		std::ifstream file(filename, std::ios::in | std::ios::binary);
+
+		char format;
+		file.read(&format, sizeof(char));
+
+		int64_t vertexCount;
+		file.read(reinterpret_cast<char*>(&vertexCount), sizeof(int64_t));
+		std::vector<float> vertices(vertexCount);
+
+		file.read(reinterpret_cast<char*>(vertices.data()), vertexCount * sizeof(float));
+
+		int64_t indexCount;
+		file.read(reinterpret_cast<char*>(&indexCount), sizeof(int64_t));
+		std::vector<int32_t> indices(indexCount);
+
+
+		file.read(reinterpret_cast<char*>(indices.data()), indexCount * sizeof(int32_t));
+		file.close();
+		return std::make_shared<Mesh>(VertexFormat(format),vertices, indices);
 	}
 }

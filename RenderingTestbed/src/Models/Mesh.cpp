@@ -4,7 +4,7 @@ namespace {
 	std::size_t nextID = 0;
 }
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<int> indices) : m_id(nextID++), vertices(vertices), indices(indices)
+Mesh::Mesh(VertexFormat format, std::vector<float> vertices, std::vector<int> indices) : format(format), m_id(nextID++), m_vertices(vertices), indices(indices)
 {
 }
 
@@ -12,14 +12,9 @@ Mesh::~Mesh()
 {
 }
 
-std::vector<float> Mesh::rawVertexData() const
+const std::vector<float>& Mesh::rawVertexData() const
 {
-	std::vector<float> data;
-	for (const Vertex& v : vertices)
-	{
-		v.append(data);
-	}
-	return data;
+	return m_vertices;
 }
 
 const const std::vector<int>& Mesh::indexData() const
@@ -27,9 +22,9 @@ const const std::vector<int>& Mesh::indexData() const
 	return indices;
 }
 
-const Vertex Mesh::vertex() const
+const VertexFormat Mesh::vertexFormat() const
 {
-	return vertices[0];
+	return format;
 }
 
 std::size_t Mesh::id() const

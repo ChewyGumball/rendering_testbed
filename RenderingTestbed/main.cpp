@@ -4,6 +4,8 @@
 #include <cstdio>
 #include <string>
 
+#include <fstream>
+
 #include <Renderer\OpenGL\OpenGLRenderer.h>
 #include <Models\Model.h>
 #include <Models\ModelInstance.h>
@@ -13,6 +15,7 @@
 
 #include <Util\FileUtils.h>
 #include <random>
+#include "main.h"
 
 int width = 800;
 int height = 800;
@@ -38,6 +41,11 @@ std::shared_ptr<Shader> phongShader()
 std::shared_ptr<Mesh> buddha()
 {
 	return ModelLoader::loadOBJFile(R"(F:\Users\Ben\Desktop\buddha.obj)");
+}
+
+std::shared_ptr<Mesh> buddhaBin()
+{
+	return ModelLoader::loadBinFile(R"(F:\Users\Ben\Desktop\buddha.mbin)");
 }
 
 std::shared_ptr<Mesh> cube()
@@ -72,7 +80,7 @@ std::vector<std::shared_ptr<ModelInstance>> makeLotsOfCubes()
 std::vector<std::shared_ptr<ModelInstance>> makeBuddha()
 {
 	std::vector<std::shared_ptr<ModelInstance>> instances;
-	Model model(buddha(), phongShader());
+	Model model(buddhaBin(), phongShader());
 	instances.push_back(std::make_shared<ModelInstance>(model));
 
 	return instances;
@@ -87,8 +95,38 @@ std::vector<std::shared_ptr<ModelInstance>> makeCube()
 	return instances;
 }
 
+void convert(int argc, char* argv[])
+{
+	std::string filename(argv[2]);
+	std::string path = filename.substr(0, filename.find_last_of("/\\") + 1);
+
+	std::shared_ptr<Mesh> mesh = ModelLoader::loadOBJFile(filename);
+	std::ofstream convertedFile(argv[3], std::ios::out | std::ios::binary);
+
+	std::vector<float> vertices = mesh->rawVertexData();
+	std::vector<int> indices = mesh->indexData();
+
+	int64_t vertexCount = vertices.size();
+	int64_t indexCount = indices.size();
+
+	char format = mesh->vertexFormat().formatData();
+
+	convertedFile.write(&(format), sizeof(char));
+	convertedFile.write(reinterpret_cast<char*>(&vertexCount), sizeof(int64_t));
+	convertedFile.write(reinterpret_cast<char*>(vertices.data()), vertexCount * sizeof(float));
+	convertedFile.write(reinterpret_cast<char*>(&indexCount), sizeof(int64_t));
+	convertedFile.write(reinterpret_cast<char*>(indices.data()), indexCount * sizeof(int));
+
+	convertedFile.close();
+}
+
 int main(int argc, char *argv[])
 {
+	if (argc > 1 && std::string(argv[1]) == "convert")
+	{
+		convert(argc, argv);
+		return 0;
+	}
 	/*
 	if (argc != 2)
 	{

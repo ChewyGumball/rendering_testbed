@@ -27,7 +27,6 @@ void main()
     color = texture(screenTexture, TexCoords);
 } 
 		)";
-
 	std::vector < Vertex > finalRenderMeshVertices = {
 		Vertex(glm::vec3(-1.0f,  1.0f, 0.0f), glm::vec2(0.0f, 1.0f)),
 		Vertex(glm::vec3(-1.0f, -1.0f, 0.0f), glm::vec2(0.0f, 0.0f)),
@@ -45,7 +44,10 @@ void main()
 }
 
 
-Renderer::Renderer(int width, int height) : finalRenderShader(finalRenderVertexSource, finalRenderFragmentSource), finalRenderMesh(finalRenderMeshVertices, finalRenderMeshIndicies)
+Renderer::Renderer(int width, int height) 
+	: finalRenderShader(finalRenderVertexSource, finalRenderFragmentSource), 
+	finalRenderMesh(VertexFormats::Position_Texture, Vertex::flatten(VertexFormats::Position_Texture, finalRenderMeshVertices),
+	finalRenderMeshIndicies)
 {
 	glGenFramebuffers(1, &frameBuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);

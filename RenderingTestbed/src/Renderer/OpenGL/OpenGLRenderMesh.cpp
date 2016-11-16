@@ -6,7 +6,7 @@ OpenGLRenderMesh::OpenGLRenderMesh()
 
 OpenGLRenderMesh::OpenGLRenderMesh(std::shared_ptr<const Mesh> mesh) : m_mesh(mesh)
 {
-	const std::vector<float> vertexData = mesh->rawVertexData();
+	const std::vector<float>& vertexData = mesh->rawVertexData();
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
@@ -15,31 +15,31 @@ OpenGLRenderMesh::OpenGLRenderMesh(std::shared_ptr<const Mesh> mesh) : m_mesh(me
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(float), vertexData.data(), GL_STATIC_DRAW);
 
-	const Vertex representativeVertex = mesh->vertex();
+	const VertexFormat format = mesh->vertexFormat();
 	int nextVertexAttribute = 0;
 
-	if (representativeVertex.hasPosition())
+	if (format.hasPosition())
 	{
 		glEnableVertexAttribArray(nextVertexAttribute);
-		glVertexAttribPointer(nextVertexAttribute++, 3, GL_FLOAT, GL_FALSE, representativeVertex.size(), (void*)representativeVertex.positionOffset());
+		glVertexAttribPointer(nextVertexAttribute++, 3, GL_FLOAT, GL_FALSE, format.size(), (void*)format.positionOffset());
 	}
 
-	if (representativeVertex.hasNormal())
+	if (format.hasNormal())
 	{
 		glEnableVertexAttribArray(nextVertexAttribute);
-		glVertexAttribPointer(nextVertexAttribute++, 3, GL_FLOAT, GL_FALSE, representativeVertex.size(), (void*)representativeVertex.normalOffset());
+		glVertexAttribPointer(nextVertexAttribute++, 3, GL_FLOAT, GL_FALSE, format.size(), (void*)format.normalOffset());
 	}
 
-	if (representativeVertex.hasTextureCoordinates())
+	if (format.hasTextureCoordinates())
 	{
 		glEnableVertexAttribArray(nextVertexAttribute);
-		glVertexAttribPointer(nextVertexAttribute++, 2, GL_FLOAT, GL_FALSE, representativeVertex.size(), (void*)representativeVertex.textureCoordinatesOffset());
+		glVertexAttribPointer(nextVertexAttribute++, 2, GL_FLOAT, GL_FALSE, format.size(), (void*)format.textureCoordinatesOffset());
 	}
 
-	if (representativeVertex.hasColour())
+	if (format.hasColour())
 	{
 		glEnableVertexAttribArray(nextVertexAttribute);
-		glVertexAttribPointer(nextVertexAttribute++, 4, GL_FLOAT, GL_FALSE, representativeVertex.size(), (void*)representativeVertex.colourOffset());
+		glVertexAttribPointer(nextVertexAttribute++, 4, GL_FLOAT, GL_FALSE, format.size(), (void*)format.colourOffset());
 	}
 
 	transformAttributeStart = nextVertexAttribute;

@@ -7,4 +7,5 @@
 namespace ModelLoader
 {
 	std::shared_ptr<Mesh> loadOBJFile(std::string filename);
+	std::shared_ptr<Mesh> loadBinFile(std::string filename);
 }

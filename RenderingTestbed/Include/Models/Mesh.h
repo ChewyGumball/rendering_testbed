@@ -5,16 +5,17 @@
 class Mesh
 {
 protected:
+	VertexFormat format;
 	std::size_t m_id;
-	std::vector<Vertex> vertices;
+	std::vector<float> m_vertices;
 	std::vector<int> indices;
 public:
-	Mesh(std::vector<Vertex> vertices, std::vector<int> indices);
+	Mesh(VertexFormat format, std::vector<float> vertexData, std::vector<int> indices);
 	~Mesh();
 
-	std::vector<float> rawVertexData() const;
+	const std::vector<float>& rawVertexData() const;
 	const std::vector<int>& indexData() const;
-	const Vertex vertex() const;
+	const VertexFormat vertexFormat() const;
 	std::size_t id() const;
 };
 

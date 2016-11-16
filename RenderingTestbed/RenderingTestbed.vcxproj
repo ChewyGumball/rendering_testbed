@@ -171,6 +171,7 @@
     <ClInclude Include="Include\Renderer\OpenGL\OpenGLRenderMesh.h" />
     <ClInclude Include="Include\Renderer\OpenGL\OpenGLShader.h" />
     <ClInclude Include="Include\Renderer\PointLight.h" />
+    <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Shaders\colour.frag" />
