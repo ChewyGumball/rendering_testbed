@@ -9,5 +9,7 @@ class TextureBuffer
 public:
 	TextureBuffer(int width, int height, GLenum format, GLenum internalFormat, void* data = nullptr);
 	~TextureBuffer();
+
+	GLuint id();
 };
 

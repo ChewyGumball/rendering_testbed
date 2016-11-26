@@ -16,3 +16,8 @@ TextureBuffer::TextureBuffer(int width, int height, GLenum format, GLenum intern
 TextureBuffer::~TextureBuffer()
 {
 }
+
+GLuint TextureBuffer::id()
+{
+	return handle;
+}

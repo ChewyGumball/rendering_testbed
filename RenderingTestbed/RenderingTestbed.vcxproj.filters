@@ -48,9 +48,6 @@
     <ClCompile Include="src\Util\StringUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\Renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Models\ModelInstance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -170,14 +167,13 @@
     <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcherWin32.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="main.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Shaders\colour.frag" />
     <None Include="src\Shaders\colour.vert" />
     <None Include="src\Shaders\normal.frag" />
     <None Include="src\Shaders\normal.vert" />
+    <None Include="src\Shaders\final.frag" />
+    <None Include="src\Shaders\final.vert" />
   </ItemGroup>
 </Project>

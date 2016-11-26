@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <unordered_set>
 
 #include <GL\glew.h>
 #include <glm\glm.hpp>
@@ -8,6 +9,7 @@ class Shader
 {
 
 protected:
+	mutable std::unordered_set<std::string> uniformErrors;
 	std::size_t m_id;
 	mutable GLuint programHandle;
 	std::string vertexFilename;

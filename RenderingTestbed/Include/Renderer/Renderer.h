@@ -1,30 +1,21 @@
 #pragma once
+#include <memory>
 #include <vector>
-#include <Renderer/LayerPass.h>
-#include <Renderer/ScreenSpacePass.h>
-#include <Models/Mesh.h>
+
+#include <Renderer\Camera.h>
+#include <Renderer\PointLight.h>
+#include <Models\ModelInstance.h>
 
 class Renderer
 {
-private:
-	Shader finalRenderShader;
-	Mesh finalRenderMesh;
-
-	GLuint colourBufferTexture;
-	GLuint depthBufferTexture;
-	GLuint frameBuffer;
-
-protected:
-	std::vector<LayerPass> layers;
-	std::vector<ScreenSpacePass> screenSpaceEffects;
 public:
-	Renderer(int width, int height);
-	~Renderer();
+	Renderer() {};
+	virtual ~Renderer() {};
+	virtual void draw(const Camera& c) = 0;
 
-	void resize(int width, int height);
+	virtual void addModelInstance(std::shared_ptr<const ModelInstance> modelInstance) = 0;
+	virtual void addPointLight(PointLight light) = 0;
 
-	void addLayer(LayerPass layer);
-	void addScreenSpacePass(ScreenSpacePass pass);
-	void draw();
+	virtual void removeModelInstance(std::shared_ptr<const ModelInstance> modelInstance) = 0;
 };
 

@@ -1,6 +1,7 @@
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 
 #include <utility>
+#include <algorithm>
 
 #include "Util/StringUtils.h"
 
@@ -8,6 +9,12 @@
 #include "Models/Model.h";
 #include "Models/Mesh.h";
 #include "Renderer/Camera.h";
+
+namespace {
+	std::unordered_map<std::size_t, OpenGLRenderMesh> meshes;
+	std::unordered_map<std::size_t, OpenGLShader> shaders;
+	std::unordered_map<std::size_t, OpenGLRenderModel> models;
+}
 
 void OpenGLRenderer::addLightUniforms(OpenGLShader & shader)
 {
@@ -42,7 +49,7 @@ void OpenGLRenderer::addModelInstance(std::shared_ptr<const ModelInstance> model
 
 	if (models.count(modelInstance->model()->id()) == 0)
 	{
-		models.emplace(modelInstance->model()->id(), OpenGLRenderModel(modelInstance->model()->mesh()->id(), modelInstance->model()->shader()->id()));
+		models.emplace(modelInstance->model()->id(), OpenGLRenderModel(modelInstance->model()->mesh()->id(), modelInstance->model()->shader()->id(), modelInstance->model()->textures()));
 	}
 
 	modelInstances[modelInstance->model()->id()].emplace_back(modelInstance);
@@ -52,6 +59,13 @@ void OpenGLRenderer::addModelInstance(std::shared_ptr<const ModelInstance> model
 void OpenGLRenderer::addPointLight(PointLight light)
 {
 	lights.push_back(light);
+}
+
+void OpenGLRenderer::removeModelInstance(std::shared_ptr<const ModelInstance> modelInstance)
+{
+	auto &instances = modelInstances[modelInstance->model()->id()];
+	instances.erase(std::remove(instances.begin(), instances.end(), modelInstance), instances.end());
+	buffersNeedingUpdates.insert(modelInstance->model()->id());
 }
 
 void OpenGLRenderer::draw(const Camera & c)
@@ -89,6 +103,7 @@ void OpenGLRenderer::draw(const Camera & c)
 		OpenGLRenderModel& model = models[instanceList.first];
 		OpenGLShader& shader = shaders[model.shaderID];
 		shader.bind();
+		model.bindTextures(shader);
 		shader.setUniformMatrix4f("view", c.transform());
 		shader.setUniformMatrix4f("projection", c.projection());
 		shader.setUniform3f("cameraPosition", c.position());

@@ -6,7 +6,7 @@
 
 #include <fstream>
 
-#include <Renderer\OpenGL\OpenGLRenderer.h>
+#include <Renderer\LayerPass.h>
 #include <Models\Model.h>
 #include <Models\ModelInstance.h>
 #include <Models\Mesh.h>
@@ -15,7 +15,6 @@
 
 #include <Util\FileUtils.h>
 #include <random>
-#include "main.h"
 
 int width = 800;
 int height = 800;
@@ -26,7 +25,7 @@ std::shared_ptr<Shader> colourShader()
 	return std::make_shared<Shader>(
 		Util::File::ReadWholeFile(R"(F:\Users\Ben\Documents\Projects\RenderingTestbed\RenderingTestbed\src\Shaders\colour.vert)"),
 		Util::File::ReadWholeFile(R"(F:\Users\Ben\Documents\Projects\RenderingTestbed\RenderingTestbed\src\Shaders\colour.frag)")
-		);
+	);
 }
 
 std::shared_ptr<Shader> phongShader()
@@ -35,7 +34,16 @@ std::shared_ptr<Shader> phongShader()
 		R"(F:\Users\Ben\Documents\Projects\RenderingTestbed\RenderingTestbed\src\Shaders\normal.vert)",
 		R"(F:\Users\Ben\Documents\Projects\RenderingTestbed\RenderingTestbed\src\Shaders\normal.frag)",
 		true
-		);
+	);
+}
+
+std::shared_ptr<Shader> finalScreenShader()
+{
+	return std::make_shared<Shader>(
+		R"(F:\Users\Ben\Documents\Projects\RenderingTestbed\RenderingTestbed\src\Shaders\final.vert)",
+		R"(F:\Users\Ben\Documents\Projects\RenderingTestbed\RenderingTestbed\src\Shaders\final.frag)",
+		true
+	);
 }
 
 std::shared_ptr<Mesh> buddha()
@@ -46,6 +54,11 @@ std::shared_ptr<Mesh> buddha()
 std::shared_ptr<Mesh> buddhaBin()
 {
 	return ModelLoader::loadBinFile(R"(F:\Users\Ben\Desktop\buddha.mbin)");
+}
+
+std::shared_ptr<Mesh> dragonBin()
+{
+	return ModelLoader::loadBinFile(R"(F:\Users\Ben\Desktop\dragon.mbin)");
 }
 
 std::shared_ptr<Mesh> cube()
@@ -86,6 +99,15 @@ std::vector<std::shared_ptr<ModelInstance>> makeBuddha()
 	return instances;
 }
 
+std::vector<std::shared_ptr<ModelInstance>> makeDragon()
+{
+	std::vector<std::shared_ptr<ModelInstance>> instances;
+	Model model(dragonBin(), phongShader());
+	instances.push_back(std::make_shared<ModelInstance>(model));
+
+	return instances;
+}
+
 std::vector<std::shared_ptr<ModelInstance>> makeCube()
 {
 	std::vector<std::shared_ptr<ModelInstance>> instances;
@@ -93,6 +115,26 @@ std::vector<std::shared_ptr<ModelInstance>> makeCube()
 	instances.push_back(std::make_shared<ModelInstance>(model));
 
 	return instances;
+}
+
+std::shared_ptr<ModelInstance> screenQuad(std::shared_ptr<TextureBuffer> buffer)
+{
+	std::vector<Vertex> vertices{
+		Vertex(glm::vec3(-1, -1, 0), glm::vec2(0, 0)),
+		Vertex(glm::vec3( 1, -1, 0), glm::vec2(1, 0)),
+		Vertex(glm::vec3( 1,  1, 0), glm::vec2(1, 1)),
+		Vertex(glm::vec3(-1,  1, 0), glm::vec2(0, 1))
+	};
+
+	std::vector<int> indices{
+		0, 1, 2,
+		0, 2, 3
+	};
+	std::shared_ptr<Mesh> m = std::make_shared<Mesh>(VertexFormats::Position_Texture, Vertex::flatten(VertexFormats::Position_Texture, vertices), indices);
+	Model quad(m, finalScreenShader());
+	quad.setTexture("screenTexture", buffer);
+
+	return std::make_shared<ModelInstance>(quad);
 }
 
 void convert(int argc, char* argv[])
@@ -162,17 +204,25 @@ int main(int argc, char *argv[])
 	glClearColor(0, 0, 0, 0);
 	glEnable(GL_DEPTH_TEST);
 
-	OpenGLRenderer renderer;
+	LayerPass pass1;
+	std::shared_ptr<TextureBuffer> colourBuffer = std::make_shared<TextureBuffer>(width, height, GL_RGB, GL_RGB8);
+	std::shared_ptr<TextureBuffer> depthBuffer = std::make_shared<TextureBuffer>(width, height, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT24);
+
+	pass1.setColourBuffer(colourBuffer);
+	pass1.setDepthBuffer(depthBuffer);
+
+	LayerPass finalPass;
+	finalPass.addModelInstance(screenQuad(colourBuffer));
 
 	//auto instances = makeLotsOfCubes();
-	auto instances = makeBuddha();
+	auto instances = makeDragon();
 	for (auto instance : instances)
 	{
-		renderer.addModelInstance(instance);
+		pass1.addModelInstance(instance);
 	}
 
-	renderer.addPointLight(PointLight(glm::vec3(1, 1, -1), glm::vec3(0.5, 0.2, 0.9)));
-	renderer.addPointLight(PointLight(glm::vec3(-1, 1, -1), glm::vec3(0, 0.4, 0.1)));
+	pass1.addPointLight(PointLight(glm::vec3(1, 1, -1), glm::vec3(0.5, 0.2, 0.9)));
+	pass1.addPointLight(PointLight(glm::vec3(-1, 1, -1), glm::vec3(0, 0.4, 0.1)));
 
 	Camera c(glm::vec3(1, 1, -1), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), 45.0, 1.0f);
 
@@ -190,8 +240,10 @@ int main(int argc, char *argv[])
 			//instance->rotate(glm::vec3(0, 1, 0), 0.3 * (currentTime - lastTime));
 		}
 		glfwPollEvents();
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		renderer.draw(c);
+		pass1.clearBuffers(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		pass1.draw(c);
+		finalPass.clearBuffers(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		finalPass.draw(c);
 		glfwSwapBuffers(window);
 		cumulative += currentTime - lastTime;
 		lastTime = currentTime;

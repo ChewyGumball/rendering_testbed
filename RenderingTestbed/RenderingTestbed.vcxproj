@@ -134,7 +134,6 @@
     <ClCompile Include="src\Renderer\LayerPass.cpp" />
     <ClCompile Include="src\Renderer\ScreenSpacePass.cpp" />
     <ClCompile Include="src\Models\ModelInstance.cpp" />
-    <ClCompile Include="src\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Models\ModelLoader.cpp" />
     <ClCompile Include="src\Util\FileUtils.cpp" />
     <ClCompile Include="main.cpp" />
@@ -171,11 +170,12 @@
     <ClInclude Include="Include\Renderer\OpenGL\OpenGLRenderMesh.h" />
     <ClInclude Include="Include\Renderer\OpenGL\OpenGLShader.h" />
     <ClInclude Include="Include\Renderer\PointLight.h" />
-    <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Shaders\colour.frag" />
     <None Include="src\Shaders\colour.vert" />
+    <None Include="src\Shaders\final.frag" />
+    <None Include="src\Shaders\final.vert" />
     <None Include="src\Shaders\normal.frag" />
     <None Include="src\Shaders\normal.vert" />
   </ItemGroup>

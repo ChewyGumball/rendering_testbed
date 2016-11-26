@@ -11,20 +11,18 @@
 #include "Models/Mesh.h"
 #include "Models/Model.h"
 
+#include <Renderer\Renderer.h>
 #include <Renderer/PointLight.h>
 
 class Camera;
 class ModelInstance;
 
-class OpenGLRenderer
+class OpenGLRenderer : public Renderer
 {
 private:
 	std::unordered_map<std::size_t, GLuint> transformsBuffers;
 	std::unordered_set<std::size_t> buffersNeedingUpdates;
 
-	std::unordered_map<std::size_t, OpenGLRenderMesh> meshes;
-	std::unordered_map<std::size_t, OpenGLShader> shaders;
-	std::unordered_map<std::size_t, OpenGLRenderModel> models;
 	std::unordered_map<std::size_t, std::vector<std::shared_ptr<const ModelInstance>>> modelInstances;
 
 	std::vector<PointLight> lights;
@@ -36,6 +34,9 @@ public:
 
 	void addModelInstance(std::shared_ptr<const ModelInstance> modelInstance);
 	void addPointLight(PointLight light);
+
+	void removeModelInstance(std::shared_ptr<const ModelInstance> modelInstance);
+	//void removePointLight(PointLight light);
 
 	void draw(const Camera& c);
 };
