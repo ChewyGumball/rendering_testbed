@@ -31,7 +31,7 @@ vec3 pointLightContribution(PointLight light, vec3 normal, vec3 position, vec3 v
 	vec3 specular = light.intensity * specularPower;
 
 	float attenuation = 1 / dot(toLight, toLight);
-
+	
 	return (diffuse + specular) * attenuation; 
 }
 
@@ -46,5 +46,5 @@ void main()
 		result += pointLightContribution(pointLights[i], norm, FragPos, viewDirection);
 	}
 
-	colour = vec4(result , 1.0); 
+	colour = vec4(result, 1.0); 
 }

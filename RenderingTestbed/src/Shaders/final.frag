@@ -13,8 +13,9 @@ float ss(float coord)
 void main()
 { 
 
-/*
 	vec4 c = texture(screenTexture, TexCoords);
+
+/*
 	if(TexCoords.x < 0.5)
 	{
 		c = vec4(1,1,1,1) - c;
@@ -40,7 +41,7 @@ void main()
 		color = texColour;
 	}
 	*/
-	
+/*	
 	vec4 c = texture(screenTexture, TexCoords);
 	if((mod(TexCoords.x, 0.03) < 0.001 || mod(TexCoords.y, 0.03) < 0.001) && c == vec4(0,0,0,1))
 	{
@@ -51,6 +52,6 @@ void main()
 		c = mix(vec4(1,1,1,1) - c, c, 0.85);
 		//c = vec4(1,1,1,1) - c;
 	}
-
+*/
 	color = c;
 }

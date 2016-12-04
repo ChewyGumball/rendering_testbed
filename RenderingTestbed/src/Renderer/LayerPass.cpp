@@ -69,4 +69,9 @@ void LayerPass::setDepthBuffer(std::shared_ptr<TextureBuffer> buffer)
 	setBuffer(framebuffer, GL_DEPTH_ATTACHMENT, buffer);
 }
 
+std::vector<std::shared_ptr<ModelInstance>> LayerPass::cull(const Camera& camera, std::vector<std::shared_ptr<ModelInstance>> instances)
+{
+	return renderer->cull(camera, instances);
+}
+
 

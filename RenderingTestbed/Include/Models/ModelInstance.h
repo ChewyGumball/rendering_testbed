@@ -6,10 +6,10 @@
 class ModelInstance
 {
 protected:
-	Model baseModel;
+	std::shared_ptr<Model> baseModel;
 	glm::mat4 transform;
 public:
-	ModelInstance(Model model);
+	ModelInstance(std::shared_ptr<Model> model);
 	~ModelInstance();
 
 	void rotate(glm::vec3 axis, float degrees);
@@ -18,5 +18,8 @@ public:
 
 	std::shared_ptr<const Model> model() const;
 	glm::mat4 transformMatrix() const;
+	Culling::BoundingSphere bounds() const;
+
+	uint64_t triangleCount() const;
 };
 

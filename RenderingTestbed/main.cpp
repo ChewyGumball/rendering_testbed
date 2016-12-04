@@ -68,7 +68,7 @@ std::shared_ptr<Mesh> cube()
 
 std::vector<std::shared_ptr<ModelInstance>> makeLotsOfCubes()
 {
-	Model model(cube(), colourShader());
+	std::shared_ptr<Model> model = std::make_shared<Model>(cube(), colourShader());
 
 	std::vector<std::shared_ptr<ModelInstance>> instances;
 
@@ -93,7 +93,7 @@ std::vector<std::shared_ptr<ModelInstance>> makeLotsOfCubes()
 std::vector<std::shared_ptr<ModelInstance>> makeBuddha()
 {
 	std::vector<std::shared_ptr<ModelInstance>> instances;
-	Model model(buddhaBin(), phongShader());
+	std::shared_ptr<Model> model = std::make_shared<Model>(buddhaBin(), phongShader());
 	instances.push_back(std::make_shared<ModelInstance>(model));
 
 	return instances;
@@ -102,8 +102,23 @@ std::vector<std::shared_ptr<ModelInstance>> makeBuddha()
 std::vector<std::shared_ptr<ModelInstance>> makeDragon()
 {
 	std::vector<std::shared_ptr<ModelInstance>> instances;
-	Model model(dragonBin(), phongShader());
-	instances.push_back(std::make_shared<ModelInstance>(model));
+	std::shared_ptr<Model> model = std::make_shared<Model>(dragonBin(), phongShader());
+	std::default_random_engine generator;
+	std::uniform_real_distribution<float> distribution(-5, 5);
+
+	for (int i = 0; i < 5; i++)
+	{
+		for (int j = 0; j < 5; j++)
+		{
+			std::shared_ptr<ModelInstance> instance = std::make_shared<ModelInstance>(model);
+			//instance->translate(glm::vec3(distribution(generator), distribution(generator), distribution(generator)));
+			instance->translate(glm::vec3(i * 2.5 - 0.5,j * 2.5  - 0.5, 5 + i));
+			instance->rotate(glm::vec3(1, 0, 0), distribution(generator));
+			instance->rotate(glm::vec3(0, 1, 0), distribution(generator));
+			instances.push_back(instance);
+		}
+	}
+	//instances.push_back(std::make_shared<ModelInstance>(model));
 
 	return instances;
 }
@@ -111,7 +126,7 @@ std::vector<std::shared_ptr<ModelInstance>> makeDragon()
 std::vector<std::shared_ptr<ModelInstance>> makeCube()
 {
 	std::vector<std::shared_ptr<ModelInstance>> instances;
-	Model model(cube(), phongShader());
+	std::shared_ptr<Model> model = std::make_shared<Model>(cube(), phongShader());
 	instances.push_back(std::make_shared<ModelInstance>(model));
 
 	return instances;
@@ -131,8 +146,8 @@ std::shared_ptr<ModelInstance> screenQuad(std::shared_ptr<TextureBuffer> buffer)
 		0, 2, 3
 	};
 	std::shared_ptr<Mesh> m = std::make_shared<Mesh>(VertexFormats::Position_Texture, Vertex::flatten(VertexFormats::Position_Texture, vertices), indices);
-	Model quad(m, finalScreenShader());
-	quad.setTexture("screenTexture", buffer);
+	std::shared_ptr<Model> quad = std::make_shared<Model>(m, finalScreenShader());
+	quad->setTexture("screenTexture", buffer);
 
 	return std::make_shared<ModelInstance>(quad);
 }
@@ -204,6 +219,9 @@ int main(int argc, char *argv[])
 	glClearColor(0, 0, 0, 0);
 	glEnable(GL_DEPTH_TEST);
 
+	//Camera c(glm::vec3(1, 1, -1), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), 45.0, 1.0f);
+	Camera c(glm::vec3(0,0,0), glm::vec3(0, 0, 1), glm::vec3(0, 1, 0), 45.0, 1.0f);
+
 	LayerPass pass1;
 	std::shared_ptr<TextureBuffer> colourBuffer = std::make_shared<TextureBuffer>(width, height, GL_RGB, GL_RGB8);
 	std::shared_ptr<TextureBuffer> depthBuffer = std::make_shared<TextureBuffer>(width, height, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT24);
@@ -215,24 +233,22 @@ int main(int argc, char *argv[])
 	finalPass.addModelInstance(screenQuad(colourBuffer));
 
 	//auto instances = makeLotsOfCubes();
-	auto instances = makeDragon();
+	auto instances = pass1.cull(c, makeDragon());
+	//auto instances = makeDragon();
 	for (auto instance : instances)
 	{
 		pass1.addModelInstance(instance);
 	}
 
-	pass1.addPointLight(PointLight(glm::vec3(1, 1, -1), glm::vec3(0.5, 0.2, 0.9)));
-	pass1.addPointLight(PointLight(glm::vec3(-1, 1, -1), glm::vec3(0, 0.4, 0.1)));
-
-	Camera c(glm::vec3(1, 1, -1), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), 45.0, 1.0f);
-
+	pass1.addPointLight(PointLight(glm::vec3(1, 1, 5), glm::vec3(0.5, 0.2, 0.9)));
+	pass1.addPointLight(PointLight(glm::vec3(-1, -1, 5), glm::vec3(0, 0.4, 0.1)));
+	
 	double lastTime = glfwGetTime();
 	double cumulative = 0;
 	int frames = 0;
 	while (!glfwWindowShouldClose(window))
 	{
 		double currentTime = glfwGetTime();
-		Util::File::MonitorFiles();
 		for (auto instance : instances)
 		{
 			instance->rotate(glm::vec3(0, 1, 0), 0.7 * (currentTime - lastTime));
@@ -250,7 +266,14 @@ int main(int argc, char *argv[])
 		frames++;
 		if (cumulative >= 1)
 		{
-			std::printf("%d frames\n", frames);
+			Util::File::MonitorFiles();
+			uint64_t tricount = 0;
+			for (auto instance : instances)
+			{
+				tricount += instance->triangleCount();
+			}
+
+			std::printf("%d frames, %d triangls\n", frames, tricount);
 			cumulative = 0;
 			frames = 0;
 		}

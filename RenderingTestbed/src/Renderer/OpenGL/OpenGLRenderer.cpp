@@ -5,10 +5,10 @@
 
 #include "Util/StringUtils.h"
 
-#include "Models/ModelInstance.h";
-#include "Models/Model.h";
-#include "Models/Mesh.h";
-#include "Renderer/Camera.h";
+#include "Models/ModelInstance.h"
+#include "Models/Model.h"
+#include "Models/Mesh.h"
+#include "Renderer/Camera.h"
 
 namespace {
 	std::unordered_map<std::size_t, OpenGLRenderMesh> meshes;
@@ -96,6 +96,7 @@ void OpenGLRenderer::draw(const Camera & c)
 		for (auto instance : instanceList.second)
 		{
 			transforms.push_back(instance->transformMatrix());
+			//transforms.push_back(glm::mat4(0));
 		}
 		glBindBuffer(GL_ARRAY_BUFFER, transformsBuffers[instanceList.first]);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, transforms.size() * sizeof(glm::mat4), transforms.data());

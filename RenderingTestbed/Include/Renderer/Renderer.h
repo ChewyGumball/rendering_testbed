@@ -17,5 +17,7 @@ public:
 	virtual void addPointLight(PointLight light) = 0;
 
 	virtual void removeModelInstance(std::shared_ptr<const ModelInstance> modelInstance) = 0;
+
+	std::vector<std::shared_ptr<ModelInstance>> cull(const Camera& camera, std::vector<std::shared_ptr<ModelInstance>> instances);
 };
 

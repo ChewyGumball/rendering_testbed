@@ -9,7 +9,6 @@ class Shader
 {
 
 protected:
-	mutable std::unordered_set<std::string> uniformErrors;
 	std::size_t m_id;
 	mutable GLuint programHandle;
 	std::string vertexFilename;

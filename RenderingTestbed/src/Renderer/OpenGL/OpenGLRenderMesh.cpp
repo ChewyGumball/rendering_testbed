@@ -66,6 +66,7 @@ void OpenGLRenderMesh::draw(int instanceCount) const
 	glBindVertexArray(0);
 }
 
+//Need to instance VAO so different models can bind their mesh transforms to different buffers
 void OpenGLRenderMesh::setupTransformAttributes() const
 {
 	glBindVertexArray(VAO);

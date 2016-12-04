@@ -25,5 +25,7 @@ public:
 
 	void setColourBuffer(std::shared_ptr<TextureBuffer> buffer);
 	void setDepthBuffer(std::shared_ptr<TextureBuffer> buffer);
+
+	std::vector<std::shared_ptr<ModelInstance>> cull(const Camera& camera, std::vector<std::shared_ptr<ModelInstance>> instances);
 };
 

@@ -16,6 +16,24 @@ namespace {
 		{GL_VERTEX_SHADER, "VERTEX"},
 		{GL_FRAGMENT_SHADER, "FRAGMENT"}
 	};
+	std::unordered_map<GLuint, std::unordered_set<std::string>> uniformErrors;
+	std::unordered_map<GLuint, std::unordered_map<std::string, GLuint>> uniformLocationCache;
+
+	GLuint uniformLocation(GLuint program, const std::string &uniformName)
+	{
+		if (uniformLocationCache[program].count(uniformName) == 0)
+		{
+			GLint location = glGetUniformLocation(program, uniformName.c_str());
+			if (location == -1 && uniformErrors[program].count(uniformName) == 0)
+			{
+				uniformErrors[program].insert(uniformName);
+				std::cout << "Could not find uniform '" << uniformName << "' in shader!" << std::endl;
+			}
+			uniformLocationCache[program][uniformName] = location;
+		}
+
+		return uniformLocationCache[program][uniformName];
+	}
 
 	GLuint compileShader(std::string& source, GLenum type)
 	{
@@ -101,70 +119,55 @@ Shader::~Shader()
 
 void Shader::setUniform1i(const std::string & uniformName, int data) const
 {
-	GLint location = glGetUniformLocation(programHandle, uniformName.c_str());
-	if (location == -1 && uniformErrors.count(uniformName) == 0)
+	GLint location = uniformLocation(programHandle, uniformName);
+	if (location != -1)
 	{
-		uniformErrors.insert(uniformName);
-		std::cout << "Could not find uniform '" << uniformName << "' in shader!" << std::endl;
-		return;
+		glUniform1i(location, data);
 	}
-	glUniform1i(location, data);
 }
 
 
 void Shader::setUniform2f(const std::string &uniformName, glm::vec2 data) const
 {
-	GLint location = glGetUniformLocation(programHandle, uniformName.c_str());
-	if (location == -1 && uniformErrors.count(uniformName) == 0)
+	GLint location = uniformLocation(programHandle, uniformName);
+	if (location != -1)
 	{
-		uniformErrors.insert(uniformName);
-		std::cout << "Could not find uniform '" << uniformName << "' in shader!" << std::endl;
-		return;
+		glUniform2fv(location, 1, glm::value_ptr(data));
 	}
-	glUniform2fv(location, 1, glm::value_ptr(data));
 }
 
 void Shader::setUniform3f(const std::string &uniformName, glm::vec3 data) const
 {
-	GLint location = glGetUniformLocation(programHandle, uniformName.c_str());
-	if (location == -1 && uniformErrors.count(uniformName) == 0)
+	GLint location = uniformLocation(programHandle, uniformName);
+	if (location != -1)
 	{
-		uniformErrors.insert(uniformName);
-		std::cout << "Could not find uniform '" << uniformName << "' in shader!" << std::endl;
-		return;
+		glUniform3fv(location, 1, glm::value_ptr(data));
 	}
-	glUniform3fv(location, 1, glm::value_ptr(data));
 }
 
 void Shader::setUniform4f(const std::string &uniformName, glm::vec4 data) const
 {
-	GLint location = glGetUniformLocation(programHandle, uniformName.c_str());
-	if (location == -1 && uniformErrors.count(uniformName) == 0)
+	GLint location = uniformLocation(programHandle, uniformName);
+	if (location != -1)
 	{
-		uniformErrors.insert(uniformName);
-		std::cout << "Could not find uniform '" << uniformName << "' in shader!" << std::endl;
-		return;
+		glUniform4fv(location, 1, glm::value_ptr(data));
 	}
-	glUniform4fv(location, 1, glm::value_ptr(data));
 }
 
 void Shader::setUniformMatrix4f(const std::string & uniformName, glm::mat4 data) const
 {
-	GLint location = glGetUniformLocation(programHandle, uniformName.c_str());
-	if (location == -1 && uniformErrors.count(uniformName) == 0)
+	GLint location = uniformLocation(programHandle, uniformName);
+	if (location != -1)
 	{
-		uniformErrors.insert(uniformName);
-		std::cout << "Could not find uniform '" << uniformName << "' in shader!" << std::endl;
-		return;
+		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(data));
 	}
-	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(data));
 }
 
 void Shader::bind() const
 {
 	if (needsToReload)
 	{
-		uniformErrors.clear();
+		uniformErrors[programHandle].clear();
 		programHandle = createProgram(Util::File::ReadWholeFile(vertexFilename), Util::File::ReadWholeFile(fragmentFilename));
 		needsToReload = false;
 	}

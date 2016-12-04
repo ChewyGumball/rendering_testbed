@@ -36,3 +36,8 @@ const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> Model::tex
 {
 	return m_textures;
 }
+
+uint64_t Model::triangleCount() const
+{
+	return m_mesh->triangleCount();
+}

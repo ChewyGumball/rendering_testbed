@@ -25,5 +25,7 @@ public:
 	std::shared_ptr<const Mesh> mesh() const;
 	std::shared_ptr<const Shader> shader() const;
 	const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures() const;
+
+	uint64_t triangleCount() const;
 };
 

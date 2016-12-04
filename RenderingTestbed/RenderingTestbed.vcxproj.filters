@@ -93,6 +93,18 @@
     <ClCompile Include="src\lib\SimpleFileWatcher\FileWatcherWin32.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Culling\Plane.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Include\Culling\BoundingSphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Culling\Frustum.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Models\Model.h">
@@ -167,6 +179,15 @@
     <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcherWin32.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Culling\BoundingSphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Culling\Plane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Culling\Frustum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Shaders\colour.frag" />
@@ -175,5 +196,7 @@
     <None Include="src\Shaders\normal.vert" />
     <None Include="src\Shaders\final.frag" />
     <None Include="src\Shaders\final.vert" />
+    <None Include="sample_render_graph.json" />
+    <None Include="sample_scene_definition.json" />
   </ItemGroup>
 </Project>
