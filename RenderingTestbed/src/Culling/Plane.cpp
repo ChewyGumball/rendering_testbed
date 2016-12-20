@@ -2,11 +2,8 @@
 
 namespace Culling {
 
-	Plane::Plane(glm::vec4 equation)
-	{
-		float length = glm::length(glm::vec3(equation));
-		coefficients = glm::vec4(-glm::vec3(equation) / length, equation.w / length);
-	}
+	Plane::Plane(glm::vec4 equation) : coefficients(equation / glm::length(glm::vec3(equation)))
+	{ }
 
 
 	Plane::~Plane()

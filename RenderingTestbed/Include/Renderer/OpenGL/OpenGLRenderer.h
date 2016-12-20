@@ -20,12 +20,15 @@ class ModelInstance;
 class OpenGLRenderer : public Renderer
 {
 private:
+
 	std::unordered_map<std::size_t, GLuint> transformsBuffers;
 	std::unordered_set<std::size_t> buffersNeedingUpdates;
 
-	std::unordered_map<std::size_t, std::vector<std::shared_ptr<const ModelInstance>>> modelInstances;
+	std::vector<std::shared_ptr<const ModelInstance>> modelInstances;
 
 	std::vector<PointLight> lights;
+
+	glm::mat4 previouslyCulledCameraMatrix;
 
 	void addLightUniforms(OpenGLShader& shader);
 public:
@@ -38,6 +41,6 @@ public:
 	void removeModelInstance(std::shared_ptr<const ModelInstance> modelInstance);
 	//void removePointLight(PointLight light);
 
-	void draw(const Camera& c);
+	void draw(const Camera& c, bool doFrustrumCulling);
 };
 

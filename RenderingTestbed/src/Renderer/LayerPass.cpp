@@ -31,10 +31,10 @@ LayerPass::~LayerPass()
 	delete renderer;
 }
 
-void LayerPass::draw(const Camera & c)
+void LayerPass::draw(const Camera & c, bool doFrustumCulling)
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-	renderer->draw(c);
+	renderer->draw(c, doFrustumCulling);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -69,9 +69,9 @@ void LayerPass::setDepthBuffer(std::shared_ptr<TextureBuffer> buffer)
 	setBuffer(framebuffer, GL_DEPTH_ATTACHMENT, buffer);
 }
 
-std::vector<std::shared_ptr<ModelInstance>> LayerPass::cull(const Camera& camera, std::vector<std::shared_ptr<ModelInstance>> instances)
+long LayerPass::trianglesDrawn() const
 {
-	return renderer->cull(camera, instances);
+	return renderer->trianglesDrawn;
 }
 
 

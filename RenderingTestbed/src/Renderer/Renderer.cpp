@@ -2,9 +2,9 @@
 
 #include "Culling/Frustum.h"
 
-std::vector<std::shared_ptr<ModelInstance>> Renderer::cull(const Camera & camera, std::vector<std::shared_ptr<ModelInstance>> instances)
+std::unordered_map<size_t, std::vector<std::shared_ptr<const ModelInstance>>> Renderer::cull(const Camera & camera, std::vector<std::shared_ptr<const ModelInstance>> instances)
 {
-	Culling::Frustum frustum(camera.transform() * camera.projection());
+	Culling::Frustum frustum(camera.projection() * camera.transform());
 	std::vector<glm::vec3> centers(instances.size());
 	std::vector<float> radii(instances.size());
 
@@ -17,13 +17,13 @@ std::vector<std::shared_ptr<ModelInstance>> Renderer::cull(const Camera & camera
 
 	std::vector<bool> intersections = frustum.intersects(centers, radii);
 
-	std::vector<std::shared_ptr<ModelInstance>> visibleModels;
+	std::unordered_map<size_t, std::vector<std::shared_ptr<const ModelInstance>>> visibleModels;
 
 	for (size_t i = 0; i < instances.size(); ++i)
 	{
 		if (intersections[i])
 		{
-			visibleModels.push_back(instances[i]);
+			visibleModels[instances[i]->model()->id()].push_back(instances[i]);
 		}
 	}
 

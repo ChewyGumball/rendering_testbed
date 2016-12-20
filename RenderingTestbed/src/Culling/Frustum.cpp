@@ -4,12 +4,12 @@
 
 namespace Culling {
 	Frustum::Frustum(glm::mat4 transform): planes({
-		Plane(glm::row(transform, 3) + glm::row(transform, 0)), //left
-		Plane(glm::row(transform, 3) - glm::row(transform, 0)), //right
-		Plane(glm::row(transform, 3) + glm::row(transform, 1)), //bottom
-		Plane(glm::row(transform, 3) - glm::row(transform, 1)), //top
-		Plane(glm::row(transform, 3) + glm::row(transform, 2)), //near
-		Plane(glm::row(transform, 3) - glm::row(transform, 2))  //far
+		Plane(glm::row(transform, 3) - glm::row(transform, 0)), //left
+		Plane(glm::row(transform, 3) + glm::row(transform, 0)), //right
+		Plane(glm::row(transform, 3) - glm::row(transform, 1)), //bottom
+		Plane(glm::row(transform, 3) + glm::row(transform, 1)), //top
+		Plane(glm::row(transform, 3) - glm::row(transform, 2)), //near
+		Plane(glm::row(transform, 3) + glm::row(transform, 2))  //far
 	})
 	{}
 
@@ -25,7 +25,7 @@ namespace Culling {
 			for (size_t j = 0; j < distances.size(); ++j)
 			{
 				bool a = intersections[j];
-				intersections[j] = a & (distances[j] >= -radii[j]);
+				intersections[j] = a & (distances[j] > -radii[j]);
 			}
 		}
 

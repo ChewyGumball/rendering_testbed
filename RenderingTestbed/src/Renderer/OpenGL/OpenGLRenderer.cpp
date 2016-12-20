@@ -52,8 +52,7 @@ void OpenGLRenderer::addModelInstance(std::shared_ptr<const ModelInstance> model
 		models.emplace(modelInstance->model()->id(), OpenGLRenderModel(modelInstance->model()->mesh()->id(), modelInstance->model()->shader()->id(), modelInstance->model()->textures()));
 	}
 
-	modelInstances[modelInstance->model()->id()].emplace_back(modelInstance);
-	buffersNeedingUpdates.insert(modelInstance->model()->id());
+	modelInstances.emplace_back(modelInstance);
 }
 
 void OpenGLRenderer::addPointLight(PointLight light)
@@ -63,42 +62,51 @@ void OpenGLRenderer::addPointLight(PointLight light)
 
 void OpenGLRenderer::removeModelInstance(std::shared_ptr<const ModelInstance> modelInstance)
 {
-	auto &instances = modelInstances[modelInstance->model()->id()];
-	instances.erase(std::remove(instances.begin(), instances.end(), modelInstance), instances.end());
-	buffersNeedingUpdates.insert(modelInstance->model()->id());
+	modelInstances.erase(std::remove(modelInstances.begin(), modelInstances.end(), modelInstance), modelInstances.end());
 }
 
-void OpenGLRenderer::draw(const Camera & c)
+void OpenGLRenderer::draw(const Camera & c, bool doFrustrumCulling)
 {
-	//remake any buffers that need to be resized
-	for (auto s : buffersNeedingUpdates)
+	trianglesDrawn = 0;
+	std::unordered_map<size_t, std::vector<std::shared_ptr<const ModelInstance>>> culledInstances;
+	if (doFrustrumCulling)
 	{
-		GLuint buffer;
-		if (transformsBuffers.count(s) != 0)
+		culledInstances = cull(c, modelInstances);
+	}
+	else
+	{
+		for (size_t i = 0; i < modelInstances.size(); ++i)
 		{
-			buffer = transformsBuffers[s];
+			culledInstances[modelInstances[i]->model()->id()].push_back(modelInstances[i]);
+		}
+	}
+
+	for (auto instanceList : culledInstances)
+	{
+		//remake any buffers that need to be resized
+		GLuint buffer;
+		if (transformsBuffers.count(instanceList.first) == 0)
+		{
+			glGenBuffers(1, &buffer);
+			transformsBuffers[instanceList.first] = buffer;
+			glBindBuffer(GL_ARRAY_BUFFER, buffer);
+			meshes[instanceList.second[0]->model()->mesh()->id()].setupTransformAttributes();
+		}
+		else
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, transformsBuffers[instanceList.first]);
 		}
 
-		glGenBuffers(1, &buffer);
-		transformsBuffers[s] = buffer;
+		glBufferData(GL_ARRAY_BUFFER, instanceList.second.size() * sizeof(glm::mat4), nullptr, GL_STATIC_DRAW);
 
-		glBindBuffer(GL_ARRAY_BUFFER, buffer);
-		glBufferData(GL_ARRAY_BUFFER, modelInstances[s].size() * sizeof(glm::mat4), nullptr, GL_STATIC_DRAW);
-
-		meshes[s].setupTransformAttributes();
-	}
-	buffersNeedingUpdates.clear();
-
-	//update transform data and draw models
-	for (auto instanceList : modelInstances)
-	{
+		//update transform data and draw models
 		std::vector<glm::mat4> transforms;
 		for (auto instance : instanceList.second)
 		{
 			transforms.push_back(instance->transformMatrix());
 			//transforms.push_back(glm::mat4(0));
+			trianglesDrawn += instance->triangleCount();
 		}
-		glBindBuffer(GL_ARRAY_BUFFER, transformsBuffers[instanceList.first]);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, transforms.size() * sizeof(glm::mat4), transforms.data());
 
 		OpenGLRenderModel& model = models[instanceList.first];

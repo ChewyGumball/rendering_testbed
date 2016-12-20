@@ -14,7 +14,7 @@ public:
 	LayerPass();
 	~LayerPass();
 
-	void draw(const Camera & c);
+	void draw(const Camera & c, bool doFrustumCulling = true);
 
 	void addModelInstance(std::shared_ptr<const ModelInstance> modelInstance);
 	void addPointLight(PointLight light);
@@ -26,6 +26,6 @@ public:
 	void setColourBuffer(std::shared_ptr<TextureBuffer> buffer);
 	void setDepthBuffer(std::shared_ptr<TextureBuffer> buffer);
 
-	std::vector<std::shared_ptr<ModelInstance>> cull(const Camera& camera, std::vector<std::shared_ptr<ModelInstance>> instances);
+	long trianglesDrawn() const;
 };
 

@@ -14,12 +14,20 @@ Camera::~Camera()
 {
 }
 
+void Camera::move(glm::vec3 displacement)
+{
+	m_transform = glm::translate(displacement) * m_transform;
+	m_position += displacement;
+}
+
+
+
 glm::vec3 Camera::position() const
 {
 	return m_position;
 }
 
-glm::mat4 Camera::transform() const
+const glm::mat4& Camera::transform() const
 {
 	return m_transform;
 }
@@ -29,7 +37,7 @@ glm::mat4 Camera::inverseTransform() const
 	return glm::transpose(m_transform);
 }
 
-glm::mat4 Camera::projection() const
+const glm::mat4& Camera::projection() const
 {
 	return m_projection;
 }
