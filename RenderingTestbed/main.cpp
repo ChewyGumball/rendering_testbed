@@ -68,7 +68,7 @@ std::shared_ptr<Mesh> cube()
 
 std::vector<std::shared_ptr<ModelInstance>> makeLotsOfCubes()
 {
-	std::shared_ptr<Model> model = std::make_shared<Model>(cube(), colourShader());
+	std::shared_ptr<Model> model = std::make_shared<Model>(cube(), phongShader());
 
 	std::vector<std::shared_ptr<ModelInstance>> instances;
 
@@ -80,7 +80,7 @@ std::vector<std::shared_ptr<ModelInstance>> makeLotsOfCubes()
 		for (int j = 0; j < 30; j++)
 		{
 			std::shared_ptr<ModelInstance> instance = std::make_shared<ModelInstance>(model);
-			instance->translate(glm::vec3(distribution(generator), distribution(generator), distribution(generator)));
+			instance->translate(glm::vec3(distribution(generator), distribution(generator), 5 + distribution(generator)));
 			instance->rotate(glm::vec3(1, 0, 0), distribution(generator));
 			instance->rotate(glm::vec3(0, 1, 0), distribution(generator));
 			instances.push_back(instance);
@@ -112,7 +112,7 @@ std::vector<std::shared_ptr<ModelInstance>> makeDragon()
 		{
 			std::shared_ptr<ModelInstance> instance = std::make_shared<ModelInstance>(model);
 			//instance->translate(glm::vec3(distribution(generator), distribution(generator), distribution(generator)));
-			instance->translate(glm::vec3(i * 2.5 - 0.5,j * 2.5  - 0.5, 5 + i));
+			instance->translate(glm::vec3(i * 2.5 - 0.5,j * 2.5  - 0.5, 5));
 			instance->rotate(glm::vec3(1, 0, 0), distribution(generator));
 			instance->rotate(glm::vec3(0, 1, 0), distribution(generator));
 			instances.push_back(instance);
@@ -218,6 +218,7 @@ int main(int argc, char *argv[])
 	glfwSwapInterval(1);
 	glClearColor(0, 0, 0, 0);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
 
 	//Camera c(glm::vec3(1, 1, -1), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), 45.0, 1.0f);
 	Camera c(glm::vec3(0,0,0), glm::vec3(0, 0, 1), glm::vec3(0, 1, 0), 45.0, 1.0f);
@@ -234,7 +235,6 @@ int main(int argc, char *argv[])
 
 	//auto instances = makeLotsOfCubes();
 	auto instances = makeDragon();
-	//auto instances = makeDragon();
 	for (auto instance : instances)
 	{
 		pass1.addModelInstance(instance);
@@ -246,6 +246,9 @@ int main(int argc, char *argv[])
 	double lastTime = glfwGetTime();
 	double cumulative = 0;
 	int frames = 0;
+
+	double mouseX, mouseY;
+	glfwGetCursorPos(window, &mouseX, &mouseY);
 	while (!glfwWindowShouldClose(window))
 	{
 		double currentTime = glfwGetTime();
@@ -259,19 +262,33 @@ int main(int argc, char *argv[])
 
 		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 		{
-			c.move(glm::vec3(-0.1, 0, 0));
+			c.move(0.1f * c.right());
 		}
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		{
-			c.move(glm::vec3(0.1, 0, 0));
+			c.move(-0.1f * c.right());
 		}
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		{
-			c.move(glm::vec3(0, 0.1, 0));
+			c.move(0.1f * c.forward());
 		}
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 		{
-			c.move(glm::vec3(0, -0.1, 0));
+			c.move(-0.1f * c.forward());
+		}
+
+		double newMouseX, newMouseY;
+		glfwGetCursorPos(window, &newMouseX, &newMouseY);
+
+		if (newMouseX != mouseX)
+		{
+			c.rotateLocal(c.up(), (newMouseX - mouseX) * 0.01);
+			mouseX = newMouseX;
+		}
+		if (newMouseY != mouseY)
+		{
+			c.rotateLocal(c.right(), (newMouseY - mouseY) * -0.01);
+			mouseY = newMouseY;
 		}
 
 
