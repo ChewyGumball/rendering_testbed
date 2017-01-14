@@ -36,7 +36,7 @@ glm::vec3 Camera::position() const
 	return m_position;
 }
 
-const glm::mat4& Camera::transform() const
+const glm::mat4 Camera::transform() const
 {
 	return glm::lookAt(m_position, m_position + m_forward, m_up);
 }

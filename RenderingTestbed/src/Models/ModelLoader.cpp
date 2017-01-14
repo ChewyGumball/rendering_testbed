@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <fstream>
 #include <iostream>
 
@@ -29,6 +30,64 @@ namespace {
 	FbxIOSettings *ios = FbxIOSettings::Create(lSdkManager, IOSROOT);
 
 
+	Vertex makeFBXVertex(int polygonIndex, int vertexIndex, FbxVector4* controlPoints, FbxMesh* mesh, glm::mat4& transform)
+	{
+		FbxVector4 vertex = controlPoints[mesh->GetPolygonVertex(polygonIndex, vertexIndex)];
+		FbxVector4 normal;
+		mesh->GetPolygonVertexNormal(polygonIndex, vertexIndex, normal);
+
+		return Vertex(glm::vec3(transform * glm::vec4(vertex[0], vertex[1], vertex[2], 1.0)), glm::vec3(normal[0], normal[1], normal[2]));
+	}
+
+	glm::mat4 FBXMatrixToGLM(FbxAMatrix& matrix)
+	{
+		glm::dvec4 c0 = glm::make_vec4((double*)matrix.GetRow(0).Buffer());
+		glm::dvec4 c1 = glm::make_vec4((double*)matrix.GetRow(1).Buffer());
+		glm::dvec4 c2 = glm::make_vec4((double*)matrix.GetRow(2).Buffer());
+		glm::dvec4 c3 = glm::make_vec4((double*)matrix.GetRow(3).Buffer());
+		return glm::mat4(c0, c1, c2, c3);
+	}
+
+	void loadFBXMeshFromNode(FbxNode* node, std::vector<int>& indices, std::vector<Vertex>& vertices)
+	{
+		FbxNodeAttribute* attribute = node->GetNodeAttribute();
+		int vertexCount = static_cast<int>(vertices.size());
+		if (attribute && attribute->GetAttributeType() == FbxNodeAttribute::eMesh)
+		{
+			glm::mat4 transform = FBXMatrixToGLM(node->EvaluateGlobalTransform(0));
+			FbxMesh* mesh = node->GetMesh(); 
+			FbxVector4* controlPoints = mesh->GetControlPoints();
+
+			int polycount = mesh->GetPolygonCount();
+
+			for (int i = 0; i < polycount; i++)
+			{
+				switch (mesh->GetPolygonSize(i))
+				{
+					case 4:
+						indices.push_back(vertexCount++);
+						vertices.push_back(makeFBXVertex(i, 0, controlPoints, mesh, transform));
+						indices.push_back(vertexCount++);
+						vertices.push_back(makeFBXVertex(i, 2, controlPoints, mesh, transform));
+						indices.push_back(vertexCount++);
+						vertices.push_back(makeFBXVertex(i, 3, controlPoints, mesh, transform));
+					case 3:
+						indices.push_back(vertexCount++);
+						vertices.push_back(makeFBXVertex(i, 0, controlPoints, mesh, transform));
+						indices.push_back(vertexCount++);
+						vertices.push_back(makeFBXVertex(i, 1, controlPoints, mesh, transform));
+						indices.push_back(vertexCount++);
+						vertices.push_back(makeFBXVertex(i, 2, controlPoints, mesh, transform));
+				}
+			}
+		}
+
+		int childrenCount = node->GetChildCount();
+		for (int i = 0; i < childrenCount; ++i)
+		{
+			loadFBXMeshFromNode(node->GetChild(i), indices, vertices);
+		}
+	}
 }
 
 
@@ -43,6 +102,7 @@ namespace ModelLoader
 
 		std::vector<int> indices;
 		std::vector<Vertex> vertices;
+		int vertexCount = 0;
 		VertexFormat format(0);
 		Util::File::ProcessLines(filename, [&](const std::string& line)
 		{
@@ -61,9 +121,9 @@ namespace ModelLoader
 			}
 			else if (elements[0] == "f")
 			{
-				indices.push_back(vertices.size());
-				indices.push_back(vertices.size() + 1);
-				indices.push_back(vertices.size() + 2);
+				indices.push_back(vertexCount++);
+				indices.push_back(vertexCount++);
+				indices.push_back(vertexCount++);
 
 				for (int i = 1; i < 4; ++i)
 				{
@@ -141,6 +201,7 @@ namespace ModelLoader
 		file.close();
 		return std::make_shared<Mesh>(VertexFormat(format), vertices, indices);
 	}
+
 	std::shared_ptr<Mesh> loadFBXFile(std::string filename)
 	{
 		lSdkManager->SetIOSettings(ios);
@@ -155,6 +216,7 @@ namespace ModelLoader
 		// Create a new scene so that it can be populated by the imported file.
 		FbxScene* lScene = FbxScene::Create(lSdkManager, "myScene");
 
+
 		// Import the contents of the file into the scene.
 		lImporter->Import(lScene);
 
@@ -162,73 +224,13 @@ namespace ModelLoader
 		lImporter->Destroy();
 
 		FbxNode* root = lScene->GetRootNode();
-		int childrenCount = root->GetChildCount();
 
 		std::vector<int> indices;
 		std::vector<Vertex> vertices;
 		VertexFormat format(VertexFormats::Position_Normal);
-		int vertexOffset = 0;
 
-		for (int i = 0; i < childrenCount; i++)
-		{
-			FbxNode* n = root->GetChild(i);
-			const char* name = n->GetName();
-			FbxMesh* m = n->GetMesh();
+		loadFBXMeshFromNode(root, indices, vertices);
 
-			int vertCount = m->GetControlPointsCount();
-			FbxVector4* controlPoints = m->GetControlPoints();
-			FbxArray<FbxVector4> normals;
-			m->GetPolygonVertexNormals(normals);
-
-			int* modelIndices = m->GetPolygonVertices();
-			int indexCount = m->GetPolygonVertexCount();
-			int polycount = m->GetPolygonCount();
-
-			for (int i = 0; i < polycount; i++)
-			{
-				int vertexCount = m->GetPolygonSize(i);
-				if (vertexCount == 3)
-				{
-					for (int offset = 0; offset < 3; offset++)
-					{
-						FbxVector4 vertex = controlPoints[m->GetPolygonVertex(i, offset)];
-						FbxVector4 normal;
-						m->GetPolygonVertexNormal(i, offset, normal);
-
-						indices.push_back(vertices.size());
-						vertices.emplace_back(glm::vec3(vertex[0], vertex[1], vertex[2]), glm::vec3(normal[0], normal[1], normal[2]));
-					}
-				}
-				else if (vertexCount == 4)
-				{
-					for (int offset = 0; offset < 3; offset++)
-					{
-						FbxVector4 vertex = controlPoints[m->GetPolygonVertex(i, offset)];
-						FbxVector4 normal;
-						m->GetPolygonVertexNormal(i, offset, normal);
-
-						indices.push_back(vertices.size());
-						vertices.emplace_back(glm::vec3(vertex[0], vertex[1], vertex[2]), glm::vec3(normal[0], normal[1], normal[2]));
-					}
-
-					for (int offset = 0; offset < 4; offset++)
-					{
-						if (offset != 1)
-						{
-							FbxVector4 vertex = controlPoints[m->GetPolygonVertex(i, offset)];
-							FbxVector4 normal;
-							m->GetPolygonVertexNormal(i, offset, normal);
-
-							indices.push_back(vertices.size());
-							vertices.emplace_back(glm::vec3(vertex[0], vertex[1], vertex[2]), glm::vec3(normal[0], normal[1], normal[2]));
-						}
-					}
-				}
-			}
-
-			return std::make_shared<Mesh>(format, Vertex::flatten(format, vertices), indices);
-		}
-
-		return nullptr;
+		return std::make_shared<Mesh>(format, Vertex::flatten(format, vertices), indices);
 	}
 }

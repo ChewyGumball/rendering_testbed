@@ -10,7 +10,7 @@
 class Renderer
 {
 public:
-	long trianglesDrawn;
+	uint64_t trianglesDrawn;
 	Renderer() {};
 	virtual ~Renderer() {};
 	virtual void draw(const Camera& c, bool doFrustrumCulling) = 0;

@@ -71,7 +71,6 @@ namespace Util::File
 		auto start = file.begin();
 		auto end = file.begin();
 		auto actualEnd = file.end();
-		long size = file.size();
 
 		while (end != actualEnd)
 		{

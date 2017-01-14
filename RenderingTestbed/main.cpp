@@ -67,7 +67,8 @@ std::shared_ptr<Mesh> cube()
 }
 std::shared_ptr<Mesh> fbx()
 {
-	return ModelLoader::loadFBXFile(R"(F:\Users\Ben\Documents\Projects\New Unity Project\Assets\Art\World\Wall\Wall_Tower.fbx)");
+	//return ModelLoader::loadFBXFile(R"(F:\Users\Ben\Documents\Projects\New Unity Project\Assets\Art\World\Wall\Wall_Tower.fbx)");
+	return ModelLoader::loadFBXFile(R"(F:\Users\Ben\Documents\Projects\New Unity Project\Assets\Art\World\Wall\Wall_Prefab_02.fbx)");
 }
 
 std::vector<std::shared_ptr<ModelInstance>> makeLotsOfCubes()
@@ -234,7 +235,7 @@ int main(int argc, char *argv[])
 	glEnable(GL_CULL_FACE);
 
 	//Camera c(glm::vec3(1, 1, -1), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), 45.0, 1.0f);
-	Camera c(glm::vec3(0,0,0), glm::vec3(0, 0, 1), glm::vec3(0, 1, 0), 45.0, 1.0f);
+	Camera c(glm::vec3(-1500,0,0), glm::vec3(0, 0, 1), glm::vec3(0, 1, 0), 45.0, 1.0f);
 
 	LayerPass pass1;
 	std::shared_ptr<TextureBuffer> colourBuffer = std::make_shared<TextureBuffer>(width, height, GL_RGB, GL_RGB8);
@@ -246,16 +247,16 @@ int main(int argc, char *argv[])
 	LayerPass finalPass;
 	finalPass.addModelInstance(screenQuad(colourBuffer));
 
-	auto instances = makeLotsOfCubes();
+	//auto instances = makeLotsOfCubes();
 	//auto instances = makeDragon();
-	//auto instances = makeFBX();
+	auto instances = makeFBX();
 	for (auto instance : instances)
 	{
 		pass1.addModelInstance(instance);
 	}
 
-	pass1.addPointLight(PointLight(glm::vec3(15, 20, 7), glm::vec3(0.5, 0.2, 0.9), 5));
-	pass1.addPointLight(PointLight(glm::vec3(-1, -1, 6), glm::vec3(0, 0.4, 0.1), 5));
+	pass1.addPointLight(PointLight(glm::vec3(15, 20, 7), glm::vec3(0.5, 0.2, 0.9), 10000));
+	pass1.addPointLight(PointLight(glm::vec3(-1, -1, 6), glm::vec3(0, 0.4, 0.1), 10000));
 	
 	double lastTime = glfwGetTime();
 	double cumulative = 0;
@@ -268,7 +269,7 @@ int main(int argc, char *argv[])
 		double currentTime = glfwGetTime();
 		for (auto instance : instances)
 		{
-			instance->rotate(glm::vec3(0, 1, 0), 0.7 * (currentTime - lastTime));
+			instance->rotate(glm::vec3(0.0f, 1.0f, 0.0f), 0.7f * static_cast<float>(currentTime - lastTime));
 			//instance->rotate(glm::vec3(1, 1, 0), 1 * (currentTime - lastTime));
 			//instance->rotate(glm::vec3(0, 1, 0), 0.3 * (currentTime - lastTime));
 		}
@@ -276,19 +277,19 @@ int main(int argc, char *argv[])
 
 		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 		{
-			c.move(0.1f * c.right());
+			c.move(0.1f * c.right() * 100.f);
 		}
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		{
-			c.move(-0.1f * c.right());
+			c.move(-0.1f * c.right()* 100.f);
 		}
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		{
-			c.move(0.1f * c.forward());
+			c.move(0.1f * c.forward()* 100.f);
 		}
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 		{
-			c.move(-0.1f * c.forward());
+			c.move(-0.1f * c.forward()* 100.f);
 		}
 
 		double newMouseX, newMouseY;
@@ -298,11 +299,11 @@ int main(int argc, char *argv[])
 		{
 			if (newMouseX != mouseX)
 			{
-				c.rotateLocal(c.up(), (newMouseX - mouseX) * 0.01);
+				c.rotateLocal(c.up(), static_cast<float>(newMouseX - mouseX) * 0.01f);
 			}
 			if (newMouseY != mouseY)
 			{
-				c.rotateLocal(c.right(), (newMouseY - mouseY) * -0.01);
+				c.rotateLocal(c.right(), static_cast<float>(newMouseY - mouseY) * -0.01f);
 			}
 		}
 		mouseY = newMouseY;
@@ -323,7 +324,7 @@ int main(int argc, char *argv[])
 			Util::File::MonitorFiles();
 			uint64_t tricount = pass1.trianglesDrawn();
 
-			std::printf("%d frames, %d triangls\n", frames, tricount);
+			std::printf("%d frames, %I64d triangls\n", frames, tricount);
 			cumulative = 0;
 			frames = 0;
 		}

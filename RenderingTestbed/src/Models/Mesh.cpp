@@ -36,7 +36,7 @@ const std::vector<float>& Mesh::rawVertexData() const
 	return m_vertices;
 }
 
-const const std::vector<int>& Mesh::indexData() const
+const std::vector<int>& Mesh::indexData() const
 {
 	return indices;
 }

@@ -10,7 +10,6 @@ namespace Util::String
 		auto start = string.begin();
 		auto end = string.begin();
 		auto actualEnd = string.end();
-		long size = string.size();
 
 		while (end != actualEnd)
 		{

@@ -69,7 +69,7 @@ void LayerPass::setDepthBuffer(std::shared_ptr<TextureBuffer> buffer)
 	setBuffer(framebuffer, GL_DEPTH_ATTACHMENT, buffer);
 }
 
-long LayerPass::trianglesDrawn() const
+uint64_t LayerPass::trianglesDrawn() const
 {
 	return renderer->trianglesDrawn;
 }

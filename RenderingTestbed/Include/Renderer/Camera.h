@@ -17,7 +17,7 @@ public:
 	void rotateLocal(glm::vec3 axis, float degrees);
 
 	glm::vec3 position() const;
-	const glm::mat4& transform() const;
+	const glm::mat4 transform() const;
 	glm::mat4 inverseTransform() const;
 	const glm::mat4& projection() const;
 	const glm::vec3& right() const;

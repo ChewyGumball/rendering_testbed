@@ -4,13 +4,8 @@
 
 std::unordered_map<size_t, std::vector<std::shared_ptr<const ModelInstance>>> Renderer::cull(const Camera & camera, std::vector<std::shared_ptr<const ModelInstance>> instances)
 {
-	glm::mat4 t = camera.transform();
-	glm::mat4 p = camera.projection();
-	glm::mat4 c = p * t;
-	Culling::Frustum frustum(c);
-	
-	//I don't know why, but in debug mode, this inline multiplication doesn't compute properly
-	//Culling::Frustum frustum(camera.projection() * camera.transform());
+	Culling::Frustum frustum(camera.projection() * camera.transform());
+
 	std::vector<glm::vec3> centers(instances.size());
 	std::vector<float> radii(instances.size());
 

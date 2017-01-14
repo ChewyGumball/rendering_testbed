@@ -26,6 +26,6 @@ public:
 	void setColourBuffer(std::shared_ptr<TextureBuffer> buffer);
 	void setDepthBuffer(std::shared_ptr<TextureBuffer> buffer);
 
-	long trianglesDrawn() const;
+	uint64_t trianglesDrawn() const;
 };
 
