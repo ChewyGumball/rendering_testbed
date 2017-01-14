@@ -4,6 +4,7 @@ const int MAX_LIGHTS = 2;
 struct PointLight {
 	vec3 position;
 	vec3 intensity;
+	float power;
 };
 uniform PointLight pointLights[MAX_LIGHTS];
 
@@ -31,8 +32,8 @@ vec3 pointLightContribution(PointLight light, vec3 normal, vec3 position, vec3 v
 	vec3 specular = light.intensity * specularPower;
 
 	float attenuation = 1 / dot(toLight, toLight);
-	
-	return (diffuse + specular) * attenuation; 
+
+	return (diffuse + specular) * clamp(light.power * attenuation, 0, 1); 
 }
 
 void main()

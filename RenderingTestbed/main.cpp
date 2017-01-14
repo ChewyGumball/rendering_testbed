@@ -65,6 +65,10 @@ std::shared_ptr<Mesh> cube()
 {
 	return ModelLoader::loadOBJFile(R"(F:\Users\Ben\Desktop\cube.obj)");
 }
+std::shared_ptr<Mesh> fbx()
+{
+	return ModelLoader::loadFBXFile(R"(F:\Users\Ben\Documents\Projects\New Unity Project\Assets\Art\World\Wall\Wall_Tower.fbx)");
+}
 
 std::vector<std::shared_ptr<ModelInstance>> makeLotsOfCubes()
 {
@@ -94,6 +98,15 @@ std::vector<std::shared_ptr<ModelInstance>> makeBuddha()
 {
 	std::vector<std::shared_ptr<ModelInstance>> instances;
 	std::shared_ptr<Model> model = std::make_shared<Model>(buddhaBin(), phongShader());
+	instances.push_back(std::make_shared<ModelInstance>(model));
+
+	return instances;
+}
+
+std::vector<std::shared_ptr<ModelInstance>> makeFBX()
+{
+	std::vector<std::shared_ptr<ModelInstance>> instances;
+	std::shared_ptr<Model> model = std::make_shared<Model>(fbx(), phongShader());
 	instances.push_back(std::make_shared<ModelInstance>(model));
 
 	return instances;
@@ -233,15 +246,16 @@ int main(int argc, char *argv[])
 	LayerPass finalPass;
 	finalPass.addModelInstance(screenQuad(colourBuffer));
 
-	//auto instances = makeLotsOfCubes();
-	auto instances = makeDragon();
+	auto instances = makeLotsOfCubes();
+	//auto instances = makeDragon();
+	//auto instances = makeFBX();
 	for (auto instance : instances)
 	{
 		pass1.addModelInstance(instance);
 	}
 
-	pass1.addPointLight(PointLight(glm::vec3(1, 1, 5), glm::vec3(0.5, 0.2, 0.9)));
-	pass1.addPointLight(PointLight(glm::vec3(-1, -1, 5), glm::vec3(0, 0.4, 0.1)));
+	pass1.addPointLight(PointLight(glm::vec3(15, 20, 7), glm::vec3(0.5, 0.2, 0.9), 5));
+	pass1.addPointLight(PointLight(glm::vec3(-1, -1, 6), glm::vec3(0, 0.4, 0.1), 5));
 	
 	double lastTime = glfwGetTime();
 	double cumulative = 0;
@@ -280,16 +294,19 @@ int main(int argc, char *argv[])
 		double newMouseX, newMouseY;
 		glfwGetCursorPos(window, &newMouseX, &newMouseY);
 
-		if (newMouseX != mouseX)
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2))
 		{
-			c.rotateLocal(c.up(), (newMouseX - mouseX) * 0.01);
-			mouseX = newMouseX;
+			if (newMouseX != mouseX)
+			{
+				c.rotateLocal(c.up(), (newMouseX - mouseX) * 0.01);
+			}
+			if (newMouseY != mouseY)
+			{
+				c.rotateLocal(c.right(), (newMouseY - mouseY) * -0.01);
+			}
 		}
-		if (newMouseY != mouseY)
-		{
-			c.rotateLocal(c.right(), (newMouseY - mouseY) * -0.01);
-			mouseY = newMouseY;
-		}
+		mouseY = newMouseY;
+		mouseX = newMouseX;
 
 
 

@@ -1,4 +1,5 @@
 #pragma once
+#include <ostream>
 #include<vector>
 #include <glm/glm.hpp>
 
@@ -62,5 +63,7 @@ public:
 	void append(VertexFormat format, std::vector<float>& data) const;
 
 	static std::vector<float> flatten(VertexFormat format, std::vector<Vertex> vertices);
+
+	friend std::ostream& operator<< (std::ostream& stream, const Vertex& obj);
 };
 

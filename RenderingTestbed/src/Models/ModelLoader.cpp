@@ -5,6 +5,8 @@
 #include <fstream>
 #include <iostream>
 
+#include <fbxsdk.h>
+
 #include "Util/FileUtils.h"
 #include "Util/StringUtils.h"
 
@@ -22,6 +24,11 @@ namespace {
 			return objs[index];
 		}
 	}
+
+	FbxManager* lSdkManager = FbxManager::Create();
+	FbxIOSettings *ios = FbxIOSettings::Create(lSdkManager, IOSROOT);
+
+
 }
 
 
@@ -110,7 +117,7 @@ namespace ModelLoader
 			}
 		});
 
-		return std::make_shared<Mesh>(format, Vertex::flatten(format,vertices), indices);
+		return std::make_shared<Mesh>(format, Vertex::flatten(format, vertices), indices);
 	}
 	std::shared_ptr<Mesh> loadBinFile(std::string filename)
 	{
@@ -132,6 +139,96 @@ namespace ModelLoader
 
 		file.read(reinterpret_cast<char*>(indices.data()), indexCount * sizeof(int32_t));
 		file.close();
-		return std::make_shared<Mesh>(VertexFormat(format),vertices, indices);
+		return std::make_shared<Mesh>(VertexFormat(format), vertices, indices);
+	}
+	std::shared_ptr<Mesh> loadFBXFile(std::string filename)
+	{
+		lSdkManager->SetIOSettings(ios);
+		FbxImporter* lImporter = FbxImporter::Create(lSdkManager, "");
+		// Use the first argument as the filename for the importer.
+		if (!lImporter->Initialize(filename.c_str(), -1, lSdkManager->GetIOSettings())) {
+			printf("Call to FbxImporter::Initialize() failed.\n");
+			printf("Error returned: %s\n\n", lImporter->GetStatus().GetErrorString());
+			return nullptr;
+		}
+
+		// Create a new scene so that it can be populated by the imported file.
+		FbxScene* lScene = FbxScene::Create(lSdkManager, "myScene");
+
+		// Import the contents of the file into the scene.
+		lImporter->Import(lScene);
+
+		// The file is imported, so get rid of the importer.
+		lImporter->Destroy();
+
+		FbxNode* root = lScene->GetRootNode();
+		int childrenCount = root->GetChildCount();
+
+		std::vector<int> indices;
+		std::vector<Vertex> vertices;
+		VertexFormat format(VertexFormats::Position_Normal);
+		int vertexOffset = 0;
+
+		for (int i = 0; i < childrenCount; i++)
+		{
+			FbxNode* n = root->GetChild(i);
+			const char* name = n->GetName();
+			FbxMesh* m = n->GetMesh();
+
+			int vertCount = m->GetControlPointsCount();
+			FbxVector4* controlPoints = m->GetControlPoints();
+			FbxArray<FbxVector4> normals;
+			m->GetPolygonVertexNormals(normals);
+
+			int* modelIndices = m->GetPolygonVertices();
+			int indexCount = m->GetPolygonVertexCount();
+			int polycount = m->GetPolygonCount();
+
+			for (int i = 0; i < polycount; i++)
+			{
+				int vertexCount = m->GetPolygonSize(i);
+				if (vertexCount == 3)
+				{
+					for (int offset = 0; offset < 3; offset++)
+					{
+						FbxVector4 vertex = controlPoints[m->GetPolygonVertex(i, offset)];
+						FbxVector4 normal;
+						m->GetPolygonVertexNormal(i, offset, normal);
+
+						indices.push_back(vertices.size());
+						vertices.emplace_back(glm::vec3(vertex[0], vertex[1], vertex[2]), glm::vec3(normal[0], normal[1], normal[2]));
+					}
+				}
+				else if (vertexCount == 4)
+				{
+					for (int offset = 0; offset < 3; offset++)
+					{
+						FbxVector4 vertex = controlPoints[m->GetPolygonVertex(i, offset)];
+						FbxVector4 normal;
+						m->GetPolygonVertexNormal(i, offset, normal);
+
+						indices.push_back(vertices.size());
+						vertices.emplace_back(glm::vec3(vertex[0], vertex[1], vertex[2]), glm::vec3(normal[0], normal[1], normal[2]));
+					}
+
+					for (int offset = 0; offset < 4; offset++)
+					{
+						if (offset != 1)
+						{
+							FbxVector4 vertex = controlPoints[m->GetPolygonVertex(i, offset)];
+							FbxVector4 normal;
+							m->GetPolygonVertexNormal(i, offset, normal);
+
+							indices.push_back(vertices.size());
+							vertices.emplace_back(glm::vec3(vertex[0], vertex[1], vertex[2]), glm::vec3(normal[0], normal[1], normal[2]));
+						}
+					}
+				}
+			}
+
+			return std::make_shared<Mesh>(format, Vertex::flatten(format, vertices), indices);
+		}
+
+		return nullptr;
 	}
 }

@@ -25,6 +25,7 @@ public:
 
 	void setUniform1i(const std::string & uniformName, int data) const;
 
+	void setUniform1f(const std::string & uniformName, float data) const;
 	void setUniform2f(const std::string & uniformName, glm::vec2 data) const;
 	void setUniform3f(const std::string & uniformName, glm::vec3 data) const;
 	void setUniform4f(const std::string & uniformName, glm::vec4 data) const;

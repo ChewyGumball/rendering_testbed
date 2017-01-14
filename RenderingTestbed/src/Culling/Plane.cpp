@@ -1,4 +1,5 @@
 #include "Culling/Plane.h"
+#include <iostream>
 
 namespace Culling {
 
@@ -19,5 +20,10 @@ namespace Culling {
 		}
 
 		return distances;
+	}
+
+	void Plane::print()
+	{
+		std::cout << "[" << coefficients.x << "," << coefficients.y << "," << coefficients.z << "," << coefficients.w << "]" << std::endl;
 	}
 }

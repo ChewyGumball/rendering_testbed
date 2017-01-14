@@ -6,7 +6,7 @@ PointLight::PointLight()
 {
 }
 
-PointLight::PointLight(glm::vec3 position, glm::vec3 intensity):m_position(position), m_intensities(intensity)
+PointLight::PointLight(glm::vec3 position, glm::vec3 intensity, float power):m_position(position), m_intensities(intensity), m_power(power)
 {
 }
 
@@ -23,4 +23,9 @@ glm::vec3 PointLight::position() const
 glm::vec3 PointLight::intensity() const
 {
 	return m_intensities;
+}
+
+float PointLight::power() const
+{
+	return m_power;
 }

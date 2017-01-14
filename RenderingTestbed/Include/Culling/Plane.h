@@ -11,6 +11,7 @@ namespace Culling {
 		~Plane();
 
 		std::vector<float> signedDistances(std::vector<glm::vec3> points);
+		void print();
 	};
 }
 

@@ -23,6 +23,7 @@ void OpenGLRenderer::addLightUniforms(OpenGLShader & shader)
 		PointLight& light = lights[i];
 		shader.setUniform3f(Util::String::Format("pointLights[%d].position", i), light.position());
 		shader.setUniform3f(Util::String::Format("pointLights[%d].intensity", i), light.intensity());
+		shader.setUniform1f(Util::String::Format("pointLights[%d].power", i), light.power());
 	}
 }
 

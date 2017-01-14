@@ -24,6 +24,11 @@ void OpenGLShader::setUniform1i(const std::string uniformName, int data) const
 	m_shader->setUniform1i(uniformName, data);
 }
 
+void OpenGLShader::setUniform1f(const std::string uniformName, float data) const
+{
+	m_shader->setUniform1f(uniformName, data);
+}
+
 void OpenGLShader::setUniform2f(const std::string uniformName, glm::vec2 data) const
 {
 	m_shader->setUniform2f(uniformName, data);

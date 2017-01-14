@@ -1,4 +1,5 @@
 #include "Models/Vertex.h"
+#include <glm\gtx\io.hpp>
 
 Vertex::~Vertex()
 {
@@ -44,6 +45,12 @@ std::vector<float> Vertex::flatten(VertexFormat format, std::vector<Vertex> vert
 	}
 
 	return flattened;
+}
+
+std::ostream & operator<<(std::ostream & stream, const Vertex& obj)
+{
+	stream << obj.position;
+	return stream;
 }
 
 Vertex::Vertex(const glm::vec3& position): position(position)

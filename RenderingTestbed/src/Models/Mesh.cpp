@@ -8,12 +8,13 @@ namespace {
 	std::size_t nextID = 0;
 	Culling::BoundingSphere calculateBoundingSphere(VertexFormat& format, std::vector<float>& verts)
 	{
+		float infinity = std::numeric_limits<float>::infinity();
 		glm::vec3 max(std::numeric_limits<float>::min(), std::numeric_limits<float>::min(), std::numeric_limits<float>::min());
 		glm::vec3 min(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
 		for (int i = format.positionOffset(); i < verts.size(); i += format.size())
 		{
 			glm::vec3 vertex(verts[i], verts[i + 1], verts[i + 2]);
-
+			if (vertex.x == -infinity || vertex.y == -infinity || vertex.z == -infinity) continue;
 			max = glm::max(max, vertex);
 			min = glm::min(min, vertex);
 		}
