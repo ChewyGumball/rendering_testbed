@@ -6,18 +6,18 @@
 class OpenGLRenderMesh
 {
 protected:
-	int transformAttributeStart;
-	GLuint VAO, VBO, EBO;
-	std::shared_ptr<const Mesh> m_mesh;
+	int m_indexCount;
+	VertexFormat m_format;
+	GLuint m_vbo, m_ebo;
 public:
 	OpenGLRenderMesh();
 	OpenGLRenderMesh(std::shared_ptr<const Mesh> mesh);
 	~OpenGLRenderMesh();
 
-	std::shared_ptr<const Mesh> mesh() const;
+	GLuint vbo() const;
+	GLuint ebo() const;
+	int indexCount() const;
+	VertexFormat vertexFormat() const;
 
-	void draw(int instanceCount) const;
-
-	void setupTransformAttributes() const;
 };
 

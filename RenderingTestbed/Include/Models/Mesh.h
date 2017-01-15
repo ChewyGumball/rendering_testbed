@@ -15,7 +15,7 @@ public:
 	Mesh(VertexFormat format, std::vector<float> vertexData, std::vector<int> indices);
 	~Mesh();
 
-	const std::vector<float>& rawVertexData() const;
+	const std::vector<float>& vertexData() const;
 	const std::vector<int>& indexData() const;
 	const VertexFormat vertexFormat() const;
 	std::size_t id() const;

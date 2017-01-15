@@ -7,14 +7,23 @@
 
 class OpenGLRenderModel
 {
+private:
+	GLuint vao, m_transformVBO;
 public:
-	const std::size_t meshID;
+	int indexCount;
+
 	const std::size_t shaderID;
 	const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures;
 
 	OpenGLRenderModel();
-	OpenGLRenderModel(std::size_t meshID, std::size_t shaderID, const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures);
+	OpenGLRenderModel(const OpenGLRenderMesh& mesh, std::size_t shaderID, const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures);
 	~OpenGLRenderModel();
+
+	void reload(std::shared_ptr<OpenGLRenderMesh> mesh, std::size_t shaderID);
+
+	void draw(int instanceCount) const;
+
+	GLuint transformVBO() const;
 
 	void bindTextures(const OpenGLShader& shader) const;
 };

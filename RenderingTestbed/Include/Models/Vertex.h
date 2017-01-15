@@ -32,6 +32,7 @@ public:
 	char formatData() const;
 };
 namespace VertexFormats {
+	static const VertexFormat Empty(0);
 	static const VertexFormat Position(VertexAttributes::Position);
 	static const VertexFormat Position_Normal(VertexAttributes::Position | VertexAttributes::Normal);
 	static const VertexFormat Position_Texture(VertexAttributes::Position | VertexAttributes::Texture);

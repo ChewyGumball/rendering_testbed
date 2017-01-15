@@ -50,7 +50,7 @@ void OpenGLRenderer::addModelInstance(std::shared_ptr<const ModelInstance> model
 
 	if (models.count(modelInstance->model()->id()) == 0)
 	{
-		models.emplace(modelInstance->model()->id(), OpenGLRenderModel(modelInstance->model()->mesh()->id(), modelInstance->model()->shader()->id(), modelInstance->model()->textures()));
+		models.emplace(modelInstance->model()->id(), OpenGLRenderModel(meshes[modelInstance->model()->mesh()->id()], modelInstance->model()->shader()->id(), modelInstance->model()->textures()));
 	}
 
 	modelInstances.emplace_back(modelInstance);
@@ -84,22 +84,7 @@ void OpenGLRenderer::draw(const Camera & c, bool doFrustrumCulling)
 
 	for (auto instanceList : culledInstances)
 	{
-		//remake any buffers that need to be resized
-		GLuint buffer;
-		if (transformsBuffers.count(instanceList.first) == 0)
-		{
-			glGenBuffers(1, &buffer);
-			transformsBuffers[instanceList.first] = buffer;
-			glBindBuffer(GL_ARRAY_BUFFER, buffer);
-			meshes[instanceList.second[0]->model()->mesh()->id()].setupTransformAttributes();
-		}
-		else
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, transformsBuffers[instanceList.first]);
-		}
-
-		glBufferData(GL_ARRAY_BUFFER, instanceList.second.size() * sizeof(glm::mat4), nullptr, GL_STATIC_DRAW);
-
+		OpenGLRenderModel& model = models[instanceList.first];
 		//update transform data and draw models
 		std::vector<glm::mat4> transforms;
 		for (auto instance : instanceList.second)
@@ -108,9 +93,8 @@ void OpenGLRenderer::draw(const Camera & c, bool doFrustrumCulling)
 			//transforms.push_back(glm::mat4(0));
 			trianglesDrawn += instance->triangleCount();
 		}
-		glBufferSubData(GL_ARRAY_BUFFER, 0, transforms.size() * sizeof(glm::mat4), transforms.data());
+		glNamedBufferData(model.transformVBO(), transforms.size() * sizeof(glm::mat4), transforms.data(), GL_STATIC_DRAW);
 
-		OpenGLRenderModel& model = models[instanceList.first];
 		OpenGLShader& shader = shaders[model.shaderID];
 		shader.bind();
 		model.bindTextures(shader);
@@ -118,6 +102,6 @@ void OpenGLRenderer::draw(const Camera & c, bool doFrustrumCulling)
 		shader.setUniformMatrix4f("projection", c.projection());
 		shader.setUniform3f("cameraPosition", c.position());
 		addLightUniforms(shader);
-		meshes[model.meshID].draw(instanceList.second.size());
+		model.draw(transforms.size());
 	}
 }

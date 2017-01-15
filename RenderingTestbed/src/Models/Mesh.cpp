@@ -31,7 +31,7 @@ Mesh::~Mesh()
 {
 }
 
-const std::vector<float>& Mesh::rawVertexData() const
+const std::vector<float>& Mesh::vertexData() const
 {
 	return m_vertices;
 }

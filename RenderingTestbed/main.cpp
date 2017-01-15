@@ -37,6 +37,15 @@ std::shared_ptr<Shader> phongShader()
 	);
 }
 
+std::shared_ptr<Shader> inversePhongShader()
+{
+	return std::make_shared<Shader>(
+		R"(F:\Users\Ben\Documents\Projects\RenderingTestbed\RenderingTestbed\src\Shaders\normal.vert)",
+		R"(F:\Users\Ben\Documents\Projects\RenderingTestbed\RenderingTestbed\src\Shaders\normal - Copy.frag)",
+		true
+		);
+}
+
 std::shared_ptr<Shader> finalScreenShader()
 {
 	return std::make_shared<Shader>(
@@ -145,6 +154,24 @@ std::vector<std::shared_ptr<ModelInstance>> makeCube()
 
 	return instances;
 }
+std::vector<std::shared_ptr<ModelInstance>> makeInverseCube()
+{
+	std::vector<std::shared_ptr<ModelInstance>> instances;
+	std::shared_ptr<Mesh> mesh = cube();
+	std::shared_ptr<Model> model = std::make_shared<Model>(mesh, inversePhongShader());
+	std::shared_ptr<Model> model2 = std::make_shared<Model>(mesh, phongShader());
+
+	auto normal = std::make_shared<ModelInstance>(model2);
+	auto inverse = std::make_shared<ModelInstance>(model);
+
+	normal->translate(glm::vec3(1, 0, 0));
+	inverse->translate(glm::vec3(-1, 0, 0));
+
+	instances.push_back(normal);
+	instances.push_back(inverse);
+
+	return instances;
+}
 
 std::shared_ptr<ModelInstance> screenQuad(std::shared_ptr<TextureBuffer> buffer)
 {
@@ -174,7 +201,7 @@ void convert(int argc, char* argv[])
 	std::shared_ptr<Mesh> mesh = ModelLoader::loadOBJFile(filename);
 	std::ofstream convertedFile(argv[3], std::ios::out | std::ios::binary);
 
-	std::vector<float> vertices = mesh->rawVertexData();
+	std::vector<float> vertices = mesh->vertexData();
 	std::vector<int> indices = mesh->indexData();
 
 	int64_t vertexCount = vertices.size();
@@ -234,8 +261,8 @@ int main(int argc, char *argv[])
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
-	//Camera c(glm::vec3(1, 1, -1), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), 45.0, 1.0f);
-	Camera c(glm::vec3(-1500,0,0), glm::vec3(0, 0, 1), glm::vec3(0, 1, 0), 45.0, 1.0f);
+	Camera c(glm::vec3(1, 1, -1), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), 45.0, 1.0f);
+	//Camera c(glm::vec3(-1500,0,0), glm::vec3(0, 0, 1), glm::vec3(0, 1, 0), 45.0, 1.0f);
 
 	LayerPass pass1;
 	std::shared_ptr<TextureBuffer> colourBuffer = std::make_shared<TextureBuffer>(width, height, GL_RGB, GL_RGB8);
@@ -248,15 +275,16 @@ int main(int argc, char *argv[])
 	finalPass.addModelInstance(screenQuad(colourBuffer));
 
 	//auto instances = makeLotsOfCubes();
-	//auto instances = makeDragon();
-	auto instances = makeFBX();
+	//auto instances = makeDragon(); 
+	auto instances = makeInverseCube();
+	//auto instances = makeFBX();
 	for (auto instance : instances)
 	{
 		pass1.addModelInstance(instance);
 	}
 
-	pass1.addPointLight(PointLight(glm::vec3(15, 20, 7), glm::vec3(0.5, 0.2, 0.9), 10000));
-	pass1.addPointLight(PointLight(glm::vec3(-1, -1, 6), glm::vec3(0, 0.4, 0.1), 10000));
+	pass1.addPointLight(PointLight(glm::vec3(15, 20, 7), glm::vec3(0.5, 0.2, 0.9)));
+	pass1.addPointLight(PointLight(glm::vec3(-0.5, -2, 0), glm::vec3(0, 0.4, 0.1)));
 	
 	double lastTime = glfwGetTime();
 	double cumulative = 0;
@@ -277,19 +305,19 @@ int main(int argc, char *argv[])
 
 		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 		{
-			c.move(0.1f * c.right() * 100.f);
+			c.move(0.1f * c.right());
 		}
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		{
-			c.move(-0.1f * c.right()* 100.f);
+			c.move(-0.1f * c.right());
 		}
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		{
-			c.move(0.1f * c.forward()* 100.f);
+			c.move(0.1f * c.forward());
 		}
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 		{
-			c.move(-0.1f * c.forward()* 100.f);
+			c.move(-0.1f * c.forward());
 		}
 
 		double newMouseX, newMouseY;
