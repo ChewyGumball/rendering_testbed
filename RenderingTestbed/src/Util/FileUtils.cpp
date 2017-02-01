@@ -1,6 +1,7 @@
 #include "Util/FileUtils.h"
 #include "Util/StringUtils.h"
 
+#include <algorithm>
 #include <fstream>
 #include <sstream>
 
@@ -22,12 +23,23 @@ namespace {
 		{}
 		void handleFileAction(FW::WatchID watchID, const FW::String& directory, const FW::String& filename, FW::Action action)
 		{
-			std::string fullPath = directory + "\\" + filename;
-			if (action == FW::Action::Modified && watchers.count(fullPath) > 0)
+			if (action == FW::Action::Modified)
 			{
-				for (auto observer : watchers[fullPath])
+				std::string fullPath = directory + "\\" + filename;
+				if (watchers.count(fullPath) > 0)
 				{
-					observer();
+					for (auto observer : watchers[fullPath])
+					{
+						observer();
+					}
+				}
+				fullPath = directory + "/" + filename;
+				if (watchers.count(fullPath) > 0)
+				{
+					for (auto observer : watchers[fullPath])
+					{
+						observer();
+					}
 				}
 			}
 		}

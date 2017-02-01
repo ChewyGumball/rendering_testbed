@@ -5,7 +5,11 @@
 
 
 
-Camera::Camera(glm::vec3 position, glm::vec3 target, glm::vec3 up, float fov, float aspectRatio) 
+Camera::Camera() :m_position(glm::vec3(0,0,0)), m_forward(glm::vec3(1,0,0)), m_up(glm::vec3(0,0,1)), m_right(glm::vec3(0,1,0)), m_projection(glm::perspective(45.0f, 1.0f, 0.1f, 10000.0f))
+{
+}
+
+Camera::Camera(glm::vec3 position, glm::vec3 target, glm::vec3 up, float fov, float aspectRatio)
 	: m_position(position), 
 	m_forward(glm::normalize(target - position)), 
 	m_up(up), 

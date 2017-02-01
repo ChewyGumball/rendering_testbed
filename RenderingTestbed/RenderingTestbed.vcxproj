@@ -137,6 +137,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Include\Culling\BoundingSphere.cpp" />
+    <ClCompile Include="src\Scene\Scene.cpp" />
+    <ClCompile Include="src\Scene\SceneLoader.cpp" />
     <ClCompile Include="src\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Culling\Frustum.cpp" />
     <ClCompile Include="src\Culling\Plane.cpp" />
@@ -150,7 +152,7 @@
     <ClCompile Include="src\Renderer\OpenGL\OpenGLRenderMesh.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\OpenGLRenderModel.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\OpenGLRenderer.cpp" />
-    <ClCompile Include="src\Renderer\LayerPass.cpp" />
+    <ClCompile Include="src\Renderer\RenderPass.cpp" />
     <ClCompile Include="src\Renderer\ScreenSpacePass.cpp" />
     <ClCompile Include="src\Models\ModelInstance.cpp" />
     <ClCompile Include="src\Models\ModelLoader.cpp" />
@@ -218,7 +220,7 @@
     <ClInclude Include="Include\Renderer\Renderer.h" />
     <ClInclude Include="Include\Models\ModelInstance.h" />
     <ClInclude Include="Include\Renderer\ScreenSpacePass.h" />
-    <ClInclude Include="Include\Renderer\LayerPass.h" />
+    <ClInclude Include="Include\Renderer\RenderPass.h" />
     <ClInclude Include="Include\Renderer\TextureBuffer.h" />
     <ClInclude Include="Include\Models\Vertex.h" />
     <ClInclude Include="Include\Renderer\OpenGL\OpenGLRenderer.h" />
@@ -227,10 +229,13 @@
     <ClInclude Include="Include\Renderer\OpenGL\OpenGLShader.h" />
     <ClInclude Include="Include\Renderer\PointLight.h" />
     <ClInclude Include="Include\Culling\Plane.h" />
+    <ClInclude Include="Include\Scene\Scene.h" />
+    <ClInclude Include="Include\Scene\SceneLoader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="sample_render_graph.json" />
     <None Include="sample_scene_definition.json" />
+    <None Include="scenes\test_scene.json" />
     <None Include="src\Shaders\colour.frag" />
     <None Include="src\Shaders\colour.vert" />
     <None Include="src\Shaders\final.frag" />

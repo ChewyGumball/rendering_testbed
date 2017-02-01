@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <thread>
+#include <algorithm>
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -56,41 +57,70 @@ namespace {
 		return shader;
 	}
 
-	GLuint createProgram(std::string& vertexSource, std::string& fragmentSource)
+	GLuint createProgram(std::vector<std::string> vertexSources, std::vector<std::string> fragmentSources)
 	{
-		GLuint vertexProgram = compileShader(vertexSource, GL_VERTEX_SHADER);
-		GLuint fragmentProgram = compileShader(fragmentSource, GL_FRAGMENT_SHADER);
-
-		if (vertexProgram != 0 && fragmentProgram != 0)
+		GLuint program = glCreateProgram();
+		for (std::string source : vertexSources)
 		{
-			GLuint program = glCreateProgram();
-			glAttachShader(program, vertexProgram);
-			glAttachShader(program, fragmentProgram);
-			glLinkProgram(program);
-
-			GLint successful;
-			glGetProgramiv(program, GL_LINK_STATUS, &successful);
-			if (successful)
+			GLuint vertexProgram = compileShader(source, GL_VERTEX_SHADER);
+			if (vertexProgram != 0)
 			{
-				return program;
+				glAttachShader(program, vertexProgram);
 			}
+			else
+			{
+				glDeleteShader(vertexProgram);
+				return 0;
+			}
+		}
+		for (std::string source : fragmentSources)
+		{
+			GLuint fragmentProgram = compileShader(source, GL_FRAGMENT_SHADER);
+			if (fragmentProgram != 0)
+			{
+				glAttachShader(program, fragmentProgram);
+			}
+			else
+			{
+				glDeleteShader(fragmentProgram);
+				return 0;
+			}
+		}
 
+		glLinkProgram(program);
+		GLint successful;
+		glGetProgramiv(program, GL_LINK_STATUS, &successful);
+		if (!successful)
+		{
 			GLchar log[512];
 			glGetProgramInfoLog(program, 512, NULL, log);
-			std::cout << "Program Compilation Error: " << log << std::endl;
-		}
+			std::cout << "Program Link Error: " << log << std::endl;
 
-		if (vertexProgram != 0)
+			return 0;
+		}
+		return successful ? program : 0;
+	}
+
+	GLuint createProgram(std::string& vertexSource, std::string& fragmentSource)
+	{
+		return createProgram({ vertexSource }, { fragmentSource });
+	}
+
+	GLuint createProgramFromFiles(std::vector<std::string> vertexFiles, std::vector<std::string> fragmentFiles)
+	{
+		std::vector<std::string> vertexSources;
+		for (std::string& file : vertexFiles)
 		{
-			glDeleteShader(vertexProgram);
+			vertexSources.push_back(Util::File::ReadWholeFile(file));
 		}
 
-		if (fragmentProgram != 0)
+		std::vector<std::string> fragmentSources;
+		for (std::string& file : fragmentFiles)
 		{
-			glDeleteShader(fragmentProgram);
+			fragmentSources.push_back(Util::File::ReadWholeFile(file));
 		}
 
-		return 0;
+		return createProgram(vertexSources, fragmentSources);
 	}
 
 	std::size_t nextID = 0;
@@ -102,13 +132,32 @@ Shader::Shader(std::string& vertexSource, std::string& fragmentSource) : m_id(ne
 
 Shader::Shader(std::string vertexFilename, std::string fragmentFilename, bool monitorFiles) 
 	: m_id(nextID++),
-	programHandle(createProgram(Util::File::ReadWholeFile(vertexFilename), Util::File::ReadWholeFile(fragmentFilename))),
-	vertexFilename(vertexFilename), fragmentFilename(fragmentFilename)
+	programHandle(createProgram(Util::File::ReadWholeFile(vertexFilename), Util::File::ReadWholeFile(fragmentFilename)))
 {
+	vertexFilenames.push_back(vertexFilename);
+	fragmentFilenames.push_back(fragmentFilename);
 	if (monitorFiles)
 	{
 		Util::File::WatchForChanges(vertexFilename, [=]() { reloadFromFiles(); });
 		Util::File::WatchForChanges(fragmentFilename, [=]() { reloadFromFiles(); });
+	}
+}
+
+Shader::Shader(std::vector<std::string> vertexFilenames, std::vector<std::string> fragmentFilenames, bool monitorFiles)
+	: m_id(nextID++),
+	programHandle(createProgramFromFiles(vertexFilenames, fragmentFilenames)),
+	vertexFilenames(vertexFilenames), fragmentFilenames(fragmentFilenames)
+{
+	if (monitorFiles)
+	{
+		for (std::string vertexFilename : vertexFilenames)
+		{
+			Util::File::WatchForChanges(vertexFilename, [=]() { reloadFromFiles(); });
+		}
+		for (std::string fragmentFilename : fragmentFilenames)
+		{
+			Util::File::WatchForChanges(fragmentFilename, [=]() { reloadFromFiles(); });
+		}
 	}
 }
 
@@ -176,8 +225,9 @@ void Shader::bind() const
 {
 	if (needsToReload)
 	{
+		std::cout << "Reloading shader" << std::endl;
 		uniformErrors[programHandle].clear();
-		programHandle = createProgram(Util::File::ReadWholeFile(vertexFilename), Util::File::ReadWholeFile(fragmentFilename));
+		programHandle = createProgramFromFiles(vertexFilenames, fragmentFilenames);
 		needsToReload = false;
 	}
 

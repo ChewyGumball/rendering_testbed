@@ -11,8 +11,8 @@ class Shader
 protected:
 	std::size_t m_id;
 	mutable GLuint programHandle;
-	std::string vertexFilename;
-	std::string fragmentFilename;
+	std::vector<std::string> vertexFilenames;
+	std::vector<std::string> fragmentFilenames;
 
 	mutable bool needsToReload;
 
@@ -21,6 +21,7 @@ protected:
 public:
 	Shader(std::string& vertexSource, std::string& fragmentSource);
 	Shader(std::string vertexFilename, std::string fragmentFilename, bool monitorFiles);
+	Shader(std::vector<std::string> vertexFilenames, std::vector<std::string> fragmentFilenames, bool monitorFiles);
 	~Shader();
 
 	void setUniform1i(const std::string & uniformName, int data) const;

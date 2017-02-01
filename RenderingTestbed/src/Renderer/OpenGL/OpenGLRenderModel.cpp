@@ -16,6 +16,13 @@ namespace {
 	const GLuint VERTEX_DATA_BINDING_POINT_INDEX = 0;
 	const GLuint TRANSFORM_DATA_BINDING_POINT_INDEX = 1;
 
+	void setupVertexAttribute(GLuint vao, GLuint attribute, GLuint bindingPoint, GLint componentCount, GLuint offset)
+	{
+		glEnableVertexArrayAttrib(vao, attribute);
+		glVertexArrayAttribBinding(vao, attribute, bindingPoint);
+		glVertexArrayAttribFormat(vao, attribute, componentCount, GL_FLOAT, GL_FALSE, offset);
+	}
+
 }
 
 OpenGLRenderModel::OpenGLRenderModel(): shaderID(0)
@@ -28,50 +35,34 @@ OpenGLRenderModel::OpenGLRenderModel(const OpenGLRenderMesh& mesh, std::size_t s
 	glCreateVertexArrays(1, &vao);
 	glCreateBuffers(1, &m_transformVBO);
 
-	GLsizei vec4Size = sizeof(glm::vec4);
-	GLuint meshVBO = mesh.vbo();
 	const VertexFormat format = mesh.vertexFormat();
 	int nextVertexAttribute = 0;
 
 	//Set up mesh vertex data attributes
-	glVertexArrayVertexBuffer(vao, VERTEX_DATA_BINDING_POINT_INDEX, meshVBO, 0, format.size());
-	if (format.hasPosition())
-	{
-		glEnableVertexArrayAttrib(vao, nextVertexAttribute);
-		glVertexArrayAttribBinding(vao, nextVertexAttribute, VERTEX_DATA_BINDING_POINT_INDEX);
-		glVertexArrayAttribFormat(vao, nextVertexAttribute++, 3, GL_FLOAT, GL_FALSE, format.positionOffset());
+	glVertexArrayVertexBuffer(vao, VERTEX_DATA_BINDING_POINT_INDEX, mesh.vbo(), 0, format.size());
+	if (format.hasPosition()) {
+		setupVertexAttribute(vao, nextVertexAttribute++, VERTEX_DATA_BINDING_POINT_INDEX, 3, format.positionOffset());
 	}
 
-	if (format.hasNormal())
-	{
-		glEnableVertexArrayAttrib(vao, nextVertexAttribute);
-		glVertexArrayAttribBinding(vao, nextVertexAttribute, VERTEX_DATA_BINDING_POINT_INDEX);
-		glVertexArrayAttribFormat(vao, nextVertexAttribute++, 3, GL_FLOAT, GL_FALSE, format.normalOffset());
+	if (format.hasNormal())	{
+		setupVertexAttribute(vao, nextVertexAttribute++, VERTEX_DATA_BINDING_POINT_INDEX, 3, format.normalOffset());
 	}
 
-	if (format.hasTextureCoordinates())
-	{
-		glEnableVertexArrayAttrib(vao, nextVertexAttribute);
-		glVertexArrayAttribBinding(vao, nextVertexAttribute, VERTEX_DATA_BINDING_POINT_INDEX);
-		glVertexArrayAttribFormat(vao, nextVertexAttribute++, 2, GL_FLOAT, GL_FALSE, format.textureCoordinatesOffset());
+	if (format.hasTextureCoordinates())	{
+		setupVertexAttribute(vao, nextVertexAttribute++, VERTEX_DATA_BINDING_POINT_INDEX, 2, format.textureCoordinatesOffset());
 	}
 
-	if (format.hasColour())
-	{
-		glEnableVertexArrayAttrib(vao, nextVertexAttribute);
-		glVertexArrayAttribBinding(vao, nextVertexAttribute, VERTEX_DATA_BINDING_POINT_INDEX);
-		glVertexArrayAttribFormat(vao, nextVertexAttribute++, 4, GL_FLOAT, GL_FALSE, format.colourOffset());
+	if (format.hasColour())	{
+		setupVertexAttribute(vao, nextVertexAttribute++, VERTEX_DATA_BINDING_POINT_INDEX, 4, format.colourOffset());
 	}
 
 	//Set up instancing transform buffer attributes
+	GLsizei vec4Size = sizeof(glm::vec4);
 	glVertexArrayVertexBuffer(vao, TRANSFORM_DATA_BINDING_POINT_INDEX, m_transformVBO, 0, 4 * vec4Size); 
 	glVertexArrayBindingDivisor(vao, TRANSFORM_DATA_BINDING_POINT_INDEX, 1);
 
-	for (int i = 0; i < 4; ++i)
-	{
-		glEnableVertexArrayAttrib(vao, nextVertexAttribute);
-		glVertexArrayAttribBinding(vao, nextVertexAttribute, TRANSFORM_DATA_BINDING_POINT_INDEX);
-		glVertexArrayAttribFormat(vao, nextVertexAttribute++, 4, GL_FLOAT, GL_FALSE, i * vec4Size);
+	for (int i = 0; i < 4; ++i)	{
+		setupVertexAttribute(vao, nextVertexAttribute++, TRANSFORM_DATA_BINDING_POINT_INDEX, 4, i * vec4Size);
 	}
 
 	//Set up vertex index buffer
@@ -89,7 +80,6 @@ void OpenGLRenderModel::reload(std::shared_ptr<OpenGLRenderMesh> mesh, std::size
 void OpenGLRenderModel::draw(int instanceCount) const
 {
 	glBindVertexArray(vao);
-	//glDrawArraysInstanced(GL_TRIANGLES, 0, indexCount, instanceCount);
 	glDrawElementsInstanced(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0, instanceCount);
 	glBindVertexArray(0);
 }

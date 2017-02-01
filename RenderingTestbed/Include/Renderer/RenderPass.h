@@ -5,16 +5,16 @@
 #include <Renderer\PointLight.h>
 #include <Models\ModelInstance.h>
 
-class LayerPass
+class RenderPass
 {
 private:
 	GLuint framebuffer;
 	Renderer *renderer;
 public:
-	LayerPass();
-	~LayerPass();
+	RenderPass();
+	~RenderPass();
 
-	void draw(const Camera & c, bool doFrustumCulling = true);
+	void draw(const Camera & c, bool doFrustumCulling = false);
 
 	void addModelInstance(std::shared_ptr<const ModelInstance> modelInstance);
 	void addPointLight(PointLight light);
