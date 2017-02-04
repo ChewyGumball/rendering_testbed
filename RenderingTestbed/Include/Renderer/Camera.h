@@ -14,15 +14,18 @@ public:
 	Camera(glm::vec3 position, glm::vec3 target, glm::vec3 up, float fov, float aspectRatio);
 	~Camera();
 
-	void move(glm::vec3 displacement);
+	virtual void move(glm::vec3 displacement);
+	virtual void pitch(float offset);
+	virtual void yaw(float offset);
+	virtual void roll(float offset);
 	void rotateLocal(glm::vec3 axis, float degrees);
 
-	glm::vec3 position() const;
-	const glm::mat4 transform() const;
+	virtual glm::vec3 position() const;
+	virtual glm::mat4 transform() const;
 	glm::mat4 inverseTransform() const;
-	const glm::mat4& projection() const;
-	const glm::vec3& right() const;
-	const glm::vec3& up() const;
-	const glm::vec3& forward() const;
+	virtual const glm::mat4& projection() const;
+	virtual const glm::vec3 right() const;
+	virtual const glm::vec3 up() const;
+	virtual const glm::vec3 forward() const;
 };
 

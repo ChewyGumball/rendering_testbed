@@ -16,6 +16,8 @@ public:
 	void translate(glm::vec3 offset);
 	void scale(glm::vec3 scales);
 
+	glm::vec3 position() const;
+
 	std::shared_ptr<const Model> model() const;
 	glm::mat4 transformMatrix() const;
 	Culling::BoundingSphere bounds() const;

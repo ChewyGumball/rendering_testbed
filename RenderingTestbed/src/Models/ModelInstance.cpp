@@ -26,6 +26,11 @@ void ModelInstance::scale(glm::vec3 scales)
 	transform = glm::scale(transform, scales);
 }
 
+glm::vec3 ModelInstance::position() const
+{
+	return glm::vec3(transform * glm::vec4(0,0,0,1));
+}
+
 std::shared_ptr<const Model> ModelInstance::model() const { return baseModel; }
 
 glm::mat4 ModelInstance::transformMatrix() const { return transform; }

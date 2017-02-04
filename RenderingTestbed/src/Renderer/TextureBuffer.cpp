@@ -1,7 +1,7 @@
 #include "Renderer/TextureBuffer.h"
 
 
-TextureBuffer::TextureBuffer(int width, int height, GLenum format, GLenum internalFormat, void* data): width(width), height(height)
+TextureBuffer::TextureBuffer(int width, int height, GLenum format, GLenum internalFormat, void* data): m_width(width), m_height(height)
 {
 	glGenTextures(1, &handle);
 	glBindTexture(GL_TEXTURE_2D, handle);
@@ -17,7 +17,12 @@ TextureBuffer::~TextureBuffer()
 {
 }
 
-GLuint TextureBuffer::id()
+GLuint TextureBuffer::id() const
 {
 	return handle;
+}
+
+glm::vec2 TextureBuffer::dimensions() const
+{
+	return glm::vec2(m_width, m_height);
 }

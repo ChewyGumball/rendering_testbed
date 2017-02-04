@@ -47,6 +47,16 @@ std::vector<float> Vertex::flatten(VertexFormat format, std::vector<Vertex> vert
 	return flattened;
 }
 
+bool operator==(const VertexFormat & a, const VertexFormat & b)
+{
+	return a.formatData() == b.formatData();
+}
+
+bool operator!=(const VertexFormat & a, const VertexFormat & b)
+{
+	return !(a == b);
+}
+
 std::ostream & operator<<(std::ostream & stream, const Vertex& obj)
 {
 	stream << obj.position;
@@ -84,7 +94,12 @@ Vertex::Vertex(const glm::vec3& position, const glm::vec3& normal, const glm::ve
 {
 }
 
-VertexFormat::VertexFormat(char format) : format(format)
+//Creates an "Unknown" vertex format
+VertexFormat::VertexFormat() : format(0)
+{
+}
+
+VertexFormat::VertexFormat(VertexAttribute format) : format(format)
 {
 }
 
@@ -96,7 +111,7 @@ int VertexFormat::size() const
 		(hasColour() ? sizeof(glm::vec4) : 0);
 }
 
-char VertexFormat::formatData() const
+VertexAttribute VertexFormat::formatData() const
 {
 	return format;
 }

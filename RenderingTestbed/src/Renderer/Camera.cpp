@@ -28,11 +28,25 @@ void Camera::move(glm::vec3 displacement)
 	m_position += displacement;
 }
 
+void Camera::pitch(float offset)
+{
+	rotateLocal(m_right, offset);
+}
+
+void Camera::yaw(float offset)
+{
+	rotateLocal(m_up, offset);
+}
+
+void Camera::roll(float offset)
+{
+	rotateLocal(m_forward, offset);
+}
+
 void Camera::rotateLocal(glm::vec3 axis, float degrees)
 {	
-	m_forward = glm::normalize(glm::vec3(glm::vec4(m_forward, 1) * glm::rotate(degrees, axis)));
+	m_forward = glm::normalize(glm::vec3(glm::rotate(degrees, axis) * glm::vec4(m_forward, 1)));
 	m_right = glm::normalize(glm::cross(m_up, m_forward));
-	m_up = glm::normalize(glm::cross(m_forward, m_right));
 }
 
 glm::vec3 Camera::position() const
@@ -40,7 +54,7 @@ glm::vec3 Camera::position() const
 	return m_position;
 }
 
-const glm::mat4 Camera::transform() const
+glm::mat4 Camera::transform() const
 {
 	return glm::lookAt(m_position, m_position + m_forward, m_up);
 }
@@ -55,17 +69,17 @@ const glm::mat4& Camera::projection() const
 	return m_projection;
 }
 
-const glm::vec3& Camera::right() const
+const glm::vec3 Camera::right() const
 {
 	return m_right;
 }
 
-const glm::vec3& Camera::up() const
+const glm::vec3 Camera::up() const
 {
-	return m_up;
+	return glm::normalize(glm::cross(m_forward, m_right));
 }
 
-const glm::vec3 & Camera::forward() const
+const glm::vec3 Camera::forward() const
 {
 	return m_forward;
 }

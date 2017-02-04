@@ -111,6 +111,9 @@
     <ClCompile Include="src\Renderer\RenderPass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\QuaternionCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Models\Model.h">
@@ -305,6 +308,9 @@
     <ClInclude Include="Include\Renderer\RenderPass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Renderer\QuaternionCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Shaders\colour.frag" />
@@ -317,5 +323,7 @@
     <None Include="sample_scene_definition.json" />
     <None Include="src\Shaders\normal - Copy.frag" />
     <None Include="scenes\test_scene.json" />
+    <None Include="src\Shaders\texture.vert" />
+    <None Include="src\Shaders\texture.frag" />
   </ItemGroup>
 </Project>

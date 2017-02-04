@@ -137,6 +137,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Include\Culling\BoundingSphere.cpp" />
+    <ClCompile Include="src\Renderer\QuaternionCamera.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Scene\SceneLoader.cpp" />
     <ClCompile Include="src\Renderer\Renderer.cpp" />
@@ -231,6 +232,7 @@
     <ClInclude Include="Include\Culling\Plane.h" />
     <ClInclude Include="Include\Scene\Scene.h" />
     <ClInclude Include="Include\Scene\SceneLoader.h" />
+    <ClInclude Include="Include\Renderer\QuaternionCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="sample_render_graph.json" />
@@ -243,6 +245,8 @@
     <None Include="src\Shaders\normal - Copy.frag" />
     <None Include="src\Shaders\normal.frag" />
     <None Include="src\Shaders\normal.vert" />
+    <None Include="src\Shaders\texture.frag" />
+    <None Include="src\Shaders\texture.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

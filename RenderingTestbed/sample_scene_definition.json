@@ -1,23 +1,19 @@
 {
   "screen": {
-    "width": 800,
+    "width": 400,
     "height": 800
   },
   "meshes": {
     "cube": {
       "filename": "F:/Users/Ben/Desktop/cube.obj",
-      "format": [
-        "{position}",
-        "{normal}"
-      ]
+      "format": "Position_Normal"
     },
     "plane": {
       "filename": "F:/Users/Ben/Desktop/plane.obj",
-      "format": [
-        "{position}",
-        "{normal}",
-        "{texture}"
-      ]
+      "format": "Position_Texture"
+    },
+    "buddha": {
+      "filename":  "F:/Users/Ben/Desktop/buddha.mbin"
     }
   },
   "shaders": {
@@ -25,13 +21,22 @@
       "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/RenderingTestbed/src/Shaders/normal.vert" ],
       "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/RenderingTestbed/src/Shaders/normal.frag" ]
     },
+    "texture": {
+      "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/RenderingTestbed/src/Shaders/texture.vert" ],
+      "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/RenderingTestbed/src/Shaders/texture.frag" ]
+    },
     "finalShader": {
       "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/RenderingTestbed/src/Shaders/final.vert" ],
       "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/RenderingTestbed/src/Shaders/final.frag" ]
     }
   },
   "textures": {
-    "screenColourBuffer": {
+    "screenColourBufferA": {
+      "width": "{screen.width}",
+      "height": "{screen.height}",
+      "format": "rgb"
+    },
+    "screenColourBufferB": {
       "width": "{screen.width}",
       "height":  "{screen.height}",
 	    "format": "rgb"
@@ -43,31 +48,26 @@
     }
   },
   "models": {
-    "buddah": {
-      "mesh": "buddah_binary",
-      "shader": "phong"
-    },
     "cube": {
       "mesh": "cube",
       "shader": "phong"
     },
-    "inverseCube": {
-      "mesh": "cube",
-      "shader": "inversePhong"
-    },
-    "dragon": {
-      "mesh": "dragon_binary",
+    "buddha": {
+      "mesh": "buddha",
       "shader": "phong"
     },
-    "wall": {
-      "mesh": "wall_prefab",
-      "shader": "phong"
-    },
-    "finalOutputQuad": {
+    "cameraTestA": {
       "mesh": "plane",
-      "shader": "finalShader",
+      "shader": "texture",
       "textures": {
-        "screenTexture": "screenColourBuffer"
+        "screenTexture": "screenColourBufferA"
+      }
+    },
+    "cameraTestB": {
+      "mesh": "plane",
+      "shader": "texture",
+      "textures": {
+        "screenTexture": "screenColourBufferB"
       }
     }
   },
@@ -86,7 +86,27 @@
     "cameras": {
       "layer1Camera": {
         "fov": 45,
-        "aspectRatio":  1.0,
+        "aspectRatio": 0.5,
+        "position": {
+          "x": 5,
+          "y": 0,
+          "z": 0
+        },
+        "target": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "up": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      },
+      "layer1CameraQuaternion": {
+        "type": "quaternion",
+        "fov": 45,
+        "aspectRatio": 0.5,
         "position": {
           "x": 5,
           "y": 0,
@@ -107,9 +127,9 @@
         "fov": 45,
         "aspectRatio":  1.0,
         "position": {
-          "x": 1,
+          "x": 0,
           "y": 0,
-          "z": 0
+          "z": -2
         },
         "target": {
           "x": 0,
@@ -146,7 +166,7 @@
     "models": {
       "layer1Models": [
         {
-          "model": "cube",
+          "model": "buddha",
           "position": {
             "x": 0,
             "y": 0,
@@ -154,28 +174,72 @@
           }
         }
       ],
-      "finalOutputQuad": [
+      "cameraTest": [
         {
-          "model": "finalOutputQuad"
+          "model": "cameraTestA",
+          "position": {
+            "x": -1,
+            "y": 0,
+            "z": 0
+          },
+          "scale": {
+            "x": 0.5,
+            "y": 1,
+            "z": 1
+          }
+        },
+        {
+          "model": "cameraTestB",
+          "position": {
+            "x": 1,
+            "y": 0,
+            "z": 0
+          },
+          "scale": {
+            "x": 0.5,
+            "y": 1,
+            "z": 1
+          }
         }
       ]
     },
     "passes": {
-      "pass1": {
+      "cameraTestA": {
         "dependencies": [ ],
         "lights": [ "layer1Lights" ],
         "models": [ "layer1Models" ],
         "camera": "layer1Camera",
+        "cull": false,
+        "clearColour": { "r":  0.2, "g": 0.2, "b": 0.2, "a": 1},
         "bufferOverrides": {
-          "colour": "screenColourBuffer",
+          "colour": "screenColourBufferA",
           "depth": "screenDepthBuffer"
         }
       },
-      "finalPass": {
-        "dependencies": [ "pass1" ],
-        "lights": [ ],
-        "models": [ "finalOutputQuad" ],
-        "camera": "screenSpaceCamera"
+      "cameraTestB": {
+        "dependencies": [ ],
+        "lights": [ "layer1Lights" ],
+        "models": [ "layer1Models" ],
+        "camera": "layer1CameraQuaternion",
+        "cull": false,
+        "clearColour": { "r":  0.4, "g": 0.4, "b": 0.4, "a": 1},
+        "bufferOverrides": {
+          "colour": "screenColourBufferB",
+          "depth": "screenDepthBuffer"
+        }
+      },
+      "display": {
+        "dependencies": [ ],
+        "lights": [ "layer1Lights" ],
+        "models": [ "cameraTest" ],
+        "cull":  false,
+        "camera": "screenSpaceCamera",
+        "viewport": {
+          "x": 0,
+          "y": 0,
+          "width": 800,
+          "height": 800
+        }
       }
     }
   }

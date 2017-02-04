@@ -3,6 +3,7 @@
 
 #include <cstdio>
 #include <string>
+#include <cmath>
 
 #include <fstream>
 
@@ -32,9 +33,9 @@ void convert(int argc, char* argv[])
 	int64_t vertexCount = vertices.size();
 	int64_t indexCount = indices.size();
 
-	char format = mesh->vertexFormat().formatData();
+	VertexAttribute format = mesh->vertexFormat().formatData();
 
-	convertedFile.write(&(format), sizeof(char));
+	convertedFile.write(&(format), sizeof(VertexAttribute));
 	convertedFile.write(reinterpret_cast<char*>(&vertexCount), sizeof(int64_t));
 	convertedFile.write(reinterpret_cast<char*>(vertices.data()), vertexCount * sizeof(float));
 	convertedFile.write(reinterpret_cast<char*>(&indexCount), sizeof(int64_t));
@@ -69,14 +70,18 @@ void renderScene(std::string sceneFile)
 	}
 
 	glfwSwapInterval(1);
-	glClearColor(0, 0, 0, 0);
+	glClearColor(0.2, 0.2, 0.2, 1);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
 	Scene scene = SceneLoader::loadScene(sceneFile);
 	std::vector<std::shared_ptr<ModelInstance>> instances = scene.modelInstances("layer1Models");
-	Camera& c = scene.camera("layer1Camera");
+	std::vector<std::shared_ptr<ModelInstance>> instances2 = scene.modelInstances("cameraTest");
 	const std::vector<std::shared_ptr<RenderPass>>& passes = scene.passes();
+
+
+	std::shared_ptr<Camera> c = scene.camera("layer1Camera");
+	std::shared_ptr<Camera> c2 = scene.camera("layer1CameraQuaternion");
 
 	double lastTime = glfwGetTime();
 	double cumulative = 0;
@@ -97,19 +102,33 @@ void renderScene(std::string sceneFile)
 
 		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 		{
-			c.move(0.1f * c.right());
+			c->move(-0.1f * c->right());
+			c2->move(-0.1f * c->right());
 		}
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		{
-			c.move(-0.1f * c.right());
+			c->move(0.1f * c->right());
+			c2->move(0.1f * c->right());
 		}
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		{
-			c.move(0.1f * c.forward());
+			c->move(0.1f * c->forward());
+			c2->move(0.1f * c->forward());
 		}
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 		{
-			c.move(-0.1f * c.forward());
+			c->move(-0.1f * c->forward());
+			c2->move(-0.1f * c->forward());
+		}
+		if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+		{
+			c->move(0.1f * c->up());
+			c2->move(0.1f * c->up());
+		}
+		if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
+		{
+			c->move(-0.1f * c->up());
+			c2->move(-0.1f * c->up());
 		}
 
 		double newMouseX, newMouseY;
@@ -117,13 +136,15 @@ void renderScene(std::string sceneFile)
 
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2))
 		{
-			if (newMouseX != mouseX)
-			{
-				c.rotateLocal(c.up(), static_cast<float>(newMouseX - mouseX) * 0.01f);
-			}
 			if (newMouseY != mouseY)
 			{
-				c.rotateLocal(c.right(), static_cast<float>(newMouseY - mouseY) * -0.01f);
+				c->pitch(static_cast<float>(newMouseY - mouseY) * -0.01f);
+				c2->pitch(static_cast<float>(newMouseY - mouseY) * -0.01f);
+			}
+			if (newMouseX != mouseX)
+			{
+				c->yaw(static_cast<float>(newMouseX - mouseX) * -0.01f);
+				c2->yaw(static_cast<float>(newMouseX - mouseX) * -0.01f);
 			}
 		}
 		mouseY = newMouseY;
@@ -131,8 +152,7 @@ void renderScene(std::string sceneFile)
 
 		for (std::shared_ptr<RenderPass> pass : passes)
 		{
-			pass->clearBuffers(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			pass->draw(c, false);
+			pass->draw();
 		}
 		glfwSwapBuffers(window);
 		cumulative += currentTime - lastTime;
@@ -147,7 +167,7 @@ void renderScene(std::string sceneFile)
 				tricount += pass->trianglesDrawn();
 			}
 
-			std::printf("%d frames, %I64d triangles\n", frames, tricount);
+			//std::printf("%d frames, %I64d triangles\n", frames, tricount);
 			cumulative = 0;
 			frames = 0;
 		}

@@ -14,7 +14,7 @@ void setBuffer(GLuint& frameBuffer, GLenum attatchment, std::shared_ptr<TextureB
 }
 }
 
-RenderPass::RenderPass() : framebuffer(0), renderer(new OpenGLRenderer()) {}
+RenderPass::RenderPass() : framebuffer(0), renderer(new OpenGLRenderer()), m_camera(std::make_shared<Camera>()), culllingEnabled(true) {}
 
 RenderPass::~RenderPass()
 {
@@ -25,11 +25,29 @@ RenderPass::~RenderPass()
     delete renderer;
 }
 
-void RenderPass::draw(const Camera& c, bool doFrustumCulling)
+void RenderPass::draw()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-    renderer->draw(c, doFrustumCulling);
+	glViewport(viewportOrigin.x, viewportOrigin.y, viewportSize.x, viewportSize.y);
+	glClearColor(m_clearColour.r, m_clearColour.g, m_clearColour.b, m_clearColour.a);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    renderer->draw(m_camera, culllingEnabled);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void RenderPass::clearColour(glm::vec4 colour)
+{
+	m_clearColour = colour;
+}
+
+void RenderPass::cull(bool enabled)
+{
+	culllingEnabled = enabled;
+}
+
+void RenderPass::camera(std::shared_ptr<Camera> c)
+{
+	m_camera = c;
 }
 
 void RenderPass::addModelInstance(std::shared_ptr<const ModelInstance> modelInstance) { renderer->addModelInstance(modelInstance); }
@@ -45,8 +63,14 @@ void RenderPass::clearBuffers(GLuint buffers)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void RenderPass::setColourBuffer(std::shared_ptr<TextureBuffer> buffer) { setBuffer(framebuffer, GL_COLOR_ATTACHMENT0, buffer); }
+void RenderPass::setColourBuffer(std::shared_ptr<TextureBuffer> buffer) { setBuffer(framebuffer, GL_COLOR_ATTACHMENT0, buffer); viewport(glm::vec2(), buffer->dimensions()); }
 
 void RenderPass::setDepthBuffer(std::shared_ptr<TextureBuffer> buffer) { setBuffer(framebuffer, GL_DEPTH_ATTACHMENT, buffer); }
+
+void RenderPass::viewport(glm::vec2 origin, glm::vec2 size)
+{
+	viewportOrigin = origin;
+	viewportSize = size;
+}
 
 uint64_t RenderPass::trianglesDrawn() const { return renderer->trianglesDrawn; }

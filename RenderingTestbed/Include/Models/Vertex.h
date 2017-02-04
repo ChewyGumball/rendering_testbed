@@ -3,19 +3,20 @@
 #include<vector>
 #include <glm/glm.hpp>
 
-typedef const char VertexAttribute;
+typedef char VertexAttribute;
 namespace VertexAttributes {
-	static const char Position = 0b0001;
-	static const char Normal = 0b0010;
-	static const char Texture = 0b0100;
-	static const char Colour = 0b1000;
+	static VertexAttribute Position = 0b0001;
+	static VertexAttribute Normal = 0b0010;
+	static VertexAttribute Texture = 0b0100;
+	static VertexAttribute Colour = 0b1000;
 }
 
 class VertexFormat
 {
-	char format;
+	VertexAttribute format;
 public:
-	VertexFormat(char format);
+	VertexFormat();
+	VertexFormat(VertexAttribute format);
 
 	bool hasPosition() const;
 	bool hasNormal() const;
@@ -29,10 +30,14 @@ public:
 
 	int size() const;
 
-	char formatData() const;
+	VertexAttribute formatData() const;
 };
+
+bool operator!=(const VertexFormat& a, const VertexFormat& b);
+bool operator==(const VertexFormat& a, const VertexFormat& b);
+
 namespace VertexFormats {
-	static const VertexFormat Empty(0);
+	static const VertexFormat Unknown(0);
 	static const VertexFormat Position(VertexAttributes::Position);
 	static const VertexFormat Position_Normal(VertexAttributes::Position | VertexAttributes::Normal);
 	static const VertexFormat Position_Texture(VertexAttributes::Position | VertexAttributes::Texture);

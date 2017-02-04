@@ -66,7 +66,7 @@ void OpenGLRenderer::removeModelInstance(std::shared_ptr<const ModelInstance> mo
 	modelInstances.erase(std::remove(modelInstances.begin(), modelInstances.end(), modelInstance), modelInstances.end());
 }
 
-void OpenGLRenderer::draw(const Camera & c, bool doFrustrumCulling)
+void OpenGLRenderer::draw(const std::shared_ptr<Camera> c, bool doFrustrumCulling)
 {
 	trianglesDrawn = 0;
 	std::unordered_map<size_t, std::vector<std::shared_ptr<const ModelInstance>>> culledInstances;
@@ -98,10 +98,10 @@ void OpenGLRenderer::draw(const Camera & c, bool doFrustrumCulling)
 		OpenGLShader& shader = shaders[model.shaderID];
 		shader.bind();
 		model.bindTextures(shader);
-		shader.setUniformMatrix4f("view", c.transform());
-		shader.setUniformMatrix4f("projection", c.projection());
-		shader.setUniform3f("cameraPosition", c.position());
+		shader.setUniformMatrix4f("view", c->transform());
+		shader.setUniformMatrix4f("projection", c->projection());
+		shader.setUniform3f("cameraPosition", c->position());
 		addLightUniforms(shader);
-		model.draw(transforms.size());
+		model.draw(static_cast<int>(transforms.size()));
 	}
 }

@@ -4,11 +4,11 @@ namespace {
 	GLuint tempVAO = -1;
 }
 
-OpenGLRenderMesh::OpenGLRenderMesh(): m_indexCount(0), m_format(VertexFormats::Empty)
+OpenGLRenderMesh::OpenGLRenderMesh(): m_indexCount(0), m_format(VertexFormats::Unknown)
 {
 }
 
-OpenGLRenderMesh::OpenGLRenderMesh(std::shared_ptr<const Mesh> mesh) : m_indexCount(mesh->indexData().size()), m_format(mesh->vertexFormat())
+OpenGLRenderMesh::OpenGLRenderMesh(std::shared_ptr<const Mesh> mesh) : m_indexCount(static_cast<int>(mesh->indexData().size())), m_format(mesh->vertexFormat())
 {
 	const std::vector<float>& vertexData = mesh->vertexData();
 	const std::vector<int>& indexData = mesh->indexData();

@@ -2,9 +2,9 @@
 
 #include "Culling/Frustum.h"
 
-std::unordered_map<size_t, std::vector<std::shared_ptr<const ModelInstance>>> Renderer::cull(const Camera & camera, std::vector<std::shared_ptr<const ModelInstance>> instances)
+std::unordered_map<size_t, std::vector<std::shared_ptr<const ModelInstance>>> Renderer::cull(const std::shared_ptr<Camera> camera, std::vector<std::shared_ptr<const ModelInstance>> instances)
 {
-	Culling::Frustum frustum(camera.projection() * camera.transform());
+	Culling::Frustum frustum(camera->projection() * camera->transform());
 
 	std::vector<glm::vec3> centers(instances.size());
 	std::vector<float> radii(instances.size());

@@ -2,7 +2,8 @@
 
 #include <iostream>
 #include <string>
-//#include <vector>
+
+#include <Renderer\QuaternionCamera.h>
 
 #include <lib\rapidjson\document.h>
 
@@ -13,7 +14,11 @@
 namespace {
 std::unordered_map<std::string, GLenum> textureFormats{ { "rgb", GL_RGB }, { "depth", GL_DEPTH_COMPONENT } };
 std::unordered_map<std::string, GLenum> internalTextureFormats{ { "rgb", GL_RGB8 }, { "depth", GL_DEPTH_COMPONENT24 } };
+std::unordered_map<std::string, VertexFormat> vertexFormats{ {"Position_Normal", VertexFormats::Position_Normal}, {"Position_Texture", VertexFormats::Position_Texture} };
+
 glm::vec3 objectToVec3(rapidjson::Value& json) { return glm::vec3(json["x"].GetFloat(), json["y"].GetFloat(), json["z"].GetFloat()); }
+glm::vec4 objectToVec4(rapidjson::Value& json) { return glm::vec4(json["x"].GetFloat(), json["y"].GetFloat(), json["z"].GetFloat(), json["w"].GetFloat()); }
+glm::vec4 objectToColour(rapidjson::Value& json) { return glm::vec4(json["r"].GetFloat(), json["g"].GetFloat(), json["b"].GetFloat(), json["a"].GetFloat()); }
 
 int getIntFromPath(rapidjson::Value* json, std::string path)
 {
@@ -36,7 +41,11 @@ std::unordered_map<std::string, std::shared_ptr<Mesh>> loadMeshes(rapidjson::Doc
         std::string name(mesh.name.GetString());
 
         if (extension == "obj") {
-            meshes[name] = ModelLoader::loadOBJFile(filename);
+			VertexFormat format = VertexFormats::Unknown;
+			if (mesh.value.HasMember("format"))	{
+				format = vertexFormats[mesh.value["format"].GetString()];
+			}
+            meshes[name] = ModelLoader::loadOBJFile(filename, format);
         } else if (extension == "mbin") {
             meshes[name] = ModelLoader::loadBinFile(filename);
         } else if (extension == "fbx") {
@@ -75,15 +84,26 @@ std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> loadTextures(rap
     return textures;
 }
 
-std::unordered_map<std::string, Camera> loadCameras(rapidjson::Value& json)
+std::unordered_map<std::string, std::shared_ptr<Camera>> loadCameras(rapidjson::Value& json)
 {
-    std::unordered_map<std::string, Camera> cameras;
+    std::unordered_map<std::string, std::shared_ptr<Camera>> cameras;
     for (auto& camera : json["cameras"].GetObject()) {
-        cameras[camera.name.GetString()] = Camera(objectToVec3(camera.value["position"]),
-            objectToVec3(camera.value["target"]),
-            objectToVec3(camera.value["up"]),
-            camera.value["fov"].GetFloat(),
-            camera.value["aspectRatio"].GetFloat());
+		if (camera.value.HasMember("type") && std::string(camera.value["type"].GetString()) == "quaternion")
+		{
+			cameras[camera.name.GetString()] = std::make_shared<QuaternionCamera>(objectToVec3(camera.value["position"]),
+				objectToVec3(camera.value["target"]),
+				objectToVec3(camera.value["up"]),
+				camera.value["fov"].GetFloat(),
+				camera.value["aspectRatio"].GetFloat());
+		}
+		else
+		{
+			cameras[camera.name.GetString()] = std::make_shared<Camera>(objectToVec3(camera.value["position"]),
+				objectToVec3(camera.value["target"]),
+				objectToVec3(camera.value["up"]),
+				camera.value["fov"].GetFloat(),
+				camera.value["aspectRatio"].GetFloat());
+		}
     }
     return cameras;
 }
@@ -96,11 +116,14 @@ std::unordered_map<std::string, std::vector<std::shared_ptr<ModelInstance>>> loa
         std::string name = modelGroup.name.GetString();
         for (auto& instance : modelGroup.value.GetArray()) {
             std::shared_ptr<ModelInstance> i(std::make_shared<ModelInstance>(models[instance["model"].GetString()]));
+			if (instance.HasMember("scale")) {
+				i->scale(objectToVec3(instance["scale"]));
+			}
+			if (instance.HasMember("rotation")) {
+				i->rotate(objectToVec3(instance["rotation"]["axis"]), instance["rotation"]["degrees"].GetFloat());
+			}
             if (instance.HasMember("position")) {
                 i->translate(objectToVec3(instance["position"]));
-            }
-            if (instance.HasMember("rotation")) {
-                i->rotate(objectToVec3(instance["rotation"]["axis"]), instance["rotation"]["degrees"].GetFloat());
             }
             modelGroups[name].push_back(i);
         }
@@ -124,22 +147,44 @@ std::unordered_map<std::string, std::vector<PointLight>> loadLightGroups(rapidjs
 std::unordered_map<std::string, std::shared_ptr<RenderPass>> loadPasses(rapidjson::Value&         json,
     std::unordered_map<std::string, std::vector<std::shared_ptr<ModelInstance>>> modelGroups,
     std::unordered_map<std::string, std::vector<PointLight>>                     lightGroups,
+	std::unordered_map<std::string, std::shared_ptr<Camera>> cameras,
     std::unordered_map<std::string, std::shared_ptr<TextureBuffer>>              textures)
 {
     std::unordered_map<std::string, std::shared_ptr<RenderPass>> passes;
     for (auto& pass : json["passes"].GetObject()) {
         std::string name = pass.name.GetString();
 		std::shared_ptr<RenderPass> p = std::make_shared<RenderPass>();
-        for (auto& lightGroup : pass.value["lights"].GetArray()) {
-            for (auto& light : lightGroups[lightGroup.GetString()]) {
-                p->addPointLight(light);
-            }
-        }
-        for (auto& modelGroup : pass.value["models"].GetArray()) {
-            for (auto& model : modelGroups[modelGroup.GetString()]) {
-                p->addModelInstance(model);
-            }
-        }
+
+
+		for (auto& modelGroup : pass.value["models"].GetArray()) {
+			for (auto& model : modelGroups[modelGroup.GetString()]) {
+				p->addModelInstance(model);
+			}
+		}
+
+		if (pass.value.HasMember("clearColour"))
+		{
+			p->clearColour(objectToColour(pass.value["clearColour"]));
+		}
+
+		if (pass.value.HasMember("cull"))
+		{
+			p->cull(pass.value["cull"].GetBool());
+		}
+
+		if (pass.value.HasMember("camera"))
+		{
+			p->camera(cameras[pass.value["camera"].GetString()]);
+		}
+
+		if (pass.value.HasMember("lights"))
+		{
+			for (auto& lightGroup : pass.value["lights"].GetArray()) {
+				for (auto& light : lightGroups[lightGroup.GetString()]) {
+					p->addPointLight(light);
+				}
+			}
+		}
 
         if (pass.value.HasMember("bufferOverrides")) {
             auto& overrides = pass.value["bufferOverrides"];
@@ -150,6 +195,12 @@ std::unordered_map<std::string, std::shared_ptr<RenderPass>> loadPasses(rapidjso
                 p->setDepthBuffer(textures[overrides["depth"].GetString()]);
             }
         }
+
+		if (pass.value.HasMember("viewport")) {
+			auto& viewport = pass.value["viewport"];
+			p->viewport(glm::vec2(viewport["x"].GetFloat(), viewport["y"].GetFloat()), glm::vec2(viewport["width"].GetFloat(), viewport["height"].GetFloat()));
+		}
+
 		passes[name] = p;
     }
     return passes;
@@ -231,10 +282,10 @@ Scene SceneLoader::loadScene(std::string filename)
 	}
 
 	rapidjson::Value scene = json["scene"].GetObject();
-	std::unordered_map<std::string, Camera>                                      cameras(loadCameras(scene));
+	std::unordered_map<std::string, std::shared_ptr<Camera>>                                      cameras(loadCameras(scene));
 	std::unordered_map<std::string, std::vector<PointLight>>                     lightInstances(loadLightGroups(scene, lights));
 	std::unordered_map<std::string, std::vector<std::shared_ptr<ModelInstance>>> modelInstances(loadModelGroups(scene, models));
-	std::unordered_map<std::string, std::shared_ptr<RenderPass>>                                  passes(loadPasses(scene, modelInstances, lightInstances, textures));
+	std::unordered_map<std::string, std::shared_ptr<RenderPass>>                                  passes(loadPasses(scene, modelInstances, lightInstances, cameras, textures));
 	std::unordered_map<std::string, std::vector<std::string>>                    passDependencies(loadPassDepencencies(scene));
 
 	return Scene(passes, passDependencies, cameras, modelInstances);

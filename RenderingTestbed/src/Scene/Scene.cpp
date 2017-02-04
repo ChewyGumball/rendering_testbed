@@ -26,7 +26,7 @@ std::vector<std::string> linearizeDependencies(std::unordered_map<std::string, s
 
 Scene::Scene(std::unordered_map<std::string, std::shared_ptr<RenderPass>>        passes,
     std::unordered_map<std::string, std::vector<std::string>>                    passDependencies,
-    std::unordered_map<std::string, Camera>                                      cameras,
+    std::unordered_map<std::string, std::shared_ptr<Camera>>                     cameras,
     std::unordered_map<std::string, std::vector<std::shared_ptr<ModelInstance>>> modelInstances)
     : m_Passes(passes), m_Cameras(cameras), m_modelInstanceGroups(modelInstances)
 {
@@ -35,16 +35,16 @@ Scene::Scene(std::unordered_map<std::string, std::shared_ptr<RenderPass>>       
         orderedPasses.push_back(passes[pass]);
     }
 
-	for (auto& pass : passes) {
-		if (std::find(linearizedPasses.begin(), linearizedPasses.end(), pass.first) == linearizedPasses.end()) {
-			orderedPasses.push_back(pass.second);
-		}
-	}
+    for (auto& pass : passes) {
+        if (std::find(linearizedPasses.begin(), linearizedPasses.end(), pass.first) == linearizedPasses.end()) {
+            orderedPasses.push_back(pass.second);
+        }
+    }
 }
 
 Scene::~Scene() {}
 
-Camera& Scene::camera(std::string name) { return m_Cameras[name]; }
+std::shared_ptr<Camera> Scene::camera(std::string name) { return m_Cameras[name]; }
 
 std::shared_ptr<RenderPass> Scene::pass(std::string name) { return m_Passes[name]; }
 

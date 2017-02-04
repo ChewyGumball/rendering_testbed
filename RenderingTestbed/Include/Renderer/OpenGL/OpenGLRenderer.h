@@ -41,6 +41,6 @@ public:
 	void removeModelInstance(std::shared_ptr<const ModelInstance> modelInstance);
 	//void removePointLight(PointLight light);
 
-	void draw(const Camera& c, bool doFrustrumCulling);
+	void draw(const std::shared_ptr<Camera> c, bool doFrustrumCulling);
 };
 
