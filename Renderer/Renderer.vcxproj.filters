@@ -24,9 +24,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Models\Material.cpp">
       <Filter>Source Files\Models</Filter>
     </ClCompile>
@@ -100,12 +97,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Culling\Frustum.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\SceneLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\RenderPass.cpp">
@@ -299,12 +290,6 @@
     <ClInclude Include="Include\lib\rapidjson\stringbuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Scene\Scene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\Scene\SceneLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Include\Renderer\RenderPass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -320,9 +305,7 @@
     <None Include="src\Shaders\final.frag" />
     <None Include="src\Shaders\final.vert" />
     <None Include="sample_render_graph.json" />
-    <None Include="sample_scene_definition.json" />
     <None Include="src\Shaders\normal - Copy.frag" />
-    <None Include="scenes\test_scene.json" />
     <None Include="src\Shaders\texture.vert" />
     <None Include="src\Shaders\texture.frag" />
   </ItemGroup>

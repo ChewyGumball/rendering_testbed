@@ -1,7 +1,7 @@
 {
   "screen": {
-    "width": 400,
-    "height": 800
+    "width": 1000,
+    "height": 2000
   },
   "meshes": {
     "cube": {
@@ -18,16 +18,16 @@
   },
   "shaders": {
     "phong": {
-      "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/RenderingTestbed/src/Shaders/normal.vert" ],
-      "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/RenderingTestbed/src/Shaders/normal.frag" ]
+      "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Renderer/src/Shaders/normal.vert" ],
+      "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Renderer/src/Shaders/normal.frag" ]
     },
     "texture": {
-      "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/RenderingTestbed/src/Shaders/texture.vert" ],
-      "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/RenderingTestbed/src/Shaders/texture.frag" ]
+      "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Renderer/src/Shaders/texture.vert" ],
+      "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Renderer/src/Shaders/texture.frag" ]
     },
     "finalShader": {
-      "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/RenderingTestbed/src/Shaders/final.vert" ],
-      "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/RenderingTestbed/src/Shaders/final.frag" ]
+      "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Renderer/src/Shaders/final.vert" ],
+      "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Renderer/src/Shaders/final.frag" ]
     }
   },
   "textures": {
@@ -210,7 +210,7 @@
         "models": [ "layer1Models" ],
         "camera": "layer1Camera",
         "cull": false,
-        "clearColour": { "r":  0.2, "g": 0.2, "b": 0.2, "a": 1},
+        "clearColour": { "r":  0.1, "g": 0.1, "b": 0.1, "a": 1},
         "bufferOverrides": {
           "colour": "screenColourBufferA",
           "depth": "screenDepthBuffer"
@@ -222,7 +222,7 @@
         "models": [ "layer1Models" ],
         "camera": "layer1CameraQuaternion",
         "cull": false,
-        "clearColour": { "r":  0.4, "g": 0.4, "b": 0.4, "a": 1},
+        "clearColour": { "r":  0.2, "g": 0.2, "b": 0.2, "a": 1},
         "bufferOverrides": {
           "colour": "screenColourBufferB",
           "depth": "screenDepthBuffer"

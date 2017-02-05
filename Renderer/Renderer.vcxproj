@@ -22,6 +22,7 @@
     <ProjectGuid>{14BC9B44-5DB4-4202-9227-4AD0E2377633}</ProjectGuid>
     <RootNamespace>RenderingTestbed</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ProjectName>Renderer</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -38,7 +39,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -99,7 +100,7 @@
     <Link>
       <Profile>true</Profile>
       <AdditionalLibraryDirectories>F:\Program Files\Autodesk\FBX\FBX SDK\2017.1\lib\vs2015\x64\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3dll.lib;glew32.lib;opengl32.lib;libfbxsdk.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;opengl32.lib;libfbxsdk.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -138,8 +139,6 @@
   <ItemGroup>
     <ClCompile Include="Include\Culling\BoundingSphere.cpp" />
     <ClCompile Include="src\Renderer\QuaternionCamera.cpp" />
-    <ClCompile Include="src\Scene\Scene.cpp" />
-    <ClCompile Include="src\Scene\SceneLoader.cpp" />
     <ClCompile Include="src\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Culling\Frustum.cpp" />
     <ClCompile Include="src\Culling\Plane.cpp" />
@@ -158,7 +157,6 @@
     <ClCompile Include="src\Models\ModelInstance.cpp" />
     <ClCompile Include="src\Models\ModelLoader.cpp" />
     <ClCompile Include="src\Util\FileUtils.cpp" />
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="src\Shaders\Shader.cpp" />
     <ClCompile Include="src\Models\Material.cpp" />
     <ClCompile Include="src\Models\Mesh.cpp" />
@@ -230,14 +228,10 @@
     <ClInclude Include="Include\Renderer\OpenGL\OpenGLShader.h" />
     <ClInclude Include="Include\Renderer\PointLight.h" />
     <ClInclude Include="Include\Culling\Plane.h" />
-    <ClInclude Include="Include\Scene\Scene.h" />
-    <ClInclude Include="Include\Scene\SceneLoader.h" />
     <ClInclude Include="Include\Renderer\QuaternionCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="sample_render_graph.json" />
-    <None Include="sample_scene_definition.json" />
-    <None Include="scenes\test_scene.json" />
     <None Include="src\Shaders\colour.frag" />
     <None Include="src\Shaders\colour.vert" />
     <None Include="src\Shaders\final.frag" />

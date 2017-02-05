@@ -160,7 +160,7 @@ void renderScene(std::string sceneFile)
 		frames++;
 		if (cumulative >= 1)
 		{
-			Util::File::MonitorFiles(); 
+			Util::File::MonitorFiles();
 			uint64_t tricount = 0;
 			for (std::shared_ptr<RenderPass> pass : passes)
 			{
@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
 		if (std::string(argv[1]) == "convert")
 		{
 			convert(argc, argv);
-		} 
+		}
 		else if (std::string(argv[1]) == "render")
 		{
 			renderScene(std::string(argv[2]));
