@@ -11,12 +11,24 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Testbed", "Testbed\Testbed.
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug DirectX11|x64 = Debug DirectX11|x64
+		Debug DirectX11|x86 = Debug DirectX11|x86
+		Debug OpenGL|x64 = Debug OpenGL|x64
+		Debug OpenGL|x86 = Debug OpenGL|x86
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{14BC9B44-5DB4-4202-9227-4AD0E2377633}.Debug DirectX11|x64.ActiveCfg = Debug DirectX11|x64
+		{14BC9B44-5DB4-4202-9227-4AD0E2377633}.Debug DirectX11|x64.Build.0 = Debug DirectX11|x64
+		{14BC9B44-5DB4-4202-9227-4AD0E2377633}.Debug DirectX11|x86.ActiveCfg = Debug DirectX11|Win32
+		{14BC9B44-5DB4-4202-9227-4AD0E2377633}.Debug DirectX11|x86.Build.0 = Debug DirectX11|Win32
+		{14BC9B44-5DB4-4202-9227-4AD0E2377633}.Debug OpenGL|x64.ActiveCfg = Debug OpenGL|x64
+		{14BC9B44-5DB4-4202-9227-4AD0E2377633}.Debug OpenGL|x64.Build.0 = Debug OpenGL|x64
+		{14BC9B44-5DB4-4202-9227-4AD0E2377633}.Debug OpenGL|x86.ActiveCfg = Debug OpenGL|Win32
+		{14BC9B44-5DB4-4202-9227-4AD0E2377633}.Debug OpenGL|x86.Build.0 = Debug OpenGL|Win32
 		{14BC9B44-5DB4-4202-9227-4AD0E2377633}.Debug|x64.ActiveCfg = Debug|x64
 		{14BC9B44-5DB4-4202-9227-4AD0E2377633}.Debug|x64.Build.0 = Debug|x64
 		{14BC9B44-5DB4-4202-9227-4AD0E2377633}.Debug|x86.ActiveCfg = Debug|Win32
@@ -25,6 +37,14 @@ Global
 		{14BC9B44-5DB4-4202-9227-4AD0E2377633}.Release|x64.Build.0 = Release|x64
 		{14BC9B44-5DB4-4202-9227-4AD0E2377633}.Release|x86.ActiveCfg = Release|Win32
 		{14BC9B44-5DB4-4202-9227-4AD0E2377633}.Release|x86.Build.0 = Release|Win32
+		{B3DDCEA4-A241-49A6-A634-7E88CA10470E}.Debug DirectX11|x64.ActiveCfg = Debug DirectX11|x64
+		{B3DDCEA4-A241-49A6-A634-7E88CA10470E}.Debug DirectX11|x64.Build.0 = Debug DirectX11|x64
+		{B3DDCEA4-A241-49A6-A634-7E88CA10470E}.Debug DirectX11|x86.ActiveCfg = Debug DirectX11|Win32
+		{B3DDCEA4-A241-49A6-A634-7E88CA10470E}.Debug DirectX11|x86.Build.0 = Debug DirectX11|Win32
+		{B3DDCEA4-A241-49A6-A634-7E88CA10470E}.Debug OpenGL|x64.ActiveCfg = Debug OpenGL|x64
+		{B3DDCEA4-A241-49A6-A634-7E88CA10470E}.Debug OpenGL|x64.Build.0 = Debug OpenGL|x64
+		{B3DDCEA4-A241-49A6-A634-7E88CA10470E}.Debug OpenGL|x86.ActiveCfg = Debug OpenGL|Win32
+		{B3DDCEA4-A241-49A6-A634-7E88CA10470E}.Debug OpenGL|x86.Build.0 = Debug OpenGL|Win32
 		{B3DDCEA4-A241-49A6-A634-7E88CA10470E}.Debug|x64.ActiveCfg = Debug|x64
 		{B3DDCEA4-A241-49A6-A634-7E88CA10470E}.Debug|x64.Build.0 = Debug|x64
 		{B3DDCEA4-A241-49A6-A634-7E88CA10470E}.Debug|x86.ActiveCfg = Debug|Win32
@@ -33,6 +53,14 @@ Global
 		{B3DDCEA4-A241-49A6-A634-7E88CA10470E}.Release|x64.Build.0 = Release|x64
 		{B3DDCEA4-A241-49A6-A634-7E88CA10470E}.Release|x86.ActiveCfg = Release|Win32
 		{B3DDCEA4-A241-49A6-A634-7E88CA10470E}.Release|x86.Build.0 = Release|Win32
+		{3567A3E7-1926-4C87-8F39-CC484B00F53B}.Debug DirectX11|x64.ActiveCfg = Debug DirectX11|x64
+		{3567A3E7-1926-4C87-8F39-CC484B00F53B}.Debug DirectX11|x64.Build.0 = Debug DirectX11|x64
+		{3567A3E7-1926-4C87-8F39-CC484B00F53B}.Debug DirectX11|x86.ActiveCfg = Debug DirectX11|Win32
+		{3567A3E7-1926-4C87-8F39-CC484B00F53B}.Debug DirectX11|x86.Build.0 = Debug DirectX11|Win32
+		{3567A3E7-1926-4C87-8F39-CC484B00F53B}.Debug OpenGL|x64.ActiveCfg = Debug OpenGL|x64
+		{3567A3E7-1926-4C87-8F39-CC484B00F53B}.Debug OpenGL|x64.Build.0 = Debug OpenGL|x64
+		{3567A3E7-1926-4C87-8F39-CC484B00F53B}.Debug OpenGL|x86.ActiveCfg = Debug OpenGL|Win32
+		{3567A3E7-1926-4C87-8F39-CC484B00F53B}.Debug OpenGL|x86.Build.0 = Debug OpenGL|Win32
 		{3567A3E7-1926-4C87-8F39-CC484B00F53B}.Debug|x64.ActiveCfg = Debug|x64
 		{3567A3E7-1926-4C87-8F39-CC484B00F53B}.Debug|x64.Build.0 = Debug|x64
 		{3567A3E7-1926-4C87-8F39-CC484B00F53B}.Debug|x86.ActiveCfg = Debug|Win32

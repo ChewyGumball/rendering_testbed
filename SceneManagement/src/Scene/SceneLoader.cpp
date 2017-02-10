@@ -172,6 +172,11 @@ std::unordered_map<std::string, std::shared_ptr<RenderPass>> loadPasses(rapidjso
 			p->cull(pass.value["cull"].GetBool());
 		}
 
+		if (pass.value.HasMember("wireframe"))
+		{
+			p->wireframe(pass.value["wireframe"].GetBool());
+		}
+
 		if (pass.value.HasMember("camera"))
 		{
 			p->camera(cameras[pass.value["camera"].GetString()]);

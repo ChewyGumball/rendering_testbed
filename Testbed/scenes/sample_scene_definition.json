@@ -166,7 +166,7 @@
     "models": {
       "layer1Models": [
         {
-          "model": "buddha",
+          "model": "cube",
           "position": {
             "x": 0,
             "y": 0,
@@ -222,6 +222,7 @@
         "models": [ "layer1Models" ],
         "camera": "layer1CameraQuaternion",
         "cull": false,
+        "wireframe": true,
         "clearColour": { "r":  0.2, "g": 0.2, "b": 0.2, "a": 1},
         "bufferOverrides": {
           "colour": "screenColourBufferB",

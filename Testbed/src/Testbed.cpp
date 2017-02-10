@@ -1,6 +1,9 @@
+
+#include <windows.h>
 #include <GL\glew.h>
 #include <GLFW\glfw3.h>
 
+#include <iostream>
 #include <cstdio>
 #include <string>
 #include <cmath>
@@ -42,6 +45,11 @@ void convert(int argc, char* argv[])
 	convertedFile.write(reinterpret_cast<char*>(indices.data()), indexCount * sizeof(int));
 
 	convertedFile.close();
+}
+
+void printGLFWError(int error, const char* description)
+{
+	std::cout << "GLFW ERROR (" << error << "): " << description << std::endl;
 }
 
 void printHelp() {}
@@ -176,6 +184,29 @@ void renderScene(std::string sceneFile)
 	glfwTerminate();
 }
 
+void directx(std::string sceneFile)
+{
+	if (!glfwInit())
+	{
+		return;
+	}
+	glfwSetErrorCallback(printGLFWError);
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
+	GLFWwindow* window = glfwCreateWindow(width, height, "Hello World", nullptr, nullptr);
+	if (!window)
+	{
+		glfwTerminate();
+		return;
+	}
+	while (!glfwWindowShouldClose(window))
+	{
+		glfwPollEvents();
+	}
+
+	glfwTerminate();
+}
+
 int main(int argc, char *argv[])
 {
 	if (argc > 1)
@@ -186,7 +217,14 @@ int main(int argc, char *argv[])
 		}
 		else if (std::string(argv[1]) == "render")
 		{
-			renderScene(std::string(argv[2]));
+			if (std::string(argv[2]) == "-opengl")
+			{
+				renderScene(std::string(argv[3]));
+			}
+			else if (std::string(argv[2]) == "-directx11")
+			{
+				directx(std::string(argv[3]));
+			}
 		}
 		return 0;
 	}

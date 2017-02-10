@@ -13,6 +13,7 @@ private:
 	std::shared_ptr<Camera> m_camera;
 	glm::vec4 m_clearColour;
 	bool culllingEnabled;
+	bool m_wireframe;
 	glm::vec2 viewportOrigin, viewportSize;
 public:
 	RenderPass();
@@ -22,6 +23,7 @@ public:
 
 	void clearColour(glm::vec4 colour);
 	void cull(bool enabled);
+	void wireframe(bool enabled);
 	void camera(std::shared_ptr<Camera> c);
 
 	void addModelInstance(std::shared_ptr<const ModelInstance> modelInstance);
