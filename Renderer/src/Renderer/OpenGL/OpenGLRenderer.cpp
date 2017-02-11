@@ -9,23 +9,57 @@
 #include "Models/Model.h"
 #include "Models/Mesh.h"
 #include "Renderer/Camera.h"
+#include "Renderer/OpenGL/OpenGLTextureBuffer.h"
+#include "Renderer/OpenGL/OpenGLFrameBuffer.h"
 
 namespace {
-	std::unordered_map<std::size_t, OpenGLRenderMesh> meshes;
-	std::unordered_map<std::size_t, OpenGLShader> shaders;
-	std::unordered_map<std::size_t, OpenGLRenderModel> models;
-}
 
-void OpenGLRenderer::addLightUniforms(OpenGLShader & shader)
-{
-	for (int i = 0; i < lights.size(); i++)
+	std::vector<GLenum> textureUnits{
+		GL_TEXTURE0,
+		GL_TEXTURE1,
+		GL_TEXTURE2,
+		GL_TEXTURE3,
+		GL_TEXTURE4,
+		GL_TEXTURE5,
+		GL_TEXTURE6,
+		GL_TEXTURE7,
+		GL_TEXTURE8
+	};
+
+	std::unordered_map<uint32_t, OpenGLRenderMesh> meshes;
+	std::unordered_map<uint32_t, OpenGLShader> shaders;
+	std::unordered_map<uint32_t, OpenGLRenderModel> models;
+	std::unordered_map<uint32_t, OpenGLTextureBuffer> textures;
+	std::unordered_map<uint32_t, OpenGLFrameBuffer> frameBuffers;
+
+	void addLightUniforms(OpenGLShader & shader, std::vector<PointLight>& lights)
 	{
-		PointLight& light = lights[i];
-		shader.setUniform3f(Util::String::Format("pointLights[%d].position", i), light.position());
-		shader.setUniform3f(Util::String::Format("pointLights[%d].intensity", i), light.intensity());
-		shader.setUniform1f(Util::String::Format("pointLights[%d].power", i), light.power());
+		for (int i = 0; i < lights.size(); i++)
+		{
+			PointLight& light = lights[i];
+			shader.setUniform3f(Util::String::Format("pointLights[%d].position", i), light.position());
+			shader.setUniform3f(Util::String::Format("pointLights[%d].intensity", i), light.intensity());
+			shader.setUniform1f(Util::String::Format("pointLights[%d].power", i), light.power());
+		}
+	}
+
+	void bindTextures(OpenGLShader& shader, std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> modelTextures)
+	{
+		int textureUnit = 0;
+		for (auto &texture : modelTextures)
+		{
+			glActiveTexture(textureUnits[textureUnit]);
+			glBindTexture(GL_TEXTURE_2D, textures[texture.second->id()].handle());
+			shader.setUniform1i(texture.first, textureUnit);
+
+			if (textureUnit++ >= textureUnits.size())
+			{
+				break;
+			}
+		}
 	}
 }
+
 
 OpenGLRenderer::OpenGLRenderer()
 {
@@ -36,21 +70,48 @@ OpenGLRenderer::~OpenGLRenderer()
 {
 }
 
+void OpenGLRenderer::addFrameBuffer(std::shared_ptr<const FrameBuffer> frameBuffer)
+{
+	for (auto target : frameBuffer->targets())
+	{
+		if (textures.count(target.second->id()) == 0)
+		{
+			textures.emplace(target.second->id(), target.second);
+		}
+	}
+
+	if (frameBuffers.count(frameBuffer->id()) == 0)
+	{
+		frameBuffers.emplace(frameBuffer->id(), OpenGLFrameBuffer(frameBuffer, textures));
+	}
+}
+
 void OpenGLRenderer::addModelInstance(std::shared_ptr<const ModelInstance> modelInstance)
 {
-	if (meshes.count(modelInstance->model()->mesh()->id()) == 0)
+	auto model = modelInstance->model();
+	auto mesh = model->mesh();
+
+	for (auto texture : model->textures())
 	{
-		meshes.emplace(modelInstance->model()->mesh()->id(), modelInstance->model()->mesh());
+		if (textures.count(texture.second->id()) == 0)
+		{
+			textures.emplace(texture.second->id(), texture.second);
+		}
 	}
 
-	if (shaders.count(modelInstance->model()->shader()->id()) == 0)
+	if (meshes.count(mesh->id()) == 0)
 	{
-		shaders.emplace(modelInstance->model()->shader()->id(), modelInstance->model()->shader());
+		meshes.emplace(mesh->id(), mesh);
 	}
 
-	if (models.count(modelInstance->model()->id()) == 0)
+	if (shaders.count(model->shader()->id()) == 0)
 	{
-		models.emplace(modelInstance->model()->id(), OpenGLRenderModel(meshes[modelInstance->model()->mesh()->id()], modelInstance->model()->shader()->id(), modelInstance->model()->textures()));
+		shaders.emplace(model->shader()->id(), model->shader());
+	}
+
+	if (models.count(model->id()) == 0)
+	{
+		models.emplace(model->id(), OpenGLRenderModel(meshes[mesh->id()], model->shader()->id(), model->textures()));
 	}
 
 	modelInstances.emplace_back(modelInstance);
@@ -66,13 +127,13 @@ void OpenGLRenderer::removeModelInstance(std::shared_ptr<const ModelInstance> mo
 	modelInstances.erase(std::remove(modelInstances.begin(), modelInstances.end(), modelInstance), modelInstances.end());
 }
 
-void OpenGLRenderer::draw(const std::shared_ptr<Camera> c, bool doFrustrumCulling)
+void OpenGLRenderer::draw(std::shared_ptr<FrameBuffer> frameBuffer, const std::shared_ptr<Camera> camera, RenderOptions& options)
 {
 	trianglesDrawn = 0;
 	std::unordered_map<size_t, std::vector<std::shared_ptr<const ModelInstance>>> culledInstances;
-	if (doFrustrumCulling)
+	if (options.cullingEnabled)
 	{
-		culledInstances = cull(c, modelInstances);
+		culledInstances = cull(camera, modelInstances);
 	}
 	else
 	{
@@ -80,6 +141,18 @@ void OpenGLRenderer::draw(const std::shared_ptr<Camera> c, bool doFrustrumCullin
 		{
 			culledInstances[modelInstances[i]->model()->id()].push_back(modelInstances[i]);
 		}
+	}
+
+	frameBuffers[frameBuffer->id()].bind();
+
+	glViewport(options.viewportOrigin.x, options.viewportOrigin.y, options.viewportDimensions.x, options.viewportDimensions.y);
+	glClearColor(options.clearColour.r, options.clearColour.g, options.clearColour.b, options.clearColour.a);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	if (options.wireframe)
+	{
+		glPolygonMode(GL_FRONT, GL_LINE);
+		glPolygonMode(GL_BACK, GL_LINE);
 	}
 
 	for (auto instanceList : culledInstances)
@@ -97,11 +170,19 @@ void OpenGLRenderer::draw(const std::shared_ptr<Camera> c, bool doFrustrumCullin
 
 		OpenGLShader& shader = shaders[model.shaderID];
 		shader.bind();
-		model.bindTextures(shader);
-		shader.setUniformMatrix4f("view", c->transform());
-		shader.setUniformMatrix4f("projection", c->projection());
-		shader.setUniform3f("cameraPosition", c->position());
-		addLightUniforms(shader);
+		bindTextures(shader, model.textures);
+		shader.setUniformMatrix4f("view", camera->transform());
+		shader.setUniformMatrix4f("projection", camera->projection());
+		shader.setUniform3f("cameraPosition", camera->position());
+		addLightUniforms(shader, lights);
+
 		model.draw(static_cast<int>(transforms.size()));
 	}
+
+	if (options.wireframe)
+	{
+		glPolygonMode(GL_FRONT, GL_FILL);
+		glPolygonMode(GL_BACK, GL_FILL);
+	}
+	frameBuffers[frameBuffer->id()].unbind();
 }

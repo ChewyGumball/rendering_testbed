@@ -52,7 +52,17 @@ void printGLFWError(int error, const char* description)
 	std::cout << "GLFW ERROR (" << error << "): " << description << std::endl;
 }
 
-void printHelp() {}
+void printHelp() 
+{
+	std::cout << "USAGE: Testbed.exe [command] [options] [input filename] [output filename]" << std::endl;
+	std::cout << "Commands:" << std::endl;
+	std::cout << "\thelp    - prints this help text" << std::endl;
+	std::cout << "\tconvert - converts the .obj file specified to a binary representation that loads faster" << std::endl;
+	std::cout << "\trender  - renders the scene specified in the given scene file" << std::endl;
+	std::cout << "\t\tOptions:" << std::endl;
+	std::cout << "\t\t\t-opengl    - use the OpenGL Renderer" << std::endl;
+	std::cout << "\t\t\t-directx10 - use the DirectX10 Renderer" << std::endl;
+}
 
 void renderScene(std::string sceneFile)
 {
@@ -77,7 +87,7 @@ void renderScene(std::string sceneFile)
 		return;
 	}
 
-	glfwSwapInterval(1);
+	glfwSwapInterval(0);
 	glClearColor(0.2, 0.2, 0.2, 1);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -175,7 +185,7 @@ void renderScene(std::string sceneFile)
 				tricount += pass->trianglesDrawn();
 			}
 
-			//std::printf("%d frames, %I64d triangles\n", frames, tricount);
+			std::printf("%d frames, %I64d triangles\n", frames, tricount);
 			cumulative = 0;
 			frames = 0;
 		}
@@ -209,27 +219,31 @@ void directx(std::string sceneFile)
 
 int main(int argc, char *argv[])
 {
-	if (argc > 1)
+	if (argc >= 3 && std::string(argv[1]) == "convert")
 	{
-		if (std::string(argv[1]) == "convert")
+		convert(argc, argv);
+	}
+	else if (std::string(argv[1]) == "render" && argc >= 4)
+	{
+		if (std::string(argv[2]) == "-opengl")
 		{
-			convert(argc, argv);
+			renderScene(std::string(argv[3]));
 		}
-		else if (std::string(argv[1]) == "render")
+		else if (std::string(argv[2]) == "-directx10")
 		{
-			if (std::string(argv[2]) == "-opengl")
-			{
-				renderScene(std::string(argv[3]));
-			}
-			else if (std::string(argv[2]) == "-directx11")
-			{
-				directx(std::string(argv[3]));
-			}
+			directx(std::string(argv[3]));
 		}
-		return 0;
+		else {
+			std::cout << "Invalid renderer: " << argv[2] << std::endl;
+		}
 	}
 	else
 	{
+		if (argc != 1 || std::string(argv[1]) != "help") {
+			std::cout << "Invalid Arguments" << std::endl << std::endl;
+		}
 		printHelp();
 	}
+
+	return 0;
 }

@@ -13,6 +13,8 @@
 
 #include <Renderer\Renderer.h>
 #include <Renderer/PointLight.h>
+#include <Renderer/FrameBuffer.h>
+#include <Renderer\RenderOptions.h>
 
 class Camera;
 class ModelInstance;
@@ -29,18 +31,17 @@ private:
 	std::vector<PointLight> lights;
 
 	glm::mat4 previouslyCulledCameraMatrix;
-
-	void addLightUniforms(OpenGLShader& shader);
 public:
 	OpenGLRenderer();
 	~OpenGLRenderer();
 
+	void addFrameBuffer(std::shared_ptr<const FrameBuffer> frameBuffer);
 	void addModelInstance(std::shared_ptr<const ModelInstance> modelInstance);
 	void addPointLight(PointLight light);
 
 	void removeModelInstance(std::shared_ptr<const ModelInstance> modelInstance);
 	//void removePointLight(PointLight light);
 
-	void draw(const std::shared_ptr<Camera> c, bool doFrustrumCulling);
+	void draw(std::shared_ptr<FrameBuffer> frameBuffer, const std::shared_ptr<Camera> camera, RenderOptions& options);
 };
 

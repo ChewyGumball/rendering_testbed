@@ -1,17 +1,23 @@
 #pragma once
-#include <GL\glew.h>
 #include <glm/vec2.hpp>
-class TextureBuffer
-{
-	int m_width;
-	int m_height;
-	GLuint handle;
+#include <Renderer\RenderResource.h>
 
+enum struct TextureFormat {
+	RGB8,
+	DEPTH
+};
+
+class TextureBuffer : public RenderResource
+{
+	glm::vec2 m_dimensions;
+	TextureFormat m_format;
+	void* m_data;
 public:
-	TextureBuffer(int width, int height, GLenum format, GLenum internalFormat, void* data = nullptr);
+	TextureBuffer(glm::vec2 dimensions, TextureFormat format, void* data = nullptr);
 	~TextureBuffer();
 
-	GLuint id() const;
+	void* const data() const;
+	TextureFormat format() const;
 	glm::vec2 dimensions() const;
 };
 

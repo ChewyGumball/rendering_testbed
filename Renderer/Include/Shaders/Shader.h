@@ -1,15 +1,14 @@
 #pragma once
 #include <string>
 #include <unordered_set>
+#include <Renderer\RenderResource.h>
 
 #include <GL\glew.h>
 #include <glm\glm.hpp>
 
-class Shader
+class Shader : public RenderResource
 {
-
 protected:
-	std::size_t m_id;
 	mutable GLuint programHandle;
 	std::vector<std::string> vertexFilenames;
 	std::vector<std::string> fragmentFilenames;
@@ -33,8 +32,5 @@ public:
 	void setUniformMatrix4f(const std::string& uniformName, glm::mat4 data) const;
 
 	void bind() const;
-
-	std::size_t id() const;
-
 };
 

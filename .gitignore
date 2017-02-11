@@ -246,3 +246,6 @@ ModelManifest.xml
 /.clang_format
 *.etl
 /RenderingTestbed/.clang-format
+/Testbed/*.clang-format
+/SceneManagement/*.clang-format
+/Renderer/*.clang-format

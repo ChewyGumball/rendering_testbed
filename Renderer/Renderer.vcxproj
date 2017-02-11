@@ -247,6 +247,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Renderer\RenderResource.cpp" />
+    <ClCompile Include="src\Renderer\RenderOptions.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\OpenGLTextureBuffer.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\OpenGLFrameBuffer.cpp" />
+    <ClCompile Include="src\Renderer\FrameBuffer.cpp" />
     <ClCompile Include="Include\Culling\BoundingSphere.cpp" />
     <ClCompile Include="src\Renderer\QuaternionCamera.cpp" />
     <ClCompile Include="src\Renderer\Renderer.cpp" />
@@ -276,6 +281,7 @@
     <ClCompile Include="src\Models\Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Include\Renderer\FrameBuffer.h" />
     <ClInclude Include="Include\Culling\Frustum.h" />
     <ClInclude Include="Include\Culling\BoundingSphere.h" />
     <ClInclude Include="Include\lib\rapidjson\allocators.h" />
@@ -339,6 +345,10 @@
     <ClInclude Include="Include\Renderer\PointLight.h" />
     <ClInclude Include="Include\Culling\Plane.h" />
     <ClInclude Include="Include\Renderer\QuaternionCamera.h" />
+    <ClInclude Include="Include\Renderer\OpenGL\OpenGLFrameBuffer.h" />
+    <ClInclude Include="Include\Renderer\OpenGL\OpenGLTextureBuffer.h" />
+    <ClInclude Include="Include\Renderer\RenderOptions.h" />
+    <ClInclude Include="Include\Renderer\RenderResource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="sample_render_graph.json" />

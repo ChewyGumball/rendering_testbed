@@ -1,17 +1,6 @@
 #include "Renderer/OpenGL/OpenGLRenderModel.h"
 
 namespace {
-	std::vector<GLenum> textureUnits{
-		GL_TEXTURE0,
-		GL_TEXTURE1,
-		GL_TEXTURE2,
-		GL_TEXTURE3,
-		GL_TEXTURE4,
-		GL_TEXTURE5,
-		GL_TEXTURE6,
-		GL_TEXTURE7,
-		GL_TEXTURE8
-	};
 
 	const GLuint VERTEX_DATA_BINDING_POINT_INDEX = 0;
 	const GLuint TRANSFORM_DATA_BINDING_POINT_INDEX = 1;
@@ -89,18 +78,3 @@ GLuint OpenGLRenderModel::transformVBO() const
 	return m_transformVBO;
 }
 
-void OpenGLRenderModel::bindTextures(const OpenGLShader& shader) const
-{
-	int textureUnit = 0;
-	for (auto &texture : textures)
-	{
-		glActiveTexture(textureUnits[textureUnit]);
-		glBindTexture(GL_TEXTURE_2D, texture.second->id());
-		shader.setUniform1i(texture.first, textureUnit);
-
-		if (textureUnit++ >= textureUnits.size())
-		{
-			break;
-		}
-	}
-}

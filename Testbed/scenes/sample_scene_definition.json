@@ -1,7 +1,7 @@
 {
   "screen": {
-    "width": 1000,
-    "height": 2000
+    "width": 800,
+    "height": 800
   },
   "meshes": {
     "cube": {
@@ -166,7 +166,7 @@
     "models": {
       "layer1Models": [
         {
-          "model": "cube",
+          "model": "buddha",
           "position": {
             "x": 0,
             "y": 0,
@@ -209,7 +209,7 @@
         "lights": [ "layer1Lights" ],
         "models": [ "layer1Models" ],
         "camera": "layer1Camera",
-        "cull": false,
+        "cull": true,
         "clearColour": { "r":  0.1, "g": 0.1, "b": 0.1, "a": 1},
         "bufferOverrides": {
           "colour": "screenColourBufferA",
@@ -221,7 +221,7 @@
         "lights": [ "layer1Lights" ],
         "models": [ "layer1Models" ],
         "camera": "layer1CameraQuaternion",
-        "cull": false,
+        "cull": true,
         "wireframe": true,
         "clearColour": { "r":  0.2, "g": 0.2, "b": 0.2, "a": 1},
         "bufferOverrides": {
@@ -230,7 +230,7 @@
         }
       },
       "display": {
-        "dependencies": [ ],
+        "dependencies": [ "cameraTestB", "cameraTestA" ],
         "lights": [ "layer1Lights" ],
         "models": [ "cameraTest" ],
         "cull":  false,

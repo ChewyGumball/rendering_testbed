@@ -2,31 +2,29 @@
 
 #include "Culling/Frustum.h"
 
-std::unordered_map<size_t, std::vector<std::shared_ptr<const ModelInstance>>> Renderer::cull(const std::shared_ptr<Camera> camera, std::vector<std::shared_ptr<const ModelInstance>> instances)
+std::unordered_map<size_t, std::vector<std::shared_ptr<const ModelInstance>>> Renderer::cull(
+    const std::shared_ptr<Camera> camera, std::vector<std::shared_ptr<const ModelInstance>> instances)
 {
-	Culling::Frustum frustum(camera->projection() * camera->transform());
+    Culling::Frustum frustum(camera->projection() * camera->transform());
 
-	std::vector<glm::vec3> centers(instances.size());
-	std::vector<float> radii(instances.size());
+    std::vector<glm::vec3> centers(instances.size());
+    std::vector<float>     radii(instances.size());
 
-	for (size_t i = 0; i < instances.size(); ++i)
-	{
-		Culling::BoundingSphere s = instances[i]->bounds();
-		centers[i] = s.center();
-		radii[i] = s.radius();
-	}
+    for (size_t i = 0; i < instances.size(); ++i) {
+        Culling::BoundingSphere s = instances[i]->bounds();
+        centers[i]                = s.center();
+        radii[i]                  = s.radius();
+    }
 
-	std::vector<bool> intersections = frustum.intersects(centers, radii);
+    std::vector<bool> intersections = frustum.intersects(centers, radii);
 
-	std::unordered_map<size_t, std::vector<std::shared_ptr<const ModelInstance>>> visibleModels;
+    std::unordered_map<size_t, std::vector<std::shared_ptr<const ModelInstance>>> visibleModels;
 
-	for (size_t i = 0; i < instances.size(); ++i)
-	{
-		if (intersections[i])
-		{
-			visibleModels[instances[i]->model()->id()].push_back(instances[i]);
-		}
-	}
+    for (size_t i = 0; i < instances.size(); ++i) {
+        if (intersections[i]) {
+            visibleModels[instances[i]->model()->id()].push_back(instances[i]);
+        }
+    }
 
-	return visibleModels;
+    return visibleModels;
 }

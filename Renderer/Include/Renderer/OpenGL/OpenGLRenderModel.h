@@ -24,7 +24,5 @@ public:
 	void draw(int instanceCount) const;
 
 	GLuint transformVBO() const;
-
-	void bindTextures(const OpenGLShader& shader) const;
 };
 

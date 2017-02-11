@@ -6,6 +6,8 @@
 #include <Renderer\Camera.h>
 #include <Renderer\PointLight.h>
 #include <Models\ModelInstance.h>
+#include <Renderer\FrameBuffer.h>
+#include <Renderer\RenderOptions.h>
 
 class Renderer
 {
@@ -13,8 +15,9 @@ public:
 	uint64_t trianglesDrawn;
 	Renderer() {};
 	virtual ~Renderer() {};
-	virtual void draw(const std::shared_ptr<Camera> c, bool doFrustrumCulling) = 0;
+	virtual void draw(std::shared_ptr<FrameBuffer> frameBuffer, const std::shared_ptr<Camera> camera, RenderOptions& options) = 0;
 
+	virtual void addFrameBuffer(std::shared_ptr<const FrameBuffer> frameBuffer) = 0;
 	virtual void addModelInstance(std::shared_ptr<const ModelInstance> modelInstance) = 0;
 	virtual void removeModelInstance(std::shared_ptr<const ModelInstance> modelInstance) = 0;
 

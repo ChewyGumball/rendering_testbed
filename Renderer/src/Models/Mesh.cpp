@@ -5,7 +5,6 @@
 #include <glm/common.hpp>
 
 namespace {
-	std::size_t nextID = 0;
 	Culling::BoundingSphere calculateBoundingSphere(VertexFormat& format, std::vector<float>& verts)
 	{
 		float infinity = std::numeric_limits<float>::infinity();
@@ -23,7 +22,7 @@ namespace {
 	}
 }
 
-Mesh::Mesh(VertexFormat format, std::vector<float> vertices, std::vector<int> indices) : format(format), m_id(nextID++), m_vertices(vertices), indices(indices), boundingSphere(calculateBoundingSphere(format, vertices))
+Mesh::Mesh(VertexFormat format, std::vector<float> vertices, std::vector<int> indices) : format(format), m_vertices(vertices), indices(indices), boundingSphere(calculateBoundingSphere(format, vertices))
 {
 }
 
@@ -44,11 +43,6 @@ const std::vector<int>& Mesh::indexData() const
 const VertexFormat Mesh::vertexFormat() const
 {
 	return format;
-}
-
-std::size_t Mesh::id() const
-{
-	return m_id;
 }
 
 Culling::BoundingSphere Mesh::bounds() const

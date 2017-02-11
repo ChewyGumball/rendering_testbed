@@ -1,28 +1,23 @@
 #include "Renderer/TextureBuffer.h"
 
-
-TextureBuffer::TextureBuffer(int width, int height, GLenum format, GLenum internalFormat, void* data): m_width(width), m_height(height)
+TextureBuffer::TextureBuffer(glm::vec2 dimensions, TextureFormat format, void * data) : m_dimensions(dimensions), m_format(format), m_data(data)
 {
-	glGenTextures(1, &handle);
-	glBindTexture(GL_TEXTURE_2D, handle);
-	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
 }
-
 
 TextureBuffer::~TextureBuffer()
 {
 }
 
-GLuint TextureBuffer::id() const
+void* const TextureBuffer::data() const {
+	return m_data;
+}
+
+TextureFormat TextureBuffer::format() const
 {
-	return handle;
+	return m_format;
 }
 
 glm::vec2 TextureBuffer::dimensions() const
 {
-	return glm::vec2(m_width, m_height);
+	return m_dimensions;
 }
