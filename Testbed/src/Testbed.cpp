@@ -21,6 +21,7 @@
 
 int width = 800;
 int height = 800;
+double mouseX, mouseY;
 
 void convert(int argc, char* argv[])
 {
@@ -64,6 +65,54 @@ void printHelp()
 	std::cout << "\t\t\t-directx10 - use the DirectX10 Renderer" << std::endl;
 }
 
+void handleInput(std::vector<std::shared_ptr<Camera>> cameras, GLFWwindow* window) {
+	glfwPollEvents();
+	double newMouseX, newMouseY;
+	glfwGetCursorPos(window, &newMouseX, &newMouseY);
+
+	for (auto camera : cameras) {
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		{
+			camera->move(-0.1f * camera->right());
+		}
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		{
+			camera->move(0.1f * camera->right());
+		}
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		{
+			camera->move(0.1f * camera->forward());
+		}
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		{
+			camera->move(-0.1f * camera->forward());
+		}
+		if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+		{
+			camera->move(0.1f * camera->up());
+		}
+		if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
+		{
+			camera->move(-0.1f * camera->up());
+		}
+
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2))
+		{
+			if (newMouseY != mouseY)
+			{
+				camera->pitch(static_cast<float>(newMouseY - mouseY) * -0.01f);
+			}
+			if (newMouseX != mouseX)
+			{
+				camera->yaw(static_cast<float>(newMouseX - mouseX) * -0.01f);
+			}
+		}
+	}
+
+	mouseY = newMouseY;
+	mouseX = newMouseX;
+}
+
 void renderScene(std::string sceneFile)
 {
 	if (!glfwInit())
@@ -96,10 +145,8 @@ void renderScene(std::string sceneFile)
 	std::vector<std::shared_ptr<ModelInstance>> instances = scene.modelInstances("layer1Models");
 	std::vector<std::shared_ptr<ModelInstance>> instances2 = scene.modelInstances("cameraTest");
 	const std::vector<std::shared_ptr<RenderPass>>& passes = scene.passes();
-
-
-	std::shared_ptr<Camera> c = scene.camera("layer1Camera");
-	std::shared_ptr<Camera> c2 = scene.camera("layer1CameraQuaternion");
+	
+	std::vector<std::shared_ptr<Camera>> cameras{ scene.camera("layer1Camera"), scene.camera("layer1CameraQuaternion") };
 
 	double lastTime = glfwGetTime();
 	double cumulative = 0;
@@ -113,65 +160,16 @@ void renderScene(std::string sceneFile)
 		for (auto instance : instances)
 		{
 			instance->rotate(glm::vec3(0.0f, 1.0f, 0.0f), 0.7f * static_cast<float>(currentTime - lastTime));
-			//instance->rotate(glm::vec3(1, 1, 0), 1 * (currentTime - lastTime));
-			//instance->rotate(glm::vec3(0, 1, 0), 0.3 * (currentTime - lastTime));
-		}
-		glfwPollEvents();
-
-		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		{
-			c->move(-0.1f * c->right());
-			c2->move(-0.1f * c->right());
-		}
-		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		{
-			c->move(0.1f * c->right());
-			c2->move(0.1f * c->right());
-		}
-		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		{
-			c->move(0.1f * c->forward());
-			c2->move(0.1f * c->forward());
-		}
-		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		{
-			c->move(-0.1f * c->forward());
-			c2->move(-0.1f * c->forward());
-		}
-		if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
-		{
-			c->move(0.1f * c->up());
-			c2->move(0.1f * c->up());
-		}
-		if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
-		{
-			c->move(-0.1f * c->up());
-			c2->move(-0.1f * c->up());
 		}
 
-		double newMouseX, newMouseY;
-		glfwGetCursorPos(window, &newMouseX, &newMouseY);
+		handleInput(cameras, window);
 
-		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2))
-		{
-			if (newMouseY != mouseY)
-			{
-				c->pitch(static_cast<float>(newMouseY - mouseY) * -0.01f);
-				c2->pitch(static_cast<float>(newMouseY - mouseY) * -0.01f);
-			}
-			if (newMouseX != mouseX)
-			{
-				c->yaw(static_cast<float>(newMouseX - mouseX) * -0.01f);
-				c2->yaw(static_cast<float>(newMouseX - mouseX) * -0.01f);
-			}
-		}
-		mouseY = newMouseY;
-		mouseX = newMouseX;
-
+		uint64_t tricount = 0;
 		for (std::shared_ptr<RenderPass> pass : passes)
 		{
-			pass->draw();
+			tricount += pass->draw();
 		}
+
 		glfwSwapBuffers(window);
 		cumulative += currentTime - lastTime;
 		lastTime = currentTime;
@@ -179,12 +177,6 @@ void renderScene(std::string sceneFile)
 		if (cumulative >= 1)
 		{
 			Util::File::MonitorFiles();
-			uint64_t tricount = 0;
-			for (std::shared_ptr<RenderPass> pass : passes)
-			{
-				tricount += pass->trianglesDrawn();
-			}
-
 			std::printf("%d frames, %I64d triangles\n", frames, tricount);
 			cumulative = 0;
 			frames = 0;

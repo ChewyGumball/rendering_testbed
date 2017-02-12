@@ -114,69 +114,55 @@ OpenGLRenderer::OpenGLRenderer() {}
 
 OpenGLRenderer::~OpenGLRenderer() {}
 
-void OpenGLRenderer::addFrameBuffer(std::shared_ptr<const FrameBuffer> frameBuffer) { createFrameBuffer(frameBuffer); }
+void OpenGLRenderer::addFrameBufferResources(std::shared_ptr<const FrameBuffer> frameBuffer) { createFrameBuffer(frameBuffer); }
 
-void OpenGLRenderer::addModelInstance(std::shared_ptr<const ModelInstance> modelInstance)
+void OpenGLRenderer::addModelInstanceResources(std::shared_ptr<const ModelInstance> modelInstance)
 {
     createModel(modelInstance->model());
-    modelInstances.emplace_back(modelInstance);
 }
 
 void OpenGLRenderer::addPointLight(PointLight light) { lights.push_back(light); }
 
-void OpenGLRenderer::removeModelInstance(std::shared_ptr<const ModelInstance> modelInstance)
-{
-    modelInstances.erase(std::remove(modelInstances.begin(), modelInstances.end(), modelInstance), modelInstances.end());
+
+void OpenGLRenderer::clearFrameBuffer(std::shared_ptr<const FrameBuffer> frameBuffer, glm::vec4 clearColour) {
+	frameBuffers[frameBuffer->id()].bind();
+	glClearColor(clearColour.r, clearColour.g, clearColour.b, clearColour.a);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void OpenGLRenderer::draw(std::shared_ptr<FrameBuffer> frameBuffer, const std::shared_ptr<Camera> camera, RenderOptions& options)
+void OpenGLRenderer::draw(const std::vector<std::shared_ptr<const ModelInstance>>& instances, const std::shared_ptr<Camera> camera, RenderOptions& options)
 {
-    trianglesDrawn = 0;
-    std::unordered_map<size_t, std::vector<std::shared_ptr<const ModelInstance>>> culledInstances;
-    if (options.cullingEnabled) {
-        culledInstances = cull(camera, modelInstances);
-    } else {
-        for (size_t i = 0; i < modelInstances.size(); ++i) {
-            culledInstances[modelInstances[i]->model()->id()].push_back(modelInstances[i]);
-        }
-    }
-
-    frameBuffers[frameBuffer->id()].bind();
+    frameBuffers[options.frameBuffer->id()].bind();
 
     glViewport(options.viewportOrigin.x, options.viewportOrigin.y, options.viewportDimensions.x, options.viewportDimensions.y);
-    glClearColor(options.clearColour.r, options.clearColour.g, options.clearColour.b, options.clearColour.a);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	
     if (options.wireframe) {
         glPolygonMode(GL_FRONT, GL_LINE);
         glPolygonMode(GL_BACK, GL_LINE);
     }
 
-    for (auto instanceList : culledInstances) {
-        OpenGLRenderModel& model = models[instanceList.first];
-        // update transform data and draw models
-        std::vector<glm::mat4> transforms;
-        for (auto instance : instanceList.second) {
-            transforms.push_back(instance->transformMatrix());
-            // transforms.push_back(glm::mat4(0));
-            trianglesDrawn += instance->triangleCount();
-        }
-        glNamedBufferData(model.transformVBO(), transforms.size() * sizeof(glm::mat4), transforms.data(), GL_STATIC_DRAW);
+	uint32_t modelID = instances[0]->model()->id();
 
-        OpenGLShader& shader = shaders[model.shaderID];
-        shader.bind();
-        bindTextures(shader, model.textures);
-        shader.setUniformMatrix4f("view", camera->transform());
-        shader.setUniformMatrix4f("projection", camera->projection());
-        shader.setUniform3f("cameraPosition", camera->position());
-        addLightUniforms(shader, lights);
-
-        model.draw(static_cast<int>(transforms.size()));
+    OpenGLRenderModel& model = models[modelID];
+    // update transform data and draw models
+    std::vector<glm::mat4> transforms;
+    for (auto instance : instances) {
+        transforms.push_back(instance->transformMatrix());
     }
+    glNamedBufferData(model.transformVBO(), transforms.size() * sizeof(glm::mat4), transforms.data(), GL_DYNAMIC_DRAW);
+
+    OpenGLShader& shader = shaders[model.shaderID];
+    shader.bind();
+    bindTextures(shader, model.textures);
+    shader.setUniformMatrix4f("view", camera->transform());
+    shader.setUniformMatrix4f("projection", camera->projection());
+    shader.setUniform3f("cameraPosition", camera->position());
+    addLightUniforms(shader, lights);
+
+    model.draw(static_cast<int>(transforms.size()));
 
     if (options.wireframe) {
         glPolygonMode(GL_FRONT, GL_FILL);
         glPolygonMode(GL_BACK, GL_FILL);
     }
-    frameBuffers[frameBuffer->id()].unbind();
 }

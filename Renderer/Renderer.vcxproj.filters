@@ -93,9 +93,6 @@
     <ClCompile Include="Include\Culling\BoundingSphere.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\Renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Culling\Frustum.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

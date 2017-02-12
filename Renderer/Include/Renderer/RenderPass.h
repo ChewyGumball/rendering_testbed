@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+
 #include <Renderer\TextureBuffer.h>
 #include <Renderer\Renderer.h>
 #include <Renderer\Camera.h>
@@ -11,15 +13,21 @@ class RenderPass
 {
 private:
 	Renderer *renderer;
-	std::shared_ptr<FrameBuffer> m_frameBuffer;
 	std::shared_ptr<Camera> m_camera;
 	RenderOptions options;
+	bool cullingEnabled;
+	glm::vec4 m_clearColour;
+	bool m_clearBuffers;
+	std::vector<std::shared_ptr<const ModelInstance>> modelInstances;
+
 public:
 	RenderPass();
 	~RenderPass();
 
-	void draw();
+	//Returns how many triangles were drawn (after culling if culling is enabled)
+	uint64_t draw();
 
+	void clearBuffers(bool enabled);
 	void clearColour(glm::vec4 colour);
 	void cull(bool enabled);
 	void wireframe(bool enabled);
@@ -32,7 +40,5 @@ public:
 	void removeModelInstance(std::shared_ptr<const ModelInstance> modelInstance);
 	
 	void viewport(glm::vec2 origin, glm::vec2 size);
-
-	uint64_t trianglesDrawn() const;
 };
 

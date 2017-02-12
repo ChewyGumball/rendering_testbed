@@ -254,7 +254,6 @@
     <ClCompile Include="src\Renderer\FrameBuffer.cpp" />
     <ClCompile Include="Include\Culling\BoundingSphere.cpp" />
     <ClCompile Include="src\Renderer\QuaternionCamera.cpp" />
-    <ClCompile Include="src\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Culling\Frustum.cpp" />
     <ClCompile Include="src\Culling\Plane.cpp" />
     <ClCompile Include="src\lib\SimpleFileWatcher\FileWatcher.cpp" />

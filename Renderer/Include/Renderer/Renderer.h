@@ -12,17 +12,15 @@
 class Renderer
 {
 public:
-	uint64_t trianglesDrawn;
 	Renderer() {};
 	virtual ~Renderer() {};
-	virtual void draw(std::shared_ptr<FrameBuffer> frameBuffer, const std::shared_ptr<Camera> camera, RenderOptions& options) = 0;
 
-	virtual void addFrameBuffer(std::shared_ptr<const FrameBuffer> frameBuffer) = 0;
-	virtual void addModelInstance(std::shared_ptr<const ModelInstance> modelInstance) = 0;
-	virtual void removeModelInstance(std::shared_ptr<const ModelInstance> modelInstance) = 0;
+	virtual void clearFrameBuffer(std::shared_ptr<const FrameBuffer> frameBuffer, glm::vec4 clearColour) = 0;
+	virtual void draw(const std::vector<std::shared_ptr<const ModelInstance>>& instances, const std::shared_ptr<Camera> camera, RenderOptions& options) = 0;
+
+	virtual void addFrameBufferResources(std::shared_ptr<const FrameBuffer> frameBuffer) = 0;
+	virtual void addModelInstanceResources(std::shared_ptr<const ModelInstance> modelInstance) = 0;
 
 	virtual void addPointLight(PointLight light) = 0;
-
-	std::unordered_map<size_t, std::vector<std::shared_ptr<const ModelInstance>>> cull(const std::shared_ptr<Camera> camera, std::vector<std::shared_ptr<const ModelInstance>> instances);
 };
 

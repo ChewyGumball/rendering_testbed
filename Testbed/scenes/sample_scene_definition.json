@@ -233,7 +233,7 @@
         "dependencies": [ "cameraTestB", "cameraTestA" ],
         "lights": [ "layer1Lights" ],
         "models": [ "cameraTest" ],
-        "cull":  false,
+        "cull": false,
         "camera": "screenSpaceCamera",
         "viewport": {
           "x": 0,

@@ -161,6 +161,10 @@ std::unordered_map<std::string, std::shared_ptr<RenderPass>> loadPasses(rapidjso
             p->clearColour(objectToColour(pass.value["clearColour"]));
         }
 
+		if (pass.value.HasMember("clearBuffers")) {
+			p->clearBuffers(pass.value["clearBuffers"].GetBool());
+		}
+
         if (pass.value.HasMember("cull")) {
             p->cull(pass.value["cull"].GetBool());
         }
