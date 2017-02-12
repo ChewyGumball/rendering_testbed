@@ -5,8 +5,8 @@
 
 class OpenGLShader
 {
-protected:
-	std::shared_ptr<const Shader> m_shader;
+private:
+	GLuint programHandle;
 public:
 	OpenGLShader();
 	OpenGLShader(std::shared_ptr<const Shader> shader);

@@ -229,7 +229,7 @@ std::unordered_map<std::string, std::shared_ptr<Shader>> loadShaders(
             fragmentFiles.push_back(filename.GetString());
         }
 
-        shaders[shader.name.GetString()] = std::make_shared<Shader>(vertexFiles, fragmentFiles, true);
+        shaders[shader.name.GetString()] = std::make_shared<Shader>(vertexFiles, fragmentFiles);
     }
     return shaders;
 }

@@ -77,6 +77,12 @@ namespace Util::File
 	{
 		return Util::String::Split(ReadWholeFile(filename), '\n');
 	}
+
+	void * ReadBinary(std::string filename)
+	{
+		return nullptr;
+	}
+
 	void ProcessLines(std::string filename, std::function<void(const std::string&)> processor)
 	{
 		std::string file = ReadWholeFile(filename);

@@ -1,6 +1,7 @@
 #pragma once
 #include <glm/vec2.hpp>
 #include <Renderer\RenderResource.h>
+#include <string>
 
 enum struct TextureFormat {
 	RGB8,
@@ -11,12 +12,17 @@ class TextureBuffer : public RenderResource
 {
 	glm::vec2 m_dimensions;
 	TextureFormat m_format;
-	void* m_data;
+	std::string m_filename;
+	bool fileTexture;
+
 public:
-	TextureBuffer(glm::vec2 dimensions, TextureFormat format, void* data = nullptr);
+	TextureBuffer(glm::vec2 dimensions, TextureFormat format);
+	TextureBuffer(glm::vec2 dimensions, TextureFormat format, std::string filename);
 	~TextureBuffer();
 
-	void* const data() const;
+	const std::string& filename() const;
+	bool isFileTexture() const;
+	void* data() const;
 	TextureFormat format() const;
 	glm::vec2 dimensions() const;
 };

@@ -18,7 +18,7 @@ OpenGLRenderModel::OpenGLRenderModel(): shaderID(0)
 {
 }
 
-OpenGLRenderModel::OpenGLRenderModel(const OpenGLRenderMesh& mesh, std::size_t shaderID, const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures) 
+OpenGLRenderModel::OpenGLRenderModel(const OpenGLRenderMesh& mesh, uint32_t shaderID, const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures)
 	: shaderID(shaderID), textures(textures), indexCount(mesh.indexCount())
 {
 	glCreateVertexArrays(1, &vao);
@@ -62,7 +62,7 @@ OpenGLRenderModel::~OpenGLRenderModel()
 {
 }
 
-void OpenGLRenderModel::reload(std::shared_ptr<OpenGLRenderMesh> mesh, std::size_t shaderID)
+void OpenGLRenderModel::reload(std::shared_ptr<OpenGLRenderMesh> mesh, uint32_t shaderID)
 {
 }
 
