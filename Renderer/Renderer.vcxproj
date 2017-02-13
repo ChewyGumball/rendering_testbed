@@ -191,6 +191,7 @@
       <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>F:\Program Files\Autodesk\FBX\FBX SDK\2017.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>FBXSDK_SHARED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <Profile>true</Profile>
@@ -247,6 +248,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Models\ModelInstanceStateFormat.cpp" />
     <ClCompile Include="src\Renderer\RenderResource.cpp" />
     <ClCompile Include="src\Renderer\RenderOptions.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\OpenGLTextureBuffer.cpp" />
@@ -257,8 +259,6 @@
     <ClCompile Include="src\Culling\Frustum.cpp" />
     <ClCompile Include="src\Culling\Plane.cpp" />
     <ClCompile Include="src\lib\SimpleFileWatcher\FileWatcher.cpp" />
-    <ClCompile Include="src\lib\SimpleFileWatcher\FileWatcherLinux.cpp" />
-    <ClCompile Include="src\lib\SimpleFileWatcher\FileWatcherOSX.cpp" />
     <ClCompile Include="src\lib\SimpleFileWatcher\FileWatcherWin32.cpp" />
     <ClCompile Include="src\Renderer\PointLight.cpp" />
     <ClCompile Include="src\Renderer\Camera.cpp" />
@@ -320,8 +320,6 @@
     <ClInclude Include="Include\lib\rapidjson\writer.h" />
     <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcher.h" />
     <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcherImpl.h" />
-    <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcherLinux.h" />
-    <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcherOSX.h" />
     <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcherWin32.h" />
     <ClInclude Include="Include\Renderer\Camera.h" />
     <ClInclude Include="Include\Util\FileUtils.h" />
@@ -348,6 +346,7 @@
     <ClInclude Include="Include\Renderer\OpenGL\OpenGLTextureBuffer.h" />
     <ClInclude Include="Include\Renderer\RenderOptions.h" />
     <ClInclude Include="Include\Renderer\RenderResource.h" />
+    <ClInclude Include="Include\Models\ModelInstanceStateFormat.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="sample_render_graph.json" />

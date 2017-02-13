@@ -1,12 +1,14 @@
 #pragma once
 #include <stdint.h>
+typedef uint32_t RenderResourceID;
+
 class RenderResource
 {
 protected:
-	uint32_t m_id;
+	RenderResourceID m_id;
 public:
 	RenderResource();
-	RenderResource(uint32_t id);
-	uint32_t id() const;
+	RenderResource(RenderResourceID id);
+	RenderResourceID id() const;
 };
 

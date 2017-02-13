@@ -8,11 +8,11 @@
 struct RenderOptions
 {
 	std::shared_ptr<FrameBuffer> frameBuffer;
-	glm::vec2 viewportOrigin;
-	glm::vec2 viewportDimensions;
+	glm::ivec2 viewportOrigin;
+	glm::ivec2 viewportDimensions;
 	bool wireframe;
 
 	RenderOptions();
-	RenderOptions(std::shared_ptr<FrameBuffer> frameBuffer, glm::vec2 viewportOrigin, glm::vec2 viewportDimensions, bool wireframe);
+	RenderOptions(std::shared_ptr<FrameBuffer> frameBuffer, glm::ivec2 viewportOrigin, glm::ivec2 viewportDimensions, bool wireframe);
 };
 

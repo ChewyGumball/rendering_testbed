@@ -12,14 +12,14 @@ private:
 public:
 	int indexCount;
 
-	const uint32_t shaderID;
+	const RenderResourceID shaderID;
 	const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures;
 
 	OpenGLRenderModel();
-	OpenGLRenderModel(const OpenGLRenderMesh& mesh, uint32_t shaderID, const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures);
+	OpenGLRenderModel(const OpenGLRenderMesh& mesh, RenderResourceID shaderID, const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures);
 	~OpenGLRenderModel();
 
-	void reload(std::shared_ptr<OpenGLRenderMesh> mesh, uint32_t shaderID);
+	void reload(std::shared_ptr<OpenGLRenderMesh> mesh, RenderResourceID shaderID);
 
 	void draw(int instanceCount) const;
 

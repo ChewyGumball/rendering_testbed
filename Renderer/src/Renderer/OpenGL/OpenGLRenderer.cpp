@@ -17,11 +17,11 @@ namespace {
 
 std::vector<GLenum> textureUnits{ GL_TEXTURE0, GL_TEXTURE1, GL_TEXTURE2, GL_TEXTURE3, GL_TEXTURE4, GL_TEXTURE5, GL_TEXTURE6, GL_TEXTURE7, GL_TEXTURE8 };
 
-std::unordered_map<uint32_t, OpenGLRenderMesh>    meshes;
-std::unordered_map<uint32_t, OpenGLShader>        shaders;
-std::unordered_map<uint32_t, OpenGLRenderModel>   models;
-std::unordered_map<uint32_t, OpenGLTextureBuffer> textures;
-std::unordered_map<uint32_t, OpenGLFrameBuffer>   frameBuffers;
+std::unordered_map<RenderResourceID, OpenGLRenderMesh>    meshes;
+std::unordered_map<RenderResourceID, OpenGLShader>        shaders;
+std::unordered_map<RenderResourceID, OpenGLRenderModel>   models;
+std::unordered_map<RenderResourceID, OpenGLTextureBuffer> textures;
+std::unordered_map<RenderResourceID, OpenGLFrameBuffer>   frameBuffers;
 
 void addLightUniforms(OpenGLShader& shader, std::vector<PointLight>& lights)
 {
@@ -108,6 +108,16 @@ void createModel(std::shared_ptr<const Model> model)
         models.emplace(model->id(), OpenGLRenderModel(meshes[model->mesh()->id()], model->shader()->id(), model->textures()));
     }
 }
+
+void uploadInstanceData(GLuint buffer, const std::vector<std::shared_ptr<const ModelInstance>>& instances) {
+	std::vector<uint8_t> instanceData;
+	instanceData.reserve(instances.size() * instances[0]->model()->shader()->expectedInstanceStateFormat().size());
+	for (auto instance : instances) {
+		auto& data = instance->instanceData();
+		instanceData.insert(instanceData.end(), data.begin(), data.end());
+	}
+	glNamedBufferData(buffer, instanceData.size() * sizeof(uint8_t), instanceData.data(), GL_DYNAMIC_DRAW);
+}
 }
 
 OpenGLRenderer::OpenGLRenderer() {}
@@ -136,20 +146,12 @@ void OpenGLRenderer::draw(const std::vector<std::shared_ptr<const ModelInstance>
 
     glViewport(options.viewportOrigin.x, options.viewportOrigin.y, options.viewportDimensions.x, options.viewportDimensions.y);
 	
-    if (options.wireframe) {
-        glPolygonMode(GL_FRONT, GL_LINE);
-        glPolygonMode(GL_BACK, GL_LINE);
-    }
+	GLenum polygonMode = options.wireframe ? GL_LINE : GL_FILL;
+    glPolygonMode(GL_FRONT, polygonMode);
+    glPolygonMode(GL_BACK, polygonMode);
 
-	uint32_t modelID = instances[0]->model()->id();
-
-    OpenGLRenderModel& model = models[modelID];
-    // update transform data and draw models
-    std::vector<glm::mat4> transforms;
-    for (auto instance : instances) {
-        transforms.push_back(instance->transformMatrix());
-    }
-    glNamedBufferData(model.transformVBO(), transforms.size() * sizeof(glm::mat4), transforms.data(), GL_DYNAMIC_DRAW);
+    OpenGLRenderModel& model = models[instances[0]->model()->id()];
+	uploadInstanceData(model.transformVBO(), instances);
 
     OpenGLShader& shader = shaders[model.shaderID];
     shader.bind();
@@ -159,10 +161,5 @@ void OpenGLRenderer::draw(const std::vector<std::shared_ptr<const ModelInstance>
     shader.setUniform3f("cameraPosition", camera->position());
     addLightUniforms(shader, lights);
 
-    model.draw(static_cast<int>(transforms.size()));
-
-    if (options.wireframe) {
-        glPolygonMode(GL_FRONT, GL_FILL);
-        glPolygonMode(GL_BACK, GL_FILL);
-    }
+    model.draw(static_cast<int>(instances.size()));
 }

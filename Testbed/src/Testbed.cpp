@@ -137,7 +137,7 @@ void renderScene(std::string sceneFile)
 	}
 
 	glfwSwapInterval(0);
-	glClearColor(0.2, 0.2, 0.2, 1);
+	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 

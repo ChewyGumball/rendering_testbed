@@ -21,7 +21,7 @@ OpenGLTextureBuffer::OpenGLTextureBuffer() : m_handle(0)
 
 OpenGLTextureBuffer::OpenGLTextureBuffer(std::shared_ptr<TextureBuffer> texture)
 {
-	glm::vec2 dimensions = texture->dimensions();
+	glm::ivec2 dimensions = texture->dimensions();
 
 	glGenTextures(1, &m_handle);
 	glBindTexture(GL_TEXTURE_2D, m_handle);

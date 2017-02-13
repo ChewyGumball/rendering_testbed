@@ -78,12 +78,6 @@
     <ClCompile Include="src\lib\SimpleFileWatcher\FileWatcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\SimpleFileWatcher\FileWatcherLinux.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\SimpleFileWatcher\FileWatcherOSX.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\lib\SimpleFileWatcher\FileWatcherWin32.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -115,6 +109,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\RenderResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Models\ModelInstanceStateFormat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -177,12 +174,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcherImpl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcherLinux.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcherOSX.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcherWin32.h">
@@ -321,6 +312,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\Renderer\RenderResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Models\ModelInstanceStateFormat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -82,7 +82,7 @@ namespace {
 		return successful ? program : 0;
 	}
 
-	GLuint createProgram(std::string& vertexSource, std::string& fragmentSource) { return createProgram({ vertexSource }, { fragmentSource }); }
+	GLuint createProgram(std::string& vertexSource, std::string& fragmentSource) { return createProgram(std::vector<std::string>{ vertexSource }, std::vector<std::string>{ fragmentSource }); }
 
 	GLuint createProgramFromFiles(const std::unordered_map<ShaderSourceType, std::vector<std::string>>& filenames)
 	{

@@ -13,7 +13,7 @@ OpenGLFrameBuffer::OpenGLFrameBuffer() : buffer(0)
 {
 }
 
-OpenGLFrameBuffer::OpenGLFrameBuffer(std::shared_ptr<const FrameBuffer> frameBuffer, std::unordered_map<uint32_t, OpenGLTextureBuffer>& textures) : buffer(0)
+OpenGLFrameBuffer::OpenGLFrameBuffer(std::shared_ptr<const FrameBuffer> frameBuffer, std::unordered_map<RenderResourceID, OpenGLTextureBuffer>& textures) : buffer(0)
 {
 	if (frameBuffer->targets().size() > 0) {
 		glGenFramebuffers(1, &buffer);

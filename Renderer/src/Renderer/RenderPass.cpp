@@ -5,7 +5,7 @@
 
 
 namespace {
-	std::unordered_map<uint32_t, std::vector<std::shared_ptr<const ModelInstance>>> cullAgainstCameraFrustum(const std::shared_ptr<Camera> camera, std::vector<std::shared_ptr<const ModelInstance>> instances) {
+	std::unordered_map<RenderResourceID, std::vector<std::shared_ptr<const ModelInstance>>> cullAgainstCameraFrustum(const std::shared_ptr<Camera> camera, std::vector<std::shared_ptr<const ModelInstance>> instances) {
 		Culling::Frustum frustum(camera->projection() * camera->transform());
 
 		std::vector<glm::vec3> centers(instances.size());
@@ -19,7 +19,7 @@ namespace {
 
 		std::vector<bool> intersections = frustum.intersects(centers, radii);
 
-		std::unordered_map<uint32_t, std::vector<std::shared_ptr<const ModelInstance>>> visibleModels;
+		std::unordered_map<RenderResourceID, std::vector<std::shared_ptr<const ModelInstance>>> visibleModels;
 
 		for (size_t i = 0; i < instances.size(); ++i) {
 			if (intersections[i]) {
@@ -44,7 +44,7 @@ uint64_t RenderPass::draw()
 {
 	uint64_t trianglesDrawn = 0;
 
-	std::unordered_map<uint32_t, std::vector<std::shared_ptr<const ModelInstance>>> culledInstances;
+	std::unordered_map<RenderResourceID, std::vector<std::shared_ptr<const ModelInstance>>> culledInstances;
 	if (cullingEnabled) {
 		culledInstances = cullAgainstCameraFrustum(m_camera, modelInstances);
 	}

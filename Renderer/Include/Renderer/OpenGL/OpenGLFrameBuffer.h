@@ -14,7 +14,7 @@ private:
 
 public:
 	OpenGLFrameBuffer();
-	OpenGLFrameBuffer(std::shared_ptr<const FrameBuffer> frameBuffer, std::unordered_map<uint32_t, OpenGLTextureBuffer>& textures);
+	OpenGLFrameBuffer(std::shared_ptr<const FrameBuffer> frameBuffer, std::unordered_map<RenderResourceID, OpenGLTextureBuffer>& textures);
 	~OpenGLFrameBuffer();
 
 	void bind();

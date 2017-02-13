@@ -1,10 +1,10 @@
 #include "Renderer/TextureBuffer.h"
 #include <Util/FileUtils.h>
 
-TextureBuffer::TextureBuffer(glm::vec2 dimensions, TextureFormat format) : m_dimensions(dimensions), m_format(format), fileTexture(false)
+TextureBuffer::TextureBuffer(glm::ivec2 dimensions, TextureFormat format) : m_dimensions(dimensions), m_format(format), fileTexture(false)
 {
 }
-TextureBuffer::TextureBuffer(glm::vec2 dimensions, TextureFormat format, std::string name) : m_dimensions(dimensions), m_format(format), m_filename(name), fileTexture(true)
+TextureBuffer::TextureBuffer(glm::ivec2 dimensions, TextureFormat format, std::string name) : m_dimensions(dimensions), m_format(format), m_filename(name), fileTexture(true)
 {
 }
 
@@ -37,7 +37,7 @@ TextureFormat TextureBuffer::format() const
 	return m_format;
 }
 
-glm::vec2 TextureBuffer::dimensions() const
+glm::ivec2 TextureBuffer::dimensions() const
 {
 	return m_dimensions;
 }
