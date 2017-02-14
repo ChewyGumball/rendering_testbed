@@ -132,22 +132,22 @@ glm::mat4 ModelInstance::getMat4State(std::string name) const
 
 void ModelInstance::rotate(glm::vec3 axis, float degrees)
 {
-	setState("position", glm::rotate(getMat4State("position"), degrees, axis));
+	setState("transform", glm::rotate(getMat4State("transform"), degrees, axis));
 }
 
 void ModelInstance::translate(glm::vec3 offset)
 {
-	setState("position", glm::translate(getMat4State("position"), offset));
+	setState("transform", glm::translate(getMat4State("transform"), offset));
 }
 
 void ModelInstance::scale(glm::vec3 scales)
 {
-	setState("position", glm::scale(getMat4State("position"), scales));
+	setState("transform", glm::scale(getMat4State("transform"), scales));
 }
 
 glm::vec3 ModelInstance::position() const
 {
-	return glm::vec3(getMat4State("position") * glm::vec4(0,0,0,1));
+	return glm::vec3(getMat4State("transform") * glm::vec4(0,0,0,1));
 }
 
 std::shared_ptr<const Model> ModelInstance::model() const { return baseModel; }
@@ -160,5 +160,5 @@ const std::vector<uint8_t>& ModelInstance::instanceData() const
 Culling::BoundingSphere ModelInstance::bounds() const
 {
 	Culling::BoundingSphere meshBounds = baseModel->mesh()->bounds();
-	return Culling::BoundingSphere(glm::vec3(getMat4State("position") * glm::vec4(meshBounds.center(),1)), meshBounds.radius());
+	return Culling::BoundingSphere(glm::vec3(getMat4State("transform") * glm::vec4(meshBounds.center(),1)), meshBounds.radius());
 }

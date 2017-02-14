@@ -248,6 +248,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Fonts\Font.cpp" />
     <ClCompile Include="src\Models\ModelInstanceStateFormat.cpp" />
     <ClCompile Include="src\Renderer\RenderResource.cpp" />
     <ClCompile Include="src\Renderer\RenderOptions.cpp" />
@@ -280,6 +281,9 @@
     <ClCompile Include="src\Models\Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Include\Fonts\Font.h" />
+    <ClInclude Include="Include\lib\stb_truetype\stb_rect_pack.h" />
+    <ClInclude Include="Include\lib\stb_truetype\stb_truetype.h" />
     <ClInclude Include="Include\Renderer\FrameBuffer.h" />
     <ClInclude Include="Include\Culling\Frustum.h" />
     <ClInclude Include="Include\Culling\BoundingSphere.h" />

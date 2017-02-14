@@ -1,7 +1,7 @@
 #include "Renderer/TextureBuffer.h"
 #include <Util/FileUtils.h>
 
-TextureBuffer::TextureBuffer(glm::ivec2 dimensions, TextureFormat format) : m_dimensions(dimensions), m_format(format), fileTexture(false)
+TextureBuffer::TextureBuffer(glm::ivec2 dimensions, TextureFormat format, std::vector<uint8_t> data) : m_dimensions(dimensions), m_format(format), m_data(data), fileTexture(false)
 {
 }
 TextureBuffer::TextureBuffer(glm::ivec2 dimensions, TextureFormat format, std::string name) : m_dimensions(dimensions), m_format(format), m_filename(name), fileTexture(true)
@@ -22,13 +22,13 @@ bool TextureBuffer::isFileTexture() const
 	return fileTexture;
 }
 
-void * TextureBuffer::data() const
+std::vector<uint8_t> TextureBuffer::data() const
 {
 	if (fileTexture) {
 		return Util::File::ReadBinary(m_filename);
 	}
 	else {
-		return nullptr;
+		return m_data;
 	}
 }
 

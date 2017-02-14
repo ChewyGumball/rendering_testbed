@@ -1,16 +1,11 @@
 #include "Models/Model.h"
 
-Model::Model(std::shared_ptr<const Mesh> mesh, std::shared_ptr<const Shader> shader) : m_mesh(mesh), m_shader(shader)
+Model::Model(std::shared_ptr<const Mesh> mesh, std::shared_ptr<const Shader> shader, std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures) : m_mesh(mesh), m_shader(shader), m_textures(textures)
 {
 }
 
 Model::~Model()
 {
-}
-
-void Model::setTexture(std::string name, std::shared_ptr<TextureBuffer> texture)
-{
-	m_textures[name] = texture;
 }
 
 std::shared_ptr<const Mesh> Model::mesh() const

@@ -1,7 +1,8 @@
 #pragma once
+#include <functional>
+#include <memory>
 #include <string>
 #include <vector>
-#include <functional>
 
 namespace Util::File
 {
@@ -9,7 +10,7 @@ namespace Util::File
 
 	std::vector<std::string> ReadLines(std::string filename);
 
-	void* ReadBinary(std::string filename);
+	std::vector<uint8_t> ReadBinary(std::string filename);
 
 	void ProcessLines(std::string filename, std::function<void(const std::string&)> processor);
 

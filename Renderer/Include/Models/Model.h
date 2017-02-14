@@ -16,10 +16,8 @@ protected:
 	std::shared_ptr<const Shader> m_shader;
 	std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> m_textures;
 public:
-	Model(std::shared_ptr<const Mesh> mesh, std::shared_ptr<const Shader> shader);
+	Model(std::shared_ptr<const Mesh> mesh, std::shared_ptr<const Shader> shader, std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures);
 	~Model();
-
-	void setTexture(std::string name, std::shared_ptr<TextureBuffer> texture);
 	
 	std::shared_ptr<const Mesh> mesh() const;
 	std::shared_ptr<const Shader> shader() const;

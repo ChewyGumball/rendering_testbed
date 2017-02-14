@@ -6,7 +6,7 @@
 class OpenGLRenderMesh
 {
 protected:
-	int m_indexCount;
+	uint32_t m_indexCount;
 	VertexFormat m_format;
 	GLuint m_vbo, m_ebo;
 public:
@@ -16,7 +16,7 @@ public:
 
 	GLuint vbo() const;
 	GLuint ebo() const;
-	int indexCount() const;
+	uint32_t indexCount() const;
 	VertexFormat vertexFormat() const;
 
 };

@@ -1,6 +1,8 @@
 #include "Util/FileUtils.h"
 #include "Util/StringUtils.h"
 
+#include <assert.h>
+
 #include <algorithm>
 #include <fstream>
 #include <sstream>
@@ -62,15 +64,14 @@ namespace Util::File
 	std::string ReadWholeFile(std::string filename)
 	{
 		std::ifstream file(filename, std::ios::in | std::ios::binary);
-		if (file)
-		{
-			std::ostringstream fileContents;
-			fileContents << file.rdbuf();
-			file.close();
-			return fileContents.str();
+		if (!file) {
+			assert(false); // Couldn't read file
 		}
 
-		return std::string();
+		std::ostringstream fileContents;
+		fileContents << file.rdbuf();
+		file.close();
+		return fileContents.str();
 	}
 
 	std::vector<std::string> ReadLines(std::string filename)
@@ -78,9 +79,21 @@ namespace Util::File
 		return Util::String::Split(ReadWholeFile(filename), '\n');
 	}
 
-	void * ReadBinary(std::string filename)
+	std::vector<uint8_t> ReadBinary(std::string filename)
 	{
-		return nullptr;
+		std::ifstream file(filename, std::ios::in | std::ios::binary);
+		if (!file) {
+			assert(false); // Couldn't read file
+		}
+
+		file.seekg(0, std::ios::end);
+		size_t length = file.tellg();
+		file.seekg(0, std::ios::beg);
+
+		std::vector<uint8_t> data(length);
+		file.read(reinterpret_cast<char*>(data.data()), length);
+
+		return data;
 	}
 
 	void ProcessLines(std::string filename, std::function<void(const std::string&)> processor)

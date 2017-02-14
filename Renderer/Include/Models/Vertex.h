@@ -5,13 +5,14 @@
 
 typedef char VertexAttribute;
 namespace VertexAttributes {
-static VertexAttribute Position = 0b0001;
-static VertexAttribute Normal   = 0b0010;
-static VertexAttribute Texture  = 0b0100;
-static VertexAttribute Colour   = 0b1000;
+extern const VertexAttribute Position;
+extern const VertexAttribute Normal;
+extern const VertexAttribute Texture;
+extern const VertexAttribute Colour;
 }
 
 class VertexFormat {
+private:
     VertexAttribute format;
 
 public:
@@ -37,16 +38,15 @@ bool operator!=(const VertexFormat& a, const VertexFormat& b);
 bool operator==(const VertexFormat& a, const VertexFormat& b);
 
 namespace VertexFormats {
-static const VertexFormat Unknown(0);
-static const VertexFormat Position(VertexAttributes::Position);
-static const VertexFormat Position_Normal(VertexAttributes::Position | VertexAttributes::Normal);
-static const VertexFormat Position_Texture(VertexAttributes::Position | VertexAttributes::Texture);
-static const VertexFormat Position_Colour(VertexAttributes::Position | VertexAttributes::Colour);
-static const VertexFormat Position_Normal_Colour(VertexAttributes::Position | VertexAttributes::Normal | VertexAttributes::Colour);
-static const VertexFormat Position_Normal_Texture(VertexAttributes::Position | VertexAttributes::Normal | VertexAttributes::Texture);
-static const VertexFormat Position_Texture_Colour(VertexAttributes::Position | VertexAttributes::Texture | VertexAttributes::Colour);
-static const VertexFormat Position_Normal_Texture_Colour(
-    VertexAttributes::Position | VertexAttributes::Normal | VertexAttributes::Texture | VertexAttributes::Colour);
+extern const VertexFormat Unknown;
+extern const VertexFormat Position;
+extern const VertexFormat Position_Normal;
+extern const VertexFormat Position_Texture;
+extern const VertexFormat Position_Colour;
+extern const VertexFormat Position_Normal_Colour;
+extern const VertexFormat Position_Normal_Texture;
+extern const VertexFormat Position_Texture_Colour;
+extern const VertexFormat Position_Normal_Texture_Colour;
 };
 
 class Vertex {

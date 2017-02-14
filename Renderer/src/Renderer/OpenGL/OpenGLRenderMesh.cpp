@@ -8,7 +8,7 @@ OpenGLRenderMesh::OpenGLRenderMesh(): m_indexCount(0), m_format(VertexFormats::U
 {
 }
 
-OpenGLRenderMesh::OpenGLRenderMesh(std::shared_ptr<const Mesh> mesh) : m_indexCount(static_cast<int>(mesh->indexData().size())), m_format(mesh->vertexFormat())
+OpenGLRenderMesh::OpenGLRenderMesh(std::shared_ptr<const Mesh> mesh) : m_indexCount(static_cast<uint32_t>(mesh->indexData().size())), m_format(mesh->vertexFormat())
 {
 	const std::vector<float>& vertexData = mesh->vertexData();
 	const std::vector<int>& indexData = mesh->indexData();
@@ -24,7 +24,7 @@ OpenGLRenderMesh::~OpenGLRenderMesh()
 {
 }
 
-int OpenGLRenderMesh::indexCount() const
+uint32_t OpenGLRenderMesh::indexCount() const
 {
 	return m_indexCount;
 }

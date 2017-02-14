@@ -111,11 +111,16 @@ OpenGLShader::OpenGLShader()
 {
 }
 
-OpenGLShader::OpenGLShader(std::shared_ptr<const Shader> shader) : programHandle(createProgramFromFiles(shader->filenames()))
+OpenGLShader::OpenGLShader(std::shared_ptr<const Shader> shader) : programHandle(createProgramFromFiles(shader->filenames())), m_shader(shader)
 {}
 
 OpenGLShader::~OpenGLShader()
 {
+}
+
+const std::shared_ptr<const Shader> OpenGLShader::shader() const
+{
+	return m_shader;
 }
 
 void OpenGLShader::bind()
@@ -169,4 +174,9 @@ void OpenGLShader::setUniformMatrix4f(const std::string  uniformName, glm::mat4 
 	if (location != -1) {
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(data));
 	}
+}
+
+GLint OpenGLShader::getAttributeLocation(const std::string name) const
+{
+	return glGetAttribLocation(programHandle, name.data());
 }

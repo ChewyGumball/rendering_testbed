@@ -233,7 +233,7 @@ std::unordered_map<std::string, std::shared_ptr<Shader>> loadShaders(
             fragmentFiles.push_back(filename.GetString());
         }
 
-		shaders[shader.name.GetString()] = std::make_shared<Shader>(vertexFiles, fragmentFiles, std::vector<std::pair<std::string, ModelInstanceStateType>> { std::make_pair("position", ModelInstanceStateType::MAT4) });
+		shaders[shader.name.GetString()] = std::make_shared<Shader>(vertexFiles, fragmentFiles, std::vector<std::pair<std::string, ModelInstanceStateType>> { std::make_pair("transform", ModelInstanceStateType::MAT4) });
     }
     return shaders;
 }
@@ -273,12 +273,13 @@ Scene SceneLoader::loadScene(std::string filename)
 
     for (auto& model : json["models"].GetObject()) {
         std::string name(model.name.GetString());
-        models[name] = std::make_shared<Model>(meshes[model.value["mesh"].GetString()], shaders[model.value["shader"].GetString()]);
-        if (model.value.HasMember("textures")) {
-            for (auto& texture : model.value["textures"].GetObject()) {
-                models[name]->setTexture(texture.name.GetString(), textures[texture.value.GetString()]);
-            }
-        }
+		std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> modelTextures;
+		if (model.value.HasMember("textures")) {
+			for (auto& texture : model.value["textures"].GetObject()) {
+				modelTextures.emplace(texture.name.GetString(), textures[texture.value.GetString()]);
+			}
+		}
+        models[name] = std::make_shared<Model>(meshes[model.value["mesh"].GetString()], shaders[model.value["shader"].GetString()], modelTextures);
     }
 
     rapidjson::Value scene = json["scene"].GetObject();

@@ -105,7 +105,7 @@ void createModel(std::shared_ptr<const Model> model)
     }
 
     if (models.count(model->id()) == 0) {
-        models.emplace(model->id(), OpenGLRenderModel(meshes[model->mesh()->id()], model->shader()->id(), model->textures()));
+        models.emplace(model->id(), OpenGLRenderModel(meshes[model->mesh()->id()], shaders[model->shader()->id()], model->textures()));
     }
 }
 
@@ -153,9 +153,9 @@ void OpenGLRenderer::draw(const std::vector<std::shared_ptr<const ModelInstance>
     OpenGLRenderModel& model = models[instances[0]->model()->id()];
 	uploadInstanceData(model.transformVBO(), instances);
 
-    OpenGLShader& shader = shaders[model.shaderID];
+    OpenGLShader& shader = shaders[model.shaderID()];
     shader.bind();
-    bindTextures(shader, model.textures);
+    bindTextures(shader, model.textures());
     shader.setUniformMatrix4f("view", camera->transform());
     shader.setUniformMatrix4f("projection", camera->projection());
     shader.setUniform3f("cameraPosition", camera->position());

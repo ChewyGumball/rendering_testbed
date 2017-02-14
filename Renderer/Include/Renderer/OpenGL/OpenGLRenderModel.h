@@ -3,25 +3,27 @@
 
 #include "OpenGLShader.h"
 #include "OpenGLRenderMesh.h"
+#include "OpenGLShader.h"
 #include "Renderer/TextureBuffer.h"
 
 class OpenGLRenderModel
 {
 private:
 	GLuint vao, m_transformVBO;
+	RenderResourceID m_shaderID;
+	std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> m_textures;
+	uint32_t m_indexCount;
 public:
-	int indexCount;
-
-	const RenderResourceID shaderID;
-	const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures;
 
 	OpenGLRenderModel();
-	OpenGLRenderModel(const OpenGLRenderMesh& mesh, RenderResourceID shaderID, const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures);
+	OpenGLRenderModel(const OpenGLRenderMesh& mesh, const OpenGLShader& shader, const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures);
 	~OpenGLRenderModel();
 
-	void reload(std::shared_ptr<OpenGLRenderMesh> mesh, RenderResourceID shaderID);
-
 	void draw(int instanceCount) const;
+
+	const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>>& textures() const;
+	const RenderResourceID& shaderID() const;
+	uint32_t indexCount() const;
 
 	GLuint transformVBO() const;
 };
