@@ -1,7 +1,7 @@
 #include "Util/FileUtils.h"
 #include "Util/StringUtils.h"
 
-#include <assert.h>
+//#include <assert.h>
 
 #include <algorithm>
 #include <fstream>
@@ -65,7 +65,7 @@ namespace Util::File
 	{
 		std::ifstream file(filename, std::ios::in | std::ios::binary);
 		if (!file) {
-			assert(false); // Couldn't read file
+			//assert(false); // Couldn't read file
 		}
 
 		std::ostringstream fileContents;
@@ -83,7 +83,7 @@ namespace Util::File
 	{
 		std::ifstream file(filename, std::ios::in | std::ios::binary);
 		if (!file) {
-			assert(false); // Couldn't read file
+			//assert(false); // Couldn't read file
 		}
 
 		file.seekg(0, std::ios::end);

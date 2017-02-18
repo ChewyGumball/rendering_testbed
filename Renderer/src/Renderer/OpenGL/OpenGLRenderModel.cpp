@@ -11,30 +11,30 @@ struct AttributeDetails {
     uint8_t componentCount;
 };
 
-const std::unordered_map<ModelInstanceStateType, AttributeDetails> glTypes { 
-	{ ModelInstanceStateType::FLOAT_SCALAR, { GL_FLOAT, 1, 1 } },
-    { ModelInstanceStateType::FLOAT_VEC2, { GL_FLOAT, 1, 2 } },
-    { ModelInstanceStateType::FLOAT_VEC3, { GL_FLOAT, 1, 3 } },
-    { ModelInstanceStateType::FLOAT_VEC4, { GL_FLOAT, 1, 4 } },
-    { ModelInstanceStateType::DOUBLE_SCALAR, { GL_DOUBLE, 1, 1 } },
-    { ModelInstanceStateType::DOUBLE_VEC2, { GL_DOUBLE, 1, 2 } },
-    { ModelInstanceStateType::DOUBLE_VEC3, { GL_DOUBLE, 1, 3 } },
-    { ModelInstanceStateType::DOUBLE_VEC4, { GL_DOUBLE, 1, 4 } },
-    { ModelInstanceStateType::BOOL_SCALAR, { GL_BOOL, 1, 1 } },
-    { ModelInstanceStateType::BOOL_VEC2, { GL_BOOL, 1, 2 } },
-    { ModelInstanceStateType::BOOL_VEC3, { GL_BOOL, 1, 3 } },
-    { ModelInstanceStateType::BOOL_VEC4, { GL_BOOL, 1, 4 } },
-    { ModelInstanceStateType::INT_SCALAR, { GL_INT, 1, 1 } },
-    { ModelInstanceStateType::INT_VEC2, { GL_INT, 1, 2 } },
-    { ModelInstanceStateType::INT_VEC3, { GL_INT, 1, 3 } },
-    { ModelInstanceStateType::INT_VEC4, { GL_INT, 1, 4 } },
-    { ModelInstanceStateType::UINT_SCALAR, { GL_UNSIGNED_INT, 1, 1 } },
-    { ModelInstanceStateType::UINT_VEC2, { GL_UNSIGNED_INT, 1, 2 } },
-    { ModelInstanceStateType::UINT_VEC3, { GL_UNSIGNED_INT, 1, 3 } },
-    { ModelInstanceStateType::UINT_VEC4, { GL_UNSIGNED_INT, 1, 4 } },
-    { ModelInstanceStateType::MAT2, { GL_FLOAT, 2, 2} },
-    { ModelInstanceStateType::MAT3, { GL_FLOAT, 3, 3} },
-    { ModelInstanceStateType::MAT4, { GL_FLOAT, 4, 4} }
+const std::unordered_map<BufferElementType, AttributeDetails> glTypes { 
+	{ BufferElementType::FLOAT_SCALAR, { GL_FLOAT, 1, 1 } },
+    { BufferElementType::FLOAT_VEC2, { GL_FLOAT, 1, 2 } },
+    { BufferElementType::FLOAT_VEC3, { GL_FLOAT, 1, 3 } },
+    { BufferElementType::FLOAT_VEC4, { GL_FLOAT, 1, 4 } },
+    { BufferElementType::DOUBLE_SCALAR, { GL_DOUBLE, 1, 1 } },
+    { BufferElementType::DOUBLE_VEC2, { GL_DOUBLE, 1, 2 } },
+    { BufferElementType::DOUBLE_VEC3, { GL_DOUBLE, 1, 3 } },
+    { BufferElementType::DOUBLE_VEC4, { GL_DOUBLE, 1, 4 } },
+    { BufferElementType::BOOL_SCALAR, { GL_BOOL, 1, 1 } },
+    { BufferElementType::BOOL_VEC2, { GL_BOOL, 1, 2 } },
+    { BufferElementType::BOOL_VEC3, { GL_BOOL, 1, 3 } },
+    { BufferElementType::BOOL_VEC4, { GL_BOOL, 1, 4 } },
+    { BufferElementType::INT_SCALAR, { GL_INT, 1, 1 } },
+    { BufferElementType::INT_VEC2, { GL_INT, 1, 2 } },
+    { BufferElementType::INT_VEC3, { GL_INT, 1, 3 } },
+    { BufferElementType::INT_VEC4, { GL_INT, 1, 4 } },
+    { BufferElementType::UINT_SCALAR, { GL_UNSIGNED_INT, 1, 1 } },
+    { BufferElementType::UINT_VEC2, { GL_UNSIGNED_INT, 1, 2 } },
+    { BufferElementType::UINT_VEC3, { GL_UNSIGNED_INT, 1, 3 } },
+    { BufferElementType::UINT_VEC4, { GL_UNSIGNED_INT, 1, 4 } },
+    { BufferElementType::MAT2, { GL_FLOAT, 2, 2} },
+    { BufferElementType::MAT3, { GL_FLOAT, 3, 3} },
+    { BufferElementType::MAT4, { GL_FLOAT, 4, 4} }
 };
 
 
@@ -49,10 +49,10 @@ void setupVertexAttribute(GLuint vao, GLuint attribute, GLint componentCount, GL
     glVertexArrayAttribFormat(vao, attribute, componentCount, GL_FLOAT, GL_FALSE, offset);
 }
 
-void setupInstanceStateAttribute(GLuint vao, GLuint attribute, ModelInstanceStateType type, GLuint offset)
+void setupInstanceStateAttribute(GLuint vao, GLuint attribute, BufferElementType type, GLuint offset)
 {
     const AttributeDetails& details = glTypes.at(type);
-	uint8_t size = ModelInstanceStateFormat::sizeOfType(type) / details.slotCount;
+	uint8_t size = BufferFormat::sizeOfType(type) / details.slotCount;
     for (int i = 0; i < details.slotCount; ++i) {
         glEnableVertexArrayAttrib(vao, attribute + i);
         glVertexArrayAttribBinding(vao, attribute + i, TRANSFORM_DATA_BINDING_POINT_INDEX);
@@ -92,7 +92,7 @@ OpenGLRenderModel::OpenGLRenderModel(
     }
 
     // Set up instancing transform buffer attributes
-    const ModelInstanceStateFormat& stateFormat = shader.shader()->expectedInstanceStateFormat();
+    const BufferFormat& stateFormat = shader.shader()->expectedInstanceStateFormat();
     glVertexArrayVertexBuffer(vao, TRANSFORM_DATA_BINDING_POINT_INDEX, m_transformVBO, 0, stateFormat.size());
     glVertexArrayBindingDivisor(vao, TRANSFORM_DATA_BINDING_POINT_INDEX, 1);
 

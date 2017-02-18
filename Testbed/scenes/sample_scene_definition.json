@@ -18,16 +18,16 @@
   },
   "shaders": {
     "phong": {
-      "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Renderer/src/Shaders/normal.vert" ],
-      "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Renderer/src/Shaders/normal.frag" ]
+      "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/normal.vert" ],
+      "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/normal.frag" ]
     },
     "texture": {
-      "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Renderer/src/Shaders/texture.vert" ],
-      "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Renderer/src/Shaders/texture.frag" ]
+      "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/texture.vert" ],
+      "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/texture.frag" ]
     },
     "finalShader": {
-      "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Renderer/src/Shaders/final.vert" ],
-      "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Renderer/src/Shaders/final.frag" ]
+      "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/final.vert" ],
+      "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/final.frag" ]
     }
   },
   "textures": {

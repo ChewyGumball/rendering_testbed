@@ -112,7 +112,7 @@ OpenGLShader::OpenGLShader()
 }
 
 OpenGLShader::OpenGLShader(std::shared_ptr<const Shader> shader) : programHandle(createProgramFromFiles(shader->filenames())), m_shader(shader)
-{}
+{ }
 
 OpenGLShader::~OpenGLShader()
 {

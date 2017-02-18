@@ -2,20 +2,13 @@
 #include <memory>
 #include <vector>
 
-#include "OpenGLRenderMesh.h"
-#include "OpenGLRenderModel.h"
-#include "OpenGLShader.h"
-
-#include "Models/Mesh.h"
-#include "Models/Model.h"
-
-#include <Renderer\Renderer.h>
+#include <Renderer/Renderer.h>
 #include <Renderer/PointLight.h>
-#include <Renderer/FrameBuffer.h>
-#include <Renderer\RenderOptions.h>
 
 class Camera;
 class ModelInstance;
+class FrameBuffer;
+struct RenderOptions;
 
 class OpenGLRenderer : public Renderer
 {

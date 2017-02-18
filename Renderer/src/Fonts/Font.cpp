@@ -9,7 +9,7 @@
 #include <lib/stb_truetype/stb_truetype.h>
 
 #include "Renderer/TextureBuffer.h"
-#include "Models/ModelInstance.h"
+#include "Renderer/ModelInstance.h"
 
 namespace {
 	std::unordered_map<std::string, stbtt_fontinfo> fontInfos;

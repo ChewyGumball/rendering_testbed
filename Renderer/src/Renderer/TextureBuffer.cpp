@@ -22,13 +22,17 @@ bool TextureBuffer::isFileTexture() const
 	return fileTexture;
 }
 
-std::vector<uint8_t> TextureBuffer::data() const
+void* TextureBuffer::data() const
 {
 	if (fileTexture) {
-		return Util::File::ReadBinary(m_filename);
+		m_data = Util::File::ReadBinary(m_filename);
+	}
+	
+	if(m_data.size() > 0) {
+		return m_data.data();
 	}
 	else {
-		return m_data;
+		return nullptr;
 	}
 }
 

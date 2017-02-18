@@ -4,9 +4,8 @@
 
 #include <Renderer\RenderResource.h>
 
-#include "Models/Material.h"
-#include "Models/Mesh.h"
-#include "Shaders/Shader.h"
+#include "Renderer/Mesh.h"
+#include "Renderer/Shader.h"
 #include "Renderer/TextureBuffer.h"
 
 class Model : public RenderResource
@@ -15,6 +14,8 @@ protected:
 	std::shared_ptr<const Mesh> m_mesh;
 	std::shared_ptr<const Shader> m_shader;
 	std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> m_textures;
+	std::vector<uint8_t> m_uniformData;
+
 public:
 	Model(std::shared_ptr<const Mesh> mesh, std::shared_ptr<const Shader> shader, std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures);
 	~Model();

@@ -1,4 +1,4 @@
-#include "Models/Vertex.h"
+#include "Renderer/Vertex.h"
 #include <glm\gtx\io.hpp>
 
 namespace VertexAttributes {

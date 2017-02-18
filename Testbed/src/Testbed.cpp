@@ -11,10 +11,10 @@
 #include <fstream>
 
 #include <Renderer\RenderPass.h>
-#include <Models\ModelInstance.h>
+#include <Renderer\ModelInstance.h>
 #include <Renderer\Camera.h>
 #include <Scene\SceneLoader.h>
-#include <Models\ModelLoader.h>
+#include <Renderer\ModelLoader.h>
 
 #include <Util\FileUtils.h>
 #include <random>
@@ -152,6 +152,14 @@ void renderScene(std::string sceneFile)
 	double cumulative = 0;
 	int frames = 0;
 
+	uint64_t tricount = 0;
+	for (std::shared_ptr<RenderPass> pass : passes)
+	{
+		tricount += pass->draw();
+	}
+
+	glfwSwapBuffers(window);
+
 	double mouseX, mouseY;
 	glfwGetCursorPos(window, &mouseX, &mouseY);
 	while (!glfwWindowShouldClose(window))
@@ -215,7 +223,7 @@ int main(int argc, char *argv[])
 	{
 		convert(argc, argv);
 	}
-	else if (std::string(argv[1]) == "render" && argc >= 4)
+	else if (argc >= 4 &&std::string(argv[1]) == "render")
 	{
 		if (std::string(argv[2]) == "-opengl")
 		{
@@ -231,7 +239,7 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
-		if (argc != 1 || std::string(argv[1]) != "help") {
+		if (argc != 2 || std::string(argv[1]) != "help") {
 			std::cout << "Invalid Arguments" << std::endl << std::endl;
 		}
 		printHelp();

@@ -2,7 +2,7 @@
 #include <memory>
 #include <string>
 
-#include "Models/Mesh.h"
+#include "Renderer/Mesh.h"
 
 namespace ModelLoader
 {

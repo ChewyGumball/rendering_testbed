@@ -1,13 +1,14 @@
 #pragma once
 #include <memory>
-#include <Models/Model.h>
+#include <Renderer/Model.h>
 #include <glm/glm.hpp>
+#include <Renderer/DataBuffer.h>
 
 class ModelInstance
 {
 private:
 	std::shared_ptr<Model> baseModel;
-	std::vector<uint8_t> m_instanceData;
+	DataBuffer m_instanceData;
 
 public:
 	ModelInstance(std::shared_ptr<Model> model);
@@ -40,7 +41,7 @@ public:
 	glm::vec3 position() const;
 
 	std::shared_ptr<const Model> model() const;
-	const std::vector<uint8_t>& instanceData() const;
+	const DataBuffer& instanceData() const;
 	Culling::BoundingSphere bounds() const;
 };
 

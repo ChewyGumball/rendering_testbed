@@ -1,4 +1,4 @@
-#include "Models/Model.h"
+#include "Renderer/Model.h"
 
 Model::Model(std::shared_ptr<const Mesh> mesh, std::shared_ptr<const Shader> shader, std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures) : m_mesh(mesh), m_shader(shader), m_textures(textures)
 {

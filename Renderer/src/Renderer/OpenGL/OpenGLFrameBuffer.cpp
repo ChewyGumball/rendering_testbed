@@ -1,6 +1,8 @@
 #include "Renderer/OpenGL/OpenGLFrameBuffer.h"
 #include <Renderer\OpenGL\OpenGLTextureBuffer.h>
 
+#include <iostream>
+
 namespace {
 	std::unordered_map<FrameBufferTarget, GLenum> attachments = {
 		{ FrameBufferTarget::COLOUR, GL_COLOR_ATTACHMENT0 },
@@ -21,7 +23,7 @@ OpenGLFrameBuffer::OpenGLFrameBuffer(std::shared_ptr<const FrameBuffer> frameBuf
 		glBindFramebuffer(GL_FRAMEBUFFER, buffer);
 		for (auto& target : frameBuffer->targets())
 		{
-			glFramebufferTexture2D(GL_FRAMEBUFFER, attachments[target.first], GL_TEXTURE_2D, textures[target.second->id()].handle(), 0);
+			glFramebufferTexture(GL_FRAMEBUFFER, attachments[target.first], textures[target.second->id()].handle(), 0);
 		}
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}

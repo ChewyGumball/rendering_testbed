@@ -1,13 +1,13 @@
 #pragma once
 #include <vector>
 
-#include <Renderer\TextureBuffer.h>
 #include <Renderer\Renderer.h>
-#include <Renderer\Camera.h>
 #include <Renderer\PointLight.h>
-#include <Models\ModelInstance.h>
-#include <Renderer\FrameBuffer.h>
 #include <Renderer\RenderOptions.h>
+
+class Camera;
+class ModelInstance;
+class FrameBuffer;
 
 class RenderPass
 {
@@ -16,8 +16,10 @@ private:
 	std::shared_ptr<Camera> m_camera;
 	RenderOptions options;
 	bool cullingEnabled;
+
 	glm::vec4 m_clearColour;
 	bool m_clearBuffers;
+
 	std::vector<std::shared_ptr<const ModelInstance>> modelInstances;
 
 public:

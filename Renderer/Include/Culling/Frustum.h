@@ -1,10 +1,9 @@
 #pragma once
 #include <array>
 #include <vector>
-#include <glm/glm.hpp>
+#include <glm/vec3.hpp>
 
-#include "BoundingSphere.h"
-#include "Plane.h"
+#include "Culling/Plane.h"
 
 namespace Culling {
 	class Frustum

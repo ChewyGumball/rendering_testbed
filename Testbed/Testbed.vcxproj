@@ -150,6 +150,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(LIB_DIR)/glm/include;$(LIB_DIR)/glfw-3.3.0\x64\release\include;$(LIB_DIR)\glew-1.13.0\include;$(SolutionDir)SceneManagement\Include;$(SolutionDir)Renderer\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LIB_DIR)/fbx/2017.1\lib\vs2015\x64\release;$(LIB_DIR)\glew-1.13.0\lib\Release\x64;$(LIB_DIR)/glfw-3.3.0/x64/release/lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -262,12 +264,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3dll.lib;glew32.lib;opengl32.lib;libfbxsdk.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -283,6 +288,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="scenes\sample_scene_definition.json" />
+    <None Include="shaders\colour.frag" />
+    <None Include="shaders\colour.vert" />
+    <None Include="shaders\final.frag" />
+    <None Include="shaders\final.vert" />
+    <None Include="shaders\normal - Copy.frag" />
+    <None Include="shaders\normal.frag" />
+    <None Include="shaders\normal.vert" />
+    <None Include="shaders\texture.frag" />
+    <None Include="shaders\texture.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

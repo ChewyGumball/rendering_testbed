@@ -85,7 +85,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -136,7 +136,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(ProjectDir)Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(LIB_DIR)\glew-1.13.0\lib\Release\x64;$(LIB_DIR)/glfw-3.3.0\x64\debug\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(LIB_DIR)\glew-1.13.0\lib\Release\x64;$(LIB_DIR)/glfw-3.3.0\x64\release\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -249,13 +249,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Fonts\Font.cpp" />
-    <ClCompile Include="src\Models\ModelInstanceStateFormat.cpp" />
+    <ClCompile Include="src\Renderer\BufferFormat.cpp" />
     <ClCompile Include="src\Renderer\RenderResource.cpp" />
     <ClCompile Include="src\Renderer\RenderOptions.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\OpenGLTextureBuffer.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\OpenGLFrameBuffer.cpp" />
     <ClCompile Include="src\Renderer\FrameBuffer.cpp" />
-    <ClCompile Include="Include\Culling\BoundingSphere.cpp" />
+    <ClCompile Include="src\Culling\BoundingSphere.cpp" />
     <ClCompile Include="src\Renderer\QuaternionCamera.cpp" />
     <ClCompile Include="src\Culling\Frustum.cpp" />
     <ClCompile Include="src\Culling\Plane.cpp" />
@@ -269,18 +269,18 @@
     <ClCompile Include="src\Renderer\OpenGL\OpenGLRenderer.cpp" />
     <ClCompile Include="src\Renderer\RenderPass.cpp" />
     <ClCompile Include="src\Renderer\ScreenSpacePass.cpp" />
-    <ClCompile Include="src\Models\ModelInstance.cpp" />
-    <ClCompile Include="src\Models\ModelLoader.cpp" />
+    <ClCompile Include="src\Renderer\ModelInstance.cpp" />
+    <ClCompile Include="src\Renderer\ModelLoader.cpp" />
     <ClCompile Include="src\Util\FileUtils.cpp" />
-    <ClCompile Include="src\Shaders\Shader.cpp" />
-    <ClCompile Include="src\Models\Material.cpp" />
-    <ClCompile Include="src\Models\Mesh.cpp" />
-    <ClCompile Include="src\Models\Model.cpp" />
+    <ClCompile Include="src\Renderer\Shader.cpp" />
+    <ClCompile Include="src\Renderer\Mesh.cpp" />
+    <ClCompile Include="src\Renderer\Model.cpp" />
     <ClCompile Include="src\Util\StringUtils.cpp" />
     <ClCompile Include="src\Renderer\TextureBuffer.cpp" />
-    <ClCompile Include="src\Models\Vertex.cpp" />
+    <ClCompile Include="src\Renderer\Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Include\Renderer\DataBuffer.h" />
     <ClInclude Include="Include\Fonts\Font.h" />
     <ClInclude Include="Include\lib\stb_truetype\stb_rect_pack.h" />
     <ClInclude Include="Include\lib\stb_truetype\stb_truetype.h" />
@@ -327,18 +327,17 @@
     <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcherWin32.h" />
     <ClInclude Include="Include\Renderer\Camera.h" />
     <ClInclude Include="Include\Util\FileUtils.h" />
-    <ClInclude Include="Include\Models\Material.h" />
-    <ClInclude Include="Include\Models\Mesh.h" />
-    <ClInclude Include="Include\Models\Model.h" />
-    <ClInclude Include="Include\Shaders\Shader.h" />
-    <ClInclude Include="Include\Models\ModelLoader.h" />
+    <ClInclude Include="Include\Renderer\Mesh.h" />
+    <ClInclude Include="Include\Renderer\Model.h" />
+    <ClInclude Include="Include\Renderer\Shader.h" />
+    <ClInclude Include="Include\Renderer\ModelLoader.h" />
     <ClInclude Include="Include\Util\StringUtils.h" />
     <ClInclude Include="Include\Renderer\Renderer.h" />
-    <ClInclude Include="Include\Models\ModelInstance.h" />
+    <ClInclude Include="Include\Renderer\ModelInstance.h" />
     <ClInclude Include="Include\Renderer\ScreenSpacePass.h" />
     <ClInclude Include="Include\Renderer\RenderPass.h" />
     <ClInclude Include="Include\Renderer\TextureBuffer.h" />
-    <ClInclude Include="Include\Models\Vertex.h" />
+    <ClInclude Include="Include\Renderer\Vertex.h" />
     <ClInclude Include="Include\Renderer\OpenGL\OpenGLRenderer.h" />
     <ClInclude Include="Include\Renderer\OpenGL\OpenGLRenderModel.h" />
     <ClInclude Include="Include\Renderer\OpenGL\OpenGLRenderMesh.h" />
@@ -350,19 +349,10 @@
     <ClInclude Include="Include\Renderer\OpenGL\OpenGLTextureBuffer.h" />
     <ClInclude Include="Include\Renderer\RenderOptions.h" />
     <ClInclude Include="Include\Renderer\RenderResource.h" />
-    <ClInclude Include="Include\Models\ModelInstanceStateFormat.h" />
+    <ClInclude Include="Include\Renderer\BufferFormat.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="sample_render_graph.json" />
-    <None Include="src\Shaders\colour.frag" />
-    <None Include="src\Shaders\colour.vert" />
-    <None Include="src\Shaders\final.frag" />
-    <None Include="src\Shaders\final.vert" />
-    <None Include="src\Shaders\normal - Copy.frag" />
-    <None Include="src\Shaders\normal.frag" />
-    <None Include="src\Shaders\normal.vert" />
-    <None Include="src\Shaders\texture.frag" />
-    <None Include="src\Shaders\texture.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

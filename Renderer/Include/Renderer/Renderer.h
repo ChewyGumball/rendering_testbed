@@ -3,11 +3,11 @@
 #include <vector>
 #include <unordered_map>
 
-#include <Renderer\Camera.h>
-#include <Renderer\PointLight.h>
-#include <Models\ModelInstance.h>
-#include <Renderer\FrameBuffer.h>
-#include <Renderer\RenderOptions.h>
+#include <Renderer/Camera.h>
+#include <Renderer/PointLight.h>
+#include <Renderer/ModelInstance.h>
+#include <Renderer/FrameBuffer.h>
+#include <Renderer/RenderOptions.h>
 
 class Renderer
 {

@@ -1,6 +1,9 @@
 ﻿#include "Renderer/RenderPass.h"
-#include <Renderer\OpenGL\OpenGLRenderer.h>
 
+#include "Renderer/OpenGL/OpenGLRenderer.h"
+#include "Renderer/Camera.h"
+#include "Renderer/ModelInstance.h"
+#include "Renderer/FrameBuffer.h"
 #include "Culling/Frustum.h"
 
 
@@ -31,9 +34,7 @@ namespace {
 	}
 }
 
-
-
-RenderPass::RenderPass() : renderer(new OpenGLRenderer()), m_camera(std::make_shared<Camera>()), options(RenderOptions()), cullingEnabled(false) {}
+RenderPass::RenderPass() : renderer(new OpenGLRenderer()), m_camera(std::make_shared<Camera>()), options(RenderOptions()), cullingEnabled(false), m_clearColour(glm::vec4(0,0,0,1)), m_clearBuffers(true) {}
 
 RenderPass::~RenderPass()
 {

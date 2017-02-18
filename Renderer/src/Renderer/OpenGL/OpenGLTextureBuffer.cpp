@@ -28,9 +28,12 @@ OpenGLTextureBuffer::OpenGLTextureBuffer(std::shared_ptr<TextureBuffer> texture)
 	glGenTextures(1, &m_handle);
 	glBindTexture(GL_TEXTURE_2D, m_handle);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, internalFormats[texture->format()], dimensions.x, dimensions.y, 0, formats[texture->format()], GL_UNSIGNED_BYTE, texture->data().data());
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormats[texture->format()], dimensions.x, dimensions.y, 0, formats[texture->format()], GL_UNSIGNED_BYTE, texture->data()); 
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 }

@@ -21,5 +21,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="scenes\sample_scene_definition.json" />
+    <None Include="shaders\colour.frag" />
+    <None Include="shaders\colour.vert" />
+    <None Include="shaders\final.frag" />
+    <None Include="shaders\final.vert" />
+    <None Include="shaders\normal - Copy.frag" />
+    <None Include="shaders\normal.frag" />
+    <None Include="shaders\normal.vert" />
+    <None Include="shaders\texture.frag" />
+    <None Include="shaders\texture.vert" />
   </ItemGroup>
 </Project>

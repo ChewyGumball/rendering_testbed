@@ -1,9 +1,9 @@
 #pragma once
 #include <glm\glm.hpp>
 
-#include "Plane.h"
 
 namespace Culling {
+	class Plane;
 	class BoundingSphere
 	{
 		glm::vec3 m_center;

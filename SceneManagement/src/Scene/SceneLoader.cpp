@@ -7,7 +7,7 @@
 
 #include <lib\rapidjson\document.h>
 
-#include <Models\ModelLoader.h>
+#include <Renderer\ModelLoader.h>
 #include <Util\FileUtils.h>
 #include <Util\StringUtils.h>
 
@@ -233,7 +233,7 @@ std::unordered_map<std::string, std::shared_ptr<Shader>> loadShaders(
             fragmentFiles.push_back(filename.GetString());
         }
 
-		shaders[shader.name.GetString()] = std::make_shared<Shader>(vertexFiles, fragmentFiles, std::vector<std::pair<std::string, ModelInstanceStateType>> { std::make_pair("transform", ModelInstanceStateType::MAT4) });
+		shaders[shader.name.GetString()] = std::make_shared<Shader>(vertexFiles, fragmentFiles, std::vector<std::pair<std::string, BufferElementType>> { std::make_pair("transform", BufferElementType::MAT4) });
     }
     return shaders;
 }

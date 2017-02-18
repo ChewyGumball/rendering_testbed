@@ -15,7 +15,7 @@ class TextureBuffer : public RenderResource
 	glm::ivec2 m_dimensions;
 	TextureFormat m_format;
 	std::string m_filename; 
-	std::vector<uint8_t> m_data;
+	mutable std::vector<uint8_t> m_data;
 	bool fileTexture;
 
 public:
@@ -27,7 +27,7 @@ public:
 
 	const std::string& filename() const;
 	bool isFileTexture() const;
-	std::vector<uint8_t> data() const;
+	void* data() const;
 	TextureFormat format() const;
 	glm::ivec2 dimensions() const;
 };

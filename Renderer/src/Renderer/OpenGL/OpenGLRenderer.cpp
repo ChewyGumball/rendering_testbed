@@ -1,15 +1,18 @@
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 
-#include <algorithm>
-#include <utility>
-
 #include "Util/FileUtils.h"
 #include "Util/StringUtils.h"
 
-#include "Models/Mesh.h"
-#include "Models/Model.h"
-#include "Models/ModelInstance.h"
+#include "Renderer/Mesh.h"
+#include "Renderer/Model.h"
+#include "Renderer/ModelInstance.h"
 #include "Renderer/Camera.h"
+#include "Renderer/FrameBuffer.h"
+#include "Renderer/RenderOptions.h"
+
+#include "Renderer/OpenGL/OpenGLRenderMesh.h"
+#include "Renderer/OpenGL/OpenGLRenderModel.h"
+#include "Renderer/OpenGL/OpenGLShader.h"
 #include "Renderer/OpenGL/OpenGLFrameBuffer.h"
 #include "Renderer/OpenGL/OpenGLTextureBuffer.h"
 
@@ -110,7 +113,7 @@ void createModel(std::shared_ptr<const Model> model)
 }
 
 void uploadInstanceData(GLuint buffer, const std::vector<std::shared_ptr<const ModelInstance>>& instances) {
-	std::vector<uint8_t> instanceData;
+	DataBuffer instanceData;
 	instanceData.reserve(instances.size() * instances[0]->model()->shader()->expectedInstanceStateFormat().size());
 	for (auto instance : instances) {
 		auto& data = instance->instanceData();

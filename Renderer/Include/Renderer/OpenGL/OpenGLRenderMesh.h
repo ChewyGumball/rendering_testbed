@@ -1,7 +1,7 @@
 #pragma once
 #include <GL\glew.h>
 #include <memory>
-#include <Models\Mesh.h>
+#include <Renderer\Mesh.h>
 
 class OpenGLRenderMesh
 {
