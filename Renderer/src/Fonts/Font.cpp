@@ -95,32 +95,54 @@ uint16_t Font::height()
 	return m_height;
 }
 
-std::vector<std::shared_ptr<ModelInstance>> Font::createString(std::string string, glm::vec4 colour)
+std::vector<std::shared_ptr<ModelInstance>> Font::createString(std::string string, glm::vec4 colour) const
 {
-	std::vector<std::shared_ptr<ModelInstance>> instances;
-	instances.reserve(string.size());
-	stbtt_fontinfo& fontInfo = fontInfos[fontFile];	
+	std::vector<std::shared_ptr<ModelInstance>> instances = createInstances(string.size());
+	modifyString(instances, string, colour);
+	return instances;
+}
+
+void Font::modifyColour(std::vector<std::shared_ptr<ModelInstance>>& text, int startInclusive, int endExclusive, glm::vec4 newColour) const
+{
+	for (size_t i = startInclusive; i < endExclusive; ++i) {
+		text[i]->setState("letterColour", newColour);
+	}
+}
+
+void Font::modifyString(const std::vector<std::shared_ptr<ModelInstance>>& currentText, std::string newString, glm::vec4 colour) const
+{
+	assert(currentText.size() == newString.size());
+
+	stbtt_fontinfo& fontInfo = fontInfos[fontFile];
 
 	float xPosition = 0;
 	float yPosition = 0;
-
-	for (int i = 0; i < string.size(); ++i) {
-		char currentChar = string[i];
+	for (int i = 0; i < newString.size(); ++i) {
+		char currentChar = newString[i];
 		float offset = 0;
 		if (i > 0) {
-			offset = stbtt_GetCodepointKernAdvance(&fontInfo, currentChar, string[i - 1]) * scale;
+			offset = stbtt_GetCodepointKernAdvance(&fontInfo, currentChar, newString[i - 1]) * scale;
 		}
 
-		std::shared_ptr<ModelInstance> letter = std::make_shared<ModelInstance>(m_model);
+		std::shared_ptr<ModelInstance> letter = currentText[i];
 
 		stbtt_aligned_quad q;
 		stbtt_GetPackedQuad(packedCharData.get(), atlasWidth, atlasHeight, currentChar - 32, &xPosition, &yPosition, &q, true);
-				
+
+		//I don't know why the y coordinates are weird, but these modifications are required otherwise the quads are upside down and backwards
 		letter->setState("meshBounds", glm::vec4(q.x0 + offset, -q.y1, q.x1 + offset, -q.y0));
 		letter->setState("textureBounds", glm::vec4(q.s0, q.t1, q.s1, q.t0));
 		letter->setState("letterColour", colour);
+	}
+}
 
-		instances.push_back(letter);
+std::vector<std::shared_ptr<ModelInstance>> Font::createInstances(int instanceCount) const
+{
+	std::vector<std::shared_ptr<ModelInstance>> instances;
+	instances.reserve(instanceCount);
+
+	for (int i = 0; i < instanceCount; ++i) {
+		instances.push_back(std::make_shared<ModelInstance>(m_model));
 	}
 
 	return instances;

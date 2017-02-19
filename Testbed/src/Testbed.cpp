@@ -17,7 +17,10 @@
 #include <Renderer\ModelLoader.h>
 #include <Fonts\Font.h>
 
+#include <Scene/RenderableText.h>
+
 #include <Util\FileUtils.h>
+#include <Util\StringUtils.h>
 #include <random>
 
 int width = 800;
@@ -152,16 +155,18 @@ void renderScene(std::string sceneFile)
 	
 	//std::shared_ptr<Camera> guiCamera = std::make_shared<Camera>(glm::vec3(0, 0, 1), glm::vec3(0,0,0), glm::vec3(0, 1, 0), 45.0f, 1.0f);
 	std::shared_ptr<Camera> guiCamera = std::make_shared<Camera>(glm::vec3(0, 0, 5), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec4(0, width, 0, height));
-	RenderPass gui;
-	gui.clearBuffers(false);
-	gui.cull(false);
-	gui.depthTest(false);
-	gui.camera(guiCamera);
+	std::shared_ptr<RenderPass> gui = std::make_shared<RenderPass>();
+	gui->clearBuffers(false);
+	gui->cull(false);
+	gui->depthTest(false);
+	gui->camera(guiCamera);
 	bool wireframe = false;
-	gui.wireframe(wireframe);
+	gui->wireframe(wireframe);
 
-	Font f("F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/consola.ttf", 16);
-	gui.addModelInstances(f.createString("HELLO plz Also yes plz.?", glm::vec4(1, 1, 0, 1)));
+	std::shared_ptr<Font> f = std::make_shared<Font>("F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/consola.ttf", 16);
+	std::string formatString = "%4.4fms per frame (%dframes, %5.4ffps, %I64d triangles)";
+	RenderableText fpsCounter(Util::String::Format(formatString, 0, 0, 0.f, 0ull), f, glm::vec3(5, height - 15, 0), glm::vec4(0.7,0.7,0.7,1));
+	fpsCounter.addToRenderPass(gui);
 
 	double mouseX, mouseY;
 	glfwGetCursorPos(window, &mouseX, &mouseY);
@@ -181,11 +186,11 @@ void renderScene(std::string sceneFile)
 		{
 			tricount += pass->draw();
 		}
-		tricount += gui.draw();
+		tricount += gui->draw();
 
 		if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
 			wireframe = !wireframe;
-			gui.wireframe(wireframe);
+			gui->wireframe(wireframe);
 		}
 
 		glfwSwapBuffers(window);
@@ -195,6 +200,7 @@ void renderScene(std::string sceneFile)
 		if (cumulative >= 1)
 		{
 			Util::File::MonitorFiles();
+			fpsCounter.text(Util::String::Format(formatString, cumulative / frames, frames, frames / cumulative, tricount));
 			std::printf("%d frames, %I64d triangles\n", frames, tricount);
 			cumulative = 0;
 			frames = 0;

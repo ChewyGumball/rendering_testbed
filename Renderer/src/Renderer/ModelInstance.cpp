@@ -61,7 +61,7 @@ void ModelInstance::setState(std::string name, glm::mat4 value)
 glm::vec2 ModelInstance::getVec2State(std::string name) const
 {
 	auto& details = baseModel->shader()->expectedInstanceStateFormat()[name];
-	//assert(details.second == BufferElementType::FLOAT_VEC2);
+	assert(details.second == BufferElementType::FLOAT_VEC2);
 
 	return glm::make_vec2(reinterpret_cast<const float*>(m_instanceData.data() + details.first));
 }
@@ -69,7 +69,7 @@ glm::vec2 ModelInstance::getVec2State(std::string name) const
 glm::vec3 ModelInstance::getVec3State(std::string name) const
 {
 	auto& details = baseModel->shader()->expectedInstanceStateFormat()[name];
-	//assert(details.second == BufferElementType::FLOAT_VEC3);
+	assert(details.second == BufferElementType::FLOAT_VEC3);
 
 	return glm::make_vec3(reinterpret_cast<const float*>(m_instanceData.data() + details.first));
 }
@@ -77,7 +77,7 @@ glm::vec3 ModelInstance::getVec3State(std::string name) const
 glm::vec4 ModelInstance::getVec4State(std::string name) const
 {
 	auto& details = baseModel->shader()->expectedInstanceStateFormat()[name];
-	//assert(details.second == BufferElementType::FLOAT_VEC4);
+	assert(details.second == BufferElementType::FLOAT_VEC4);
 
 	return glm::make_vec4(reinterpret_cast<const float*>(m_instanceData.data() + details.first));
 }
@@ -85,7 +85,7 @@ glm::vec4 ModelInstance::getVec4State(std::string name) const
 uint32_t ModelInstance::getUIntState(std::string name) const
 {
 	auto& details = baseModel->shader()->expectedInstanceStateFormat()[name];
-	//assert(details.second == BufferElementType::UINT_SCALAR);
+	assert(details.second == BufferElementType::UINT_SCALAR);
 
 	return *reinterpret_cast<const uint32_t*>(m_instanceData.data() + details.first);
 }
@@ -93,7 +93,7 @@ uint32_t ModelInstance::getUIntState(std::string name) const
 int32_t ModelInstance::getIntState(std::string name) const
 {
 	auto& details = baseModel->shader()->expectedInstanceStateFormat()[name];
-	//assert(details.second == BufferElementType::INT_SCALAR);
+	assert(details.second == BufferElementType::INT_SCALAR);
 
 	return *reinterpret_cast<const int32_t*>(m_instanceData.data() + details.first);
 }
@@ -101,7 +101,7 @@ int32_t ModelInstance::getIntState(std::string name) const
 bool ModelInstance::getBoolState(std::string name) const
 {
 	auto& details = baseModel->shader()->expectedInstanceStateFormat()[name];
-	//assert(details.second == BufferElementType::BOOL_SCALAR);
+	assert(details.second == BufferElementType::BOOL_SCALAR);
 
 	return *reinterpret_cast<const bool*>(m_instanceData.data() + details.first);
 }
@@ -109,7 +109,7 @@ bool ModelInstance::getBoolState(std::string name) const
 float ModelInstance::getFloatState(std::string name) const
 {
 	auto& details = baseModel->shader()->expectedInstanceStateFormat()[name];
-	//assert(details.second == BufferElementType::FLOAT_SCALAR);
+	assert(details.second == BufferElementType::FLOAT_SCALAR);
 
 	return *reinterpret_cast<const float*>(m_instanceData.data() + details.first);
 }
@@ -117,7 +117,7 @@ float ModelInstance::getFloatState(std::string name) const
 glm::mat3 ModelInstance::getMat3State(std::string name) const
 {
 	auto& details = baseModel->shader()->expectedInstanceStateFormat()[name];
-	//assert(details.second == BufferElementType::MAT3);
+	assert(details.second == BufferElementType::MAT3);
 
 	return glm::make_mat3(reinterpret_cast<const float*>(m_instanceData.data() + details.first));
 }
@@ -125,7 +125,7 @@ glm::mat3 ModelInstance::getMat3State(std::string name) const
 glm::mat4 ModelInstance::getMat4State(std::string name) const
 {
 	auto& details = baseModel->shader()->expectedInstanceStateFormat()[name];
-	//assert(details.second == BufferElementType::MAT4);
+	assert(details.second == BufferElementType::MAT4);
 
 	return glm::make_mat4(reinterpret_cast<const float*>(m_instanceData.data() + details.first));
 }
@@ -149,7 +149,10 @@ glm::vec3 ModelInstance::position() const
 {
 	return glm::vec3(getMat4State("transform") * glm::vec4(0,0,0,1));
 }
-
+void ModelInstance::model(std::shared_ptr<Model> newModel)
+{
+	baseModel = newModel;
+}
 std::shared_ptr<const Model> ModelInstance::model() const { return baseModel; }
 
 const std::vector<uint8_t>& ModelInstance::instanceData() const

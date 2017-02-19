@@ -26,5 +26,9 @@ public:
 	const std::shared_ptr<TextureBuffer> bitmap();
 	uint16_t height();
 
-	std::vector<std::shared_ptr<ModelInstance>> createString(std::string string, glm::vec4 colour = glm::vec4(1,1,1,1));
+	std::vector<std::shared_ptr<ModelInstance>> createString(std::string string, glm::vec4 colour = glm::vec4(1,1,1,1)) const;
+
+	void modifyColour(std::vector<std::shared_ptr<ModelInstance>>& text, int startInclusive, int endExclusive, glm::vec4 newColour) const;
+	void modifyString(const std::vector<std::shared_ptr<ModelInstance>>& currentText, std::string newString, glm::vec4 colour = glm::vec4(1, 1, 1, 1)) const;
+	std::vector<std::shared_ptr<ModelInstance>> createInstances(int instanceCount) const;
 };

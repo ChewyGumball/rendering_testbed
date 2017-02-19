@@ -40,6 +40,7 @@ public:
 
 	glm::vec3 position() const;
 
+	void model(std::shared_ptr<Model> newModel);
 	std::shared_ptr<const Model> model() const;
 	const DataBuffer& instanceData() const;
 	Culling::BoundingSphere bounds() const;

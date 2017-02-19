@@ -132,15 +132,7 @@ OpenGLRenderer::OpenGLRenderer()
 
 OpenGLRenderer::~OpenGLRenderer() {}
 
-void OpenGLRenderer::addFrameBufferResources(std::shared_ptr<const FrameBuffer> frameBuffer) { createFrameBuffer(frameBuffer); }
-
-void OpenGLRenderer::addModelInstanceResources(std::shared_ptr<const ModelInstance> modelInstance)
-{
-    createModel(modelInstance->model());
-}
-
 void OpenGLRenderer::addPointLight(PointLight light) { lights.push_back(light); }
-
 
 void OpenGLRenderer::clearFrameBuffer(std::shared_ptr<const FrameBuffer> frameBuffer, glm::vec4 clearColour) {
 	frameBuffers[frameBuffer->id()].bind();
@@ -150,6 +142,8 @@ void OpenGLRenderer::clearFrameBuffer(std::shared_ptr<const FrameBuffer> frameBu
 
 void OpenGLRenderer::processRenderingOptions(RenderOptions & options)
 {
+	createFrameBuffer(options.frameBuffer);
+
 	frameBuffers[options.frameBuffer->id()].bind();
 
 	if (options.clearBuffers) {
@@ -173,6 +167,9 @@ void OpenGLRenderer::processRenderingOptions(RenderOptions & options)
 
 void OpenGLRenderer::draw(const std::vector<std::shared_ptr<const ModelInstance>>& instances, const std::shared_ptr<Camera> camera)
 {
+	std::shared_ptr<const ModelInstance> firstInstance = instances[0];
+	createModel(firstInstance->model());
+
 
     OpenGLRenderModel& model = models[instances[0]->model()->id()];
 	uploadInstanceData(model.transformVBO(), instances);

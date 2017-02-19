@@ -213,8 +213,10 @@
   <ItemGroup>
     <ClInclude Include="Include\Scene\Scene.h" />
     <ClInclude Include="Include\Scene\SceneLoader.h" />
+    <ClInclude Include="Include\Scene\RenderableText.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Scene\RenderableText.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Scene\SceneLoader.cpp" />
   </ItemGroup>

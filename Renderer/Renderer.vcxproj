@@ -248,7 +248,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Include\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Fonts\Font.cpp" />
     <ClCompile Include="src\Renderer\BufferFormat.cpp" />
     <ClCompile Include="src\Renderer\RenderResource.cpp" />

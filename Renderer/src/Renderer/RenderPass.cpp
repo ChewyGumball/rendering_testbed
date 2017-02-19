@@ -98,14 +98,12 @@ void RenderPass::camera(std::shared_ptr<Camera> c)
 void RenderPass::frameBuffer(std::shared_ptr<FrameBuffer> buffer)
 {
 	options.frameBuffer = buffer;
-	renderer->addFrameBufferResources(buffer);
 }
 
 void RenderPass::addModelInstances(std::vector<std::shared_ptr<ModelInstance>> modelInstances)
 {
 	for (auto modelInstance : modelInstances) {
 		m_modelInstances.push_back(modelInstance);
-		renderer->addModelInstanceResources(modelInstance);
 	}
 }
 

@@ -19,8 +19,6 @@ public:
 	OpenGLRenderer();
 	~OpenGLRenderer();
 
-	void addFrameBufferResources(std::shared_ptr<const FrameBuffer> frameBuffer);
-	void addModelInstanceResources(std::shared_ptr<const ModelInstance> modelInstance);
 	void addPointLight(PointLight light);
 
 	void clearFrameBuffer(std::shared_ptr<const FrameBuffer> frameBuffer, glm::vec4 clearColour);
