@@ -164,8 +164,8 @@ void renderScene(std::string sceneFile)
 	gui->wireframe(wireframe);
 
 	std::shared_ptr<Font> f = std::make_shared<Font>("F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/consola.ttf", 16);
-	std::string formatString = "%4.4fms per frame (%dframes, %5.4ffps, %I64d triangles)";
-	RenderableText fpsCounter(Util::String::Format(formatString, 0, 0, 0.f, 0ull), f, glm::vec3(5, height - 15, 0), glm::vec4(0.7,0.7,0.7,1));
+	std::string formatString = "%4.4fms per frame\r\n%dframes, %5.4ffps, %I64d triangles";
+	RenderableText fpsCounter(Util::String::Format(formatString, 0, 0, 0.f, 0ull), f, glm::vec3(5, height, 0), glm::vec4(0.7,0.7,0,1));
 	fpsCounter.addToRenderPass(gui);
 
 	double mouseX, mouseY;
@@ -201,7 +201,6 @@ void renderScene(std::string sceneFile)
 		{
 			Util::File::MonitorFiles();
 			fpsCounter.text(Util::String::Format(formatString, cumulative / frames, frames, frames / cumulative, tricount));
-			std::printf("%d frames, %I64d triangles\n", frames, tricount);
 			cumulative = 0;
 			frames = 0;
 		}

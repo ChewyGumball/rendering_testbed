@@ -14,6 +14,8 @@
 #include "Renderer/ModelInstance.h"
 
 namespace {
+	//font infos require the font data to stick around so it has to be stored somewhere
+	std::unordered_map<std::string, std::vector<uint8_t>> fontData;
 	std::unordered_map<std::string, stbtt_fontinfo> fontInfos;
 
 	std::shared_ptr<Mesh> quad;
@@ -22,6 +24,9 @@ namespace {
 
 	int atlasWidth = 512;
 	int atlasHeight = 512;
+
+	char minCharacter = ' ';
+	char maxCharacter = '~';
 
 	bool initialized = false;
 	void initializeFonts() {
@@ -56,7 +61,11 @@ Font::Font(std::string fontFile, uint16_t height) : m_height(height), fontFile(f
 {
 	initializeFonts();
 	packedCharData = std::make_unique<stbtt_packedchar_DIDNT_NAME_THIS_STRUCT[]>(94);
-	std::vector<uint8_t> fontFileData = Util::File::ReadBinary(fontFile);
+	if (fontData.count(fontFile) == 0) {
+		fontData[fontFile] = Util::File::ReadBinary(fontFile);
+	}
+	std::vector<uint8_t>& fontFileData = fontData[fontFile];
+
 	if (fontInfos.count(fontFile) == 0) {
 		stbtt_fontinfo& fontInfo = fontInfos[fontFile];
 		stbtt_InitFont(&fontInfo, fontFileData.data(), 0);
@@ -64,15 +73,20 @@ Font::Font(std::string fontFile, uint16_t height) : m_height(height), fontFile(f
 
 	stbtt_fontinfo fontInfo = fontInfos[fontFile];
 
-	std::vector<uint8_t> pixelData(atlasWidth * atlasHeight);
 	scale = stbtt_ScaleForPixelHeight(&fontInfo, height);
+
+	int ascent, descent, lineGap;
+	stbtt_GetFontVMetrics(&fontInfo, &ascent, &descent, &lineGap);
+	lineHeight = (ascent - descent + lineGap) * scale;
+
+	std::vector<uint8_t> pixelData(atlasWidth * atlasHeight);
 
 	stbtt_pack_context context;
 	assert(stbtt_PackBegin(&context, pixelData.data(), atlasWidth, atlasHeight, 0, 1, nullptr));
 	stbtt_PackSetOversampling(&context, 2, 2);
 
 	//all printable ascii characters 32 (space) to 126 (~)
-	assert(stbtt_PackFontRange(&context, fontFileData.data(), 0, height, 32, 94, packedCharData.get()));
+	assert(stbtt_PackFontRange(&context, fontFileData.data(), 0, height, minCharacter, maxCharacter - minCharacter, packedCharData.get()));
 
 	stbtt_PackEnd(&context);
 	
@@ -115,13 +129,31 @@ void Font::modifyString(const std::vector<std::shared_ptr<ModelInstance>>& curre
 
 	stbtt_fontinfo& fontInfo = fontInfos[fontFile];
 
+
 	float xPosition = 0;
-	float yPosition = 0;
+	float yPosition = 0 + lineHeight;
+	char previousChar = 0;
 	for (int i = 0; i < newString.size(); ++i) {
 		char currentChar = newString[i];
+		if (currentChar == '\n') {
+			yPosition += lineHeight;
+			xPosition = 0;
+			continue;
+		}
+		else if (currentChar == '\r' && i < newString.size() - 1 && newString[i + 1] == '\n') {
+			i += 1;
+			yPosition += lineHeight;
+			xPosition = 0;
+			continue;
+		}
+		else if (currentChar < minCharacter || currentChar > maxCharacter) {
+			continue;
+		}
+
 		float offset = 0;
-		if (i > 0) {
-			offset = stbtt_GetCodepointKernAdvance(&fontInfo, currentChar, newString[i - 1]) * scale;
+		//Don't need kerning when we are at the start of the line
+		if (xPosition > 0) {
+			offset = stbtt_GetCodepointKernAdvance(&fontInfo, currentChar, previousChar) * scale;
 		}
 
 		std::shared_ptr<ModelInstance> letter = currentText[i];
@@ -133,6 +165,8 @@ void Font::modifyString(const std::vector<std::shared_ptr<ModelInstance>>& curre
 		letter->setState("meshBounds", glm::vec4(q.x0 + offset, -q.y1, q.x1 + offset, -q.y0));
 		letter->setState("textureBounds", glm::vec4(q.s0, q.t1, q.s1, q.t0));
 		letter->setState("letterColour", colour);
+
+		previousChar = currentChar;
 	}
 }
 
