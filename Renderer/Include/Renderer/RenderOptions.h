@@ -10,9 +10,12 @@ struct RenderOptions
 	std::shared_ptr<FrameBuffer> frameBuffer;
 	glm::ivec2 viewportOrigin;
 	glm::ivec2 viewportDimensions;
+	glm::vec4 clearColour;
+	bool clearBuffers;
 	bool wireframe;
+	bool depthTest;
 
 	RenderOptions();
-	RenderOptions(std::shared_ptr<FrameBuffer> frameBuffer, glm::ivec2 viewportOrigin, glm::ivec2 viewportDimensions, bool wireframe);
+	RenderOptions(std::shared_ptr<FrameBuffer> frameBuffer, glm::ivec2 viewportOrigin, glm::ivec2 viewportDimensions, glm::vec4 clearColour, bool clearBuffers, bool wireframe, bool depthTest);
 };
 

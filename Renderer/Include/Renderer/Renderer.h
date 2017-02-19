@@ -16,7 +16,9 @@ public:
 	virtual ~Renderer() {};
 
 	virtual void clearFrameBuffer(std::shared_ptr<const FrameBuffer> frameBuffer, glm::vec4 clearColour) = 0;
-	virtual void draw(const std::vector<std::shared_ptr<const ModelInstance>>& instances, const std::shared_ptr<Camera> camera, RenderOptions& options) = 0;
+
+	virtual void processRenderingOptions(RenderOptions& options) = 0;
+	virtual void draw(const std::vector<std::shared_ptr<const ModelInstance>>& instances, const std::shared_ptr<Camera> camera) = 0;
 
 	virtual void addFrameBufferResources(std::shared_ptr<const FrameBuffer> frameBuffer) = 0;
 	virtual void addModelInstanceResources(std::shared_ptr<const ModelInstance> modelInstance) = 0;

@@ -3,18 +3,22 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <glm\vec4.hpp>
 
 class TextureBuffer;
 class ModelInstance;
+class Model;
 struct stbtt_packedchar_DIDNT_NAME_THIS_STRUCT;
 
 class Font
 {
 private:
 	float scale;
-	stbtt_packedchar_DIDNT_NAME_THIS_STRUCT* packedCharData;
-	std::shared_ptr<TextureBuffer> m_bitmap;
+	std::unique_ptr<stbtt_packedchar_DIDNT_NAME_THIS_STRUCT[]> packedCharData;
+	std::shared_ptr<TextureBuffer> m_bitmap;	
+	std::shared_ptr<Model> m_model;
 	uint16_t m_height;
+	std::string fontFile;
 public:
 	Font(std::string fontFile, uint16_t height);
 	~Font();
@@ -22,5 +26,5 @@ public:
 	const std::shared_ptr<TextureBuffer> bitmap();
 	uint16_t height();
 
-	std::vector<std::shared_ptr<ModelInstance>> createString(std::string string);
+	std::vector<std::shared_ptr<ModelInstance>> createString(std::string string, glm::vec4 colour = glm::vec4(1,1,1,1));
 };

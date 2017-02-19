@@ -114,6 +114,9 @@
     <ClCompile Include="src\Renderer\Vertex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Include\Renderer\Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Util\FileUtils.h">
@@ -329,5 +332,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="sample_render_graph.json" />
+    <None Include="src\Fonts\font.vert" />
+    <None Include="src\Fonts\font.frag" />
   </ItemGroup>
 </Project>

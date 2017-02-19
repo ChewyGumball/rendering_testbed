@@ -11,6 +11,7 @@ private:
 	glm::mat4 m_projection;
 public:
 	Camera();
+	Camera(glm::vec3 position, glm::vec3 target, glm::vec3 up, glm::vec4 clippingPlanes);
 	Camera(glm::vec3 position, glm::vec3 target, glm::vec3 up, float fov, float aspectRatio);
 	~Camera();
 

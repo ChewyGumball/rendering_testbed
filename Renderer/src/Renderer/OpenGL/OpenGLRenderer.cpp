@@ -123,7 +123,12 @@ void uploadInstanceData(GLuint buffer, const std::vector<std::shared_ptr<const M
 }
 }
 
-OpenGLRenderer::OpenGLRenderer() {}
+OpenGLRenderer::OpenGLRenderer() 
+{
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_CULL_FACE);
+}
 
 OpenGLRenderer::~OpenGLRenderer() {}
 
@@ -143,15 +148,31 @@ void OpenGLRenderer::clearFrameBuffer(std::shared_ptr<const FrameBuffer> frameBu
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void OpenGLRenderer::draw(const std::vector<std::shared_ptr<const ModelInstance>>& instances, const std::shared_ptr<Camera> camera, RenderOptions& options)
+void OpenGLRenderer::processRenderingOptions(RenderOptions & options)
 {
-    frameBuffers[options.frameBuffer->id()].bind();
+	frameBuffers[options.frameBuffer->id()].bind();
 
-    glViewport(options.viewportOrigin.x, options.viewportOrigin.y, options.viewportDimensions.x, options.viewportDimensions.y);
-	
+	if (options.clearBuffers) {
+		glClearColor(options.clearColour.r, options.clearColour.g, options.clearColour.b, options.clearColour.a);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+
+	if (options.depthTest) {
+		glEnable(GL_DEPTH_TEST);
+	} 
+	else {
+		glDisable(GL_DEPTH_TEST);
+	}
+
+	glViewport(options.viewportOrigin.x, options.viewportOrigin.y, options.viewportDimensions.x, options.viewportDimensions.y);
+
 	GLenum polygonMode = options.wireframe ? GL_LINE : GL_FILL;
-    glPolygonMode(GL_FRONT, polygonMode);
-    glPolygonMode(GL_BACK, polygonMode);
+	glPolygonMode(GL_FRONT, polygonMode);
+	glPolygonMode(GL_BACK, polygonMode);
+}
+
+void OpenGLRenderer::draw(const std::vector<std::shared_ptr<const ModelInstance>>& instances, const std::shared_ptr<Camera> camera)
+{
 
     OpenGLRenderModel& model = models[instances[0]->model()->id()];
 	uploadInstanceData(model.transformVBO(), instances);

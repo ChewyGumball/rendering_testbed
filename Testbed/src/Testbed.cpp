@@ -15,6 +15,7 @@
 #include <Renderer\Camera.h>
 #include <Scene\SceneLoader.h>
 #include <Renderer\ModelLoader.h>
+#include <Fonts\Font.h>
 
 #include <Util\FileUtils.h>
 #include <random>
@@ -137,9 +138,6 @@ void renderScene(std::string sceneFile)
 	}
 
 	glfwSwapInterval(0);
-	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
 
 	Scene scene = SceneLoader::loadScene(sceneFile);
 	std::vector<std::shared_ptr<ModelInstance>> instances = scene.modelInstances("layer1Models");
@@ -151,17 +149,23 @@ void renderScene(std::string sceneFile)
 	double lastTime = glfwGetTime();
 	double cumulative = 0;
 	int frames = 0;
+	
+	//std::shared_ptr<Camera> guiCamera = std::make_shared<Camera>(glm::vec3(0, 0, 1), glm::vec3(0,0,0), glm::vec3(0, 1, 0), 45.0f, 1.0f);
+	std::shared_ptr<Camera> guiCamera = std::make_shared<Camera>(glm::vec3(0, 0, 5), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec4(0, width, 0, height));
+	RenderPass gui;
+	gui.clearBuffers(false);
+	gui.cull(false);
+	gui.depthTest(false);
+	gui.camera(guiCamera);
+	bool wireframe = false;
+	gui.wireframe(wireframe);
 
-	uint64_t tricount = 0;
-	for (std::shared_ptr<RenderPass> pass : passes)
-	{
-		tricount += pass->draw();
-	}
-
-	glfwSwapBuffers(window);
+	Font f("F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/consola.ttf", 16);
+	gui.addModelInstances(f.createString("HELLO plz Also yes plz.?", glm::vec4(1, 1, 0, 1)));
 
 	double mouseX, mouseY;
 	glfwGetCursorPos(window, &mouseX, &mouseY);
+
 	while (!glfwWindowShouldClose(window))
 	{
 		double currentTime = glfwGetTime();
@@ -176,6 +180,12 @@ void renderScene(std::string sceneFile)
 		for (std::shared_ptr<RenderPass> pass : passes)
 		{
 			tricount += pass->draw();
+		}
+		tricount += gui.draw();
+
+		if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+			wireframe = !wireframe;
+			gui.wireframe(wireframe);
 		}
 
 		glfwSwapBuffers(window);

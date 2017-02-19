@@ -6,13 +6,13 @@ namespace {
 	std::unordered_map<TextureFormat, GLenum> formats{
 		{ TextureFormat::RGB8, GL_RGB },
 		{ TextureFormat::DEPTH, GL_DEPTH_COMPONENT },
-		{ TextureFormat::GREYSCALE, GL_R }
+		{ TextureFormat::GREYSCALE, GL_RED }
 	};
 
 	std::unordered_map<TextureFormat, GLenum> internalFormats {
 		{ TextureFormat::RGB8, GL_RGB8 },
 		{ TextureFormat::DEPTH, GL_DEPTH_COMPONENT24 },
-		{ TextureFormat::GREYSCALE, GL_R8 }
+		{ TextureFormat::GREYSCALE, GL_RGB }
 	};
 }
 

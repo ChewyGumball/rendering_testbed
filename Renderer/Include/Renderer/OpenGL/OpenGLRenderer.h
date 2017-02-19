@@ -24,6 +24,7 @@ public:
 	void addPointLight(PointLight light);
 
 	void clearFrameBuffer(std::shared_ptr<const FrameBuffer> frameBuffer, glm::vec4 clearColour);
-	void draw(const std::vector<std::shared_ptr<const ModelInstance>>& instances, const std::shared_ptr<Camera> camera, RenderOptions& options);
+	void processRenderingOptions(RenderOptions& options);
+	void draw(const std::vector<std::shared_ptr<const ModelInstance>>& instances, const std::shared_ptr<Camera> camera);
 };
 

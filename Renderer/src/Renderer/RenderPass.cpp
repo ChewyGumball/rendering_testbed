@@ -34,7 +34,7 @@ namespace {
 	}
 }
 
-RenderPass::RenderPass() : renderer(new OpenGLRenderer()), m_camera(std::make_shared<Camera>()), options(RenderOptions()), cullingEnabled(false), m_clearColour(glm::vec4(0,0,0,1)), m_clearBuffers(true) {}
+RenderPass::RenderPass() : renderer(new OpenGLRenderer()), m_camera(std::make_shared<Camera>()), options(RenderOptions()), cullingEnabled(false) {}
 
 RenderPass::~RenderPass()
 {
@@ -47,20 +47,18 @@ uint64_t RenderPass::draw()
 
 	std::unordered_map<RenderResourceID, std::vector<std::shared_ptr<const ModelInstance>>> culledInstances;
 	if (cullingEnabled) {
-		culledInstances = cullAgainstCameraFrustum(m_camera, modelInstances);
+		culledInstances = cullAgainstCameraFrustum(m_camera, m_modelInstances);
 	}
 	else {
-		for (size_t i = 0; i < modelInstances.size(); ++i) {
-			culledInstances[modelInstances[i]->model()->id()].push_back(modelInstances[i]);
+		for (size_t i = 0; i < m_modelInstances.size(); ++i) {
+			culledInstances[m_modelInstances[i]->model()->id()].push_back(m_modelInstances[i]);
 		}
 	}
 
-	if (m_clearBuffers) {
-		renderer->clearFrameBuffer(options.frameBuffer, m_clearColour);
-	}
+	renderer->processRenderingOptions(options);
 
 	for (auto instanceList : culledInstances) {
-		renderer->draw(instanceList.second, m_camera, options);
+		renderer->draw(instanceList.second, m_camera);
 		trianglesDrawn += instanceList.second.size() * instanceList.second[0]->model()->triangleCount();
 	}
 
@@ -69,12 +67,17 @@ uint64_t RenderPass::draw()
 
 void RenderPass::clearBuffers(bool enabled)
 {
-	m_clearBuffers = enabled;
+	options.clearBuffers = enabled;
 }
 
 void RenderPass::clearColour(glm::vec4 colour)
 {
-	m_clearColour = colour;
+	options.clearColour = colour;
+}
+
+void RenderPass::depthTest(bool enabled)
+{
+	options.depthTest = enabled;
 }
 
 void RenderPass::cull(bool enabled)
@@ -98,15 +101,29 @@ void RenderPass::frameBuffer(std::shared_ptr<FrameBuffer> buffer)
 	renderer->addFrameBufferResources(buffer);
 }
 
-void RenderPass::addModelInstance(std::shared_ptr<const ModelInstance> modelInstance) { 
-	modelInstances.push_back(modelInstance);
-	renderer->addModelInstanceResources(modelInstance); 
+void RenderPass::addModelInstances(std::vector<std::shared_ptr<ModelInstance>> modelInstances)
+{
+	for (auto modelInstance : modelInstances) {
+		m_modelInstances.push_back(modelInstance);
+		renderer->addModelInstanceResources(modelInstance);
+	}
+}
+
+void RenderPass::addModelInstance(std::shared_ptr<ModelInstance> modelInstance) {
+	addModelInstances({ modelInstance });
 }
 
 void RenderPass::addPointLight(PointLight light) { renderer->addPointLight(light); }
 
-void RenderPass::removeModelInstance(std::shared_ptr<const ModelInstance> modelInstance) { 
-	modelInstances.erase(std::remove(modelInstances.begin(), modelInstances.end(), modelInstance), modelInstances.end());
+void RenderPass::removeModelInstances(std::vector<std::shared_ptr<ModelInstance>> modelInstances)
+{
+	for (auto modelInstance : modelInstances) {
+		m_modelInstances.erase(std::remove(m_modelInstances.begin(), m_modelInstances.end(), modelInstance), m_modelInstances.end());
+	}
+}
+
+void RenderPass::removeModelInstance(std::shared_ptr<ModelInstance> modelInstance) {
+	removeModelInstances({ modelInstance });
 }
 
 

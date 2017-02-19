@@ -49,7 +49,7 @@ void Vertex::append(VertexFormat format, std::vector<float>& data) const
     }
 }
 
-std::vector<float> Vertex::flatten(VertexFormat format, std::vector<Vertex> vertices)
+std::vector<float> Vertex::flatten(VertexFormat format, std::vector<Vertex>& vertices)
 {
     std::vector<float> flattened;
     for (Vertex& v : vertices) {
