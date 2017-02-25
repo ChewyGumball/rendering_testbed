@@ -137,12 +137,12 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug DirectX11|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(LIB_DIR)/glm/include;$(LIB_DIR)/glfw-3.3.0\x64\debug\include;$(LIB_DIR)\glew-1.13.0\include;$(SolutionDir)SceneManagement\Include;$(SolutionDir)Renderer\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Testbed\Include;$(LIB_DIR)/glm/include;$(LIB_DIR)/glfw-3.3.0\x64\debug\include;$(LIB_DIR)\glew-1.13.0\include;$(SolutionDir)SceneManagement\Include;$(SolutionDir)Renderer\Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(LIB_DIR)/fbx/2017.1\lib\vs2015\x64\debug;$(LIB_DIR)\glew-1.13.0\lib\Release\x64;$(LIB_DIR)/glfw-3.3.0/x64/debug/lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(LIB_DIR)/glm/include;$(LIB_DIR)/glfw-3.3.0\x64\debug\include;$(LIB_DIR)\glew-1.13.0\include;$(SolutionDir)SceneManagement\Include;$(SolutionDir)Renderer\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(LIB_DIR)/glm/include;$(LIB_DIR)/glfw-3.3.0\x64\debug\include;$(LIB_DIR)\glew-1.13.0\include;$(SolutionDir)SceneManagement\Include;$(SolutionDir)Renderer\Include;$(SolutionDir)Testbed\Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(LIB_DIR)/fbx/2017.1\lib\vs2015\x64\debug;$(LIB_DIR)\glew-1.13.0\lib\Release\x64;$(LIB_DIR)/glfw-3.3.0/x64/debug/lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -150,7 +150,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(LIB_DIR)/glm/include;$(LIB_DIR)/glfw-3.3.0\x64\release\include;$(LIB_DIR)\glew-1.13.0\include;$(SolutionDir)SceneManagement\Include;$(SolutionDir)Renderer\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Testbed\Include;$(LIB_DIR)/glm/include;$(LIB_DIR)/glfw-3.3.0\x64\release\include;$(LIB_DIR)\glew-1.13.0\include;$(SolutionDir)SceneManagement\Include;$(SolutionDir)Renderer\Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(LIB_DIR)/fbx/2017.1\lib\vs2015\x64\release;$(LIB_DIR)\glew-1.13.0\lib\Release\x64;$(LIB_DIR)/glfw-3.3.0/x64/release/lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -277,6 +277,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Testbed.cpp" />
+    <ClCompile Include="src\Test1.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Renderer\Renderer.vcxproj">
@@ -288,6 +289,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="scenes\sample_scene_definition.json" />
+    <None Include="scenes\ssao.json" />
     <None Include="shaders\colour.frag" />
     <None Include="shaders\colour.vert" />
     <None Include="shaders\final.frag" />
@@ -297,6 +299,9 @@
     <None Include="shaders\normal.vert" />
     <None Include="shaders\texture.frag" />
     <None Include="shaders\texture.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\Test1.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

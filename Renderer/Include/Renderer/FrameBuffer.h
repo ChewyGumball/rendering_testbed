@@ -5,7 +5,12 @@
 #include <Renderer\TextureBuffer.h>
 
 enum struct FrameBufferTarget {
-	COLOUR,
+	COLOUR0,
+	COLOUR1,
+	COLOUR2,
+	COLOUR3,
+	COLOUR4,
+	COLOUR5,
 	DEPTH
 };
 

@@ -248,8 +248,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Buffer\DataBufferArray.cpp" />
+    <ClCompile Include="src\Buffer\DataBufferArrayView.cpp" />
+    <ClCompile Include="src\Buffer\DataBufferView.cpp" />
+    <ClCompile Include="src\Buffer\DataBuffer.cpp" />
     <ClCompile Include="src\Fonts\Font.cpp" />
-    <ClCompile Include="src\Renderer\BufferFormat.cpp" />
+    <ClCompile Include="src\Buffer\BufferFormat.cpp" />
     <ClCompile Include="src\Renderer\RenderResource.cpp" />
     <ClCompile Include="src\Renderer\RenderOptions.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\OpenGLTextureBuffer.cpp" />
@@ -280,7 +284,10 @@
     <ClCompile Include="src\Renderer\Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\Renderer\DataBuffer.h" />
+    <ClInclude Include="Include\Buffer\DataBufferArray.h" />
+    <ClInclude Include="Include\Buffer\DataBufferArrayView.h" />
+    <ClInclude Include="Include\Buffer\DataBufferView.h" />
+    <ClInclude Include="Include\Buffer\DataBuffer.h" />
     <ClInclude Include="Include\Fonts\Font.h" />
     <ClInclude Include="Include\lib\stb_truetype\stb_rect_pack.h" />
     <ClInclude Include="Include\lib\stb_truetype\stb_truetype.h" />
@@ -349,7 +356,7 @@
     <ClInclude Include="Include\Renderer\OpenGL\OpenGLTextureBuffer.h" />
     <ClInclude Include="Include\Renderer\RenderOptions.h" />
     <ClInclude Include="Include\Renderer\RenderResource.h" />
-    <ClInclude Include="Include\Renderer\BufferFormat.h" />
+    <ClInclude Include="Include\Buffer\BufferFormat.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="sample_render_graph.json" />

@@ -44,7 +44,7 @@ namespace {
 			fontShader = std::make_shared<Shader>(
 				"F:/Users/Ben/Documents/Projects/RenderingTestbed/Renderer/src/Fonts/font.vert",
 				"F:/Users/Ben/Documents/Projects/RenderingTestbed/Renderer/src/Fonts/font.frag",
-				BufferFormat(std::vector<std::pair<std::string, BufferElementType>> {
+				std::make_shared<BufferFormat>(std::vector<std::pair<std::string, BufferElementType>> {
 					{ "transform", BufferElementType::MAT4},
 					{ "meshBounds", BufferElementType::FLOAT_VEC4 },
 					{ "textureBounds", BufferElementType::FLOAT_VEC4 },
@@ -62,7 +62,7 @@ Font::Font(std::string fontFile, uint16_t height) : m_height(height), fontFile(f
 	initializeFonts();
 	packedCharData = std::make_unique<stbtt_packedchar_DIDNT_NAME_THIS_STRUCT[]>(94);
 	if (fontData.count(fontFile) == 0) {
-		fontData[fontFile] = Util::File::ReadBinary(fontFile);
+		fontData[fontFile].swap(Util::File::ReadBinary(fontFile));
 	}
 	std::vector<uint8_t>& fontFileData = fontData[fontFile];
 
@@ -119,7 +119,7 @@ std::vector<std::shared_ptr<ModelInstance>> Font::createString(std::string strin
 void Font::modifyColour(std::vector<std::shared_ptr<ModelInstance>>& text, int startInclusive, int endExclusive, glm::vec4 newColour) const
 {
 	for (size_t i = startInclusive; i < endExclusive; ++i) {
-		text[i]->setState("letterColour", newColour);
+		text[i]->instanceData().set("letterColour", newColour);
 	}
 }
 
@@ -162,9 +162,9 @@ void Font::modifyString(const std::vector<std::shared_ptr<ModelInstance>>& curre
 		stbtt_GetPackedQuad(packedCharData.get(), atlasWidth, atlasHeight, currentChar - 32, &xPosition, &yPosition, &q, true);
 
 		//I don't know why the y coordinates are weird, but these modifications are required otherwise the quads are upside down and backwards
-		letter->setState("meshBounds", glm::vec4(q.x0 + offset, -q.y1, q.x1 + offset, -q.y0));
-		letter->setState("textureBounds", glm::vec4(q.s0, q.t1, q.s1, q.t0));
-		letter->setState("letterColour", colour);
+		letter->instanceData().set("meshBounds", glm::vec4(q.x0 + offset, -q.y1, q.x1 + offset, -q.y0));
+		letter->instanceData().set("textureBounds", glm::vec4(q.s0, q.t1, q.s1, q.t0));
+		letter->instanceData().set("letterColour", colour);
 
 		previousChar = currentChar;
 	}

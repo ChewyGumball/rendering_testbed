@@ -15,6 +15,17 @@ namespace {
 std::unordered_map<std::string, TextureFormat> textureFormats{ { "rgb", TextureFormat::RGB8 }, { "depth", TextureFormat::DEPTH } };
 std::unordered_map<std::string, VertexFormat>  vertexFormats{ { "Position_Normal", VertexFormats::Position_Normal },
     { "Position_Texture", VertexFormats::Position_Texture } };
+std::unordered_map<std::string, BufferElementType> elementTypes{
+	{ "buffer", BufferElementType::BUFFER},
+	{ "array", BufferElementType::ARRAY},
+	{ "float1", BufferElementType::FLOAT_SCALAR},
+	{ "float2", BufferElementType::FLOAT_VEC2 },
+	{ "float3", BufferElementType::FLOAT_VEC3 },
+	{ "float4", BufferElementType::FLOAT_VEC4 },
+	{ "int1", BufferElementType::INT_SCALAR},
+	{ "uint1", BufferElementType::UINT_SCALAR },
+	{ "mat4", BufferElementType::MAT4 },
+};
 
 glm::vec3 objectToVec3(rapidjson::Value& json) { return glm::vec3(json["x"].GetFloat(), json["y"].GetFloat(), json["z"].GetFloat()); }
 glm::vec4 objectToVec4(rapidjson::Value& json) { return glm::vec4(json["x"].GetFloat(), json["y"].GetFloat(), json["z"].GetFloat(), json["w"].GetFloat()); }
@@ -31,6 +42,41 @@ int getIntFromPath(rapidjson::Value* json, std::string path)
 
     return v->GetInt();
 }
+
+std::shared_ptr<BufferFormat> readFormat(rapidjson::Value& json) {
+	std::vector<std::pair<std::string, BufferElementType>> format; 
+	std::unordered_map<std::string, const std::shared_ptr<BufferFormat>> nestedBufferFormats;
+
+	for (auto& member : json.GetObject()) {
+		std::string name(member.name.GetString());
+
+		if (member.value.IsObject()) {
+			BufferElementType type = elementTypes[member.value["type"].GetString()];
+			if (type == BufferElementType::BUFFER) {
+				nestedBufferFormats.emplace(name, readFormat(member.value["format"]));
+			}
+			if (type == BufferElementType::ARRAY) {
+				auto& arrayType = member.value["arrayType"];
+				if (arrayType.IsObject()) {
+					std::string s = member.value["arrayType"]["type"].GetString();
+					nestedBufferFormats.emplace(name, std::make_shared<BufferFormat>(member.value["arrayCount"].GetInt64(), elementTypes[member.value["arrayType"]["type"].GetString()], readFormat(member.value["arrayType"]["format"])));
+				}
+				else {
+					nestedBufferFormats.emplace(name, std::make_shared<BufferFormat>(member.value["arrayCount"].GetInt64(), elementTypes[member.value["arrayType"].GetString()]));
+				}
+			}
+			format.push_back(std::make_pair(name, type));
+		}
+		else {
+			BufferElementType type = elementTypes[member.value.GetString()];
+			assert(type != BufferElementType::BUFFER && type != BufferElementType::ARRAY);
+			format.push_back(std::make_pair(name, type));
+		}
+	}
+
+	return std::make_shared<BufferFormat>(format, nestedBufferFormats);
+}
+
 std::unordered_map<std::string, std::shared_ptr<Mesh>> loadMeshes(rapidjson::Document& json)
 {
     std::unordered_map<std::string, std::shared_ptr<Mesh>> meshes;
@@ -188,9 +234,24 @@ std::unordered_map<std::string, std::shared_ptr<RenderPass>> loadPasses(rapidjso
         if (pass.value.HasMember("bufferOverrides")) {
             std::unordered_map<FrameBufferTarget, std::shared_ptr<TextureBuffer>> targets;
             auto& overrides = pass.value["bufferOverrides"];
-            if (overrides.HasMember("colour")) {
-                targets[FrameBufferTarget::COLOUR] = textures[overrides["colour"].GetString()];
+            if (overrides.HasMember("colour0")) {
+                targets[FrameBufferTarget::COLOUR0] = textures[overrides["colour0"].GetString()];
             }
+			if (overrides.HasMember("colour1")) {
+				targets[FrameBufferTarget::COLOUR1] = textures[overrides["colour1"].GetString()];
+			}
+			if (overrides.HasMember("colour2")) {
+				targets[FrameBufferTarget::COLOUR2] = textures[overrides["colour2"].GetString()];
+			}
+			if (overrides.HasMember("colour3")) {
+				targets[FrameBufferTarget::COLOUR3] = textures[overrides["colour3"].GetString()];
+			}
+			if (overrides.HasMember("colour4")) {
+				targets[FrameBufferTarget::COLOUR4] = textures[overrides["colour4"].GetString()];
+			}
+			if (overrides.HasMember("colour5")) {
+				targets[FrameBufferTarget::COLOUR5] = textures[overrides["colour5"].GetString()];
+			}
             if (overrides.HasMember("depth")) {
                 targets[FrameBufferTarget::DEPTH] = textures[overrides["depth"].GetString()];
             }
@@ -233,7 +294,7 @@ std::unordered_map<std::string, std::shared_ptr<Shader>> loadShaders(
             fragmentFiles.push_back(filename.GetString());
         }
 
-		shaders[shader.name.GetString()] = std::make_shared<Shader>(vertexFiles, fragmentFiles, std::vector<std::pair<std::string, BufferElementType>> { std::make_pair("transform", BufferElementType::MAT4) });
+		shaders[shader.name.GetString()] = std::make_shared<Shader>(vertexFiles, fragmentFiles, readFormat(shader.value["instanceDataFormat"]), readFormat(shader.value["constantDataFormat"]));
     }
     return shaders;
 }

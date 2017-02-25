@@ -52,20 +52,19 @@ void setupVertexAttribute(GLuint vao, GLuint attribute, GLint componentCount, GL
 void setupInstanceStateAttribute(GLuint vao, GLuint attribute, BufferElementType type, GLuint offset)
 {
     const AttributeDetails& details = glTypes.at(type);
-	uint8_t size = BufferFormat::sizeOfType(type) / details.slotCount;
+	uint64_t size = BufferFormat::sizeOfType(type) / details.slotCount;
     for (int i = 0; i < details.slotCount; ++i) {
         glEnableVertexArrayAttrib(vao, attribute + i);
         glVertexArrayAttribBinding(vao, attribute + i, TRANSFORM_DATA_BINDING_POINT_INDEX);
-        glVertexArrayAttribFormat(vao, attribute + i, details.componentCount, details.type, GL_FALSE, offset + (i * size));
+        glVertexArrayAttribFormat(vao, attribute + i, details.componentCount, details.type, GL_FALSE, static_cast<GLuint>(offset + (i * size)));
     }
 }
 }
 
-OpenGLRenderModel::OpenGLRenderModel() : m_shaderID(0) {}
+OpenGLRenderModel::OpenGLRenderModel() : m_shaderID(0), vao(0), m_transformVBO(0), m_indexCount(0), m_shaderUniforms(nullptr, nullptr) {}
 
-OpenGLRenderModel::OpenGLRenderModel(
-    const OpenGLRenderMesh& mesh, const OpenGLShader& shader, const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures)
-    : m_shaderID(shader.shader()->id()), m_textures(textures), m_indexCount(mesh.indexCount())
+OpenGLRenderModel::OpenGLRenderModel(const OpenGLRenderMesh& mesh, const OpenGLShader& shader, const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures, DataBufferView shaderUniforms)
+    : m_shaderID(shader.shader()->id()), m_textures(textures), m_indexCount(mesh.indexCount()), m_shaderUniforms(shaderUniforms)
 {
     glCreateVertexArrays(1, &vao);
     glCreateBuffers(1, &m_transformVBO);
@@ -92,13 +91,13 @@ OpenGLRenderModel::OpenGLRenderModel(
     }
 
     // Set up instancing transform buffer attributes
-    const BufferFormat& stateFormat = shader.shader()->expectedInstanceStateFormat();
-    glVertexArrayVertexBuffer(vao, TRANSFORM_DATA_BINDING_POINT_INDEX, m_transformVBO, 0, stateFormat.size());
+	std::shared_ptr<BufferFormat> stateFormat = shader.shader()->expectedInstanceStateFormat();
+    glVertexArrayVertexBuffer(vao, TRANSFORM_DATA_BINDING_POINT_INDEX, m_transformVBO, 0, static_cast<GLsizei>(stateFormat->size()));
     glVertexArrayBindingDivisor(vao, TRANSFORM_DATA_BINDING_POINT_INDEX, 1);
 
-    for (auto& variable : stateFormat.offsets()) {
+    for (auto& variable : stateFormat->offsets()) {
         GLint attributeLocation = shader.getAttributeLocation(variable.first);
-        setupInstanceStateAttribute(vao, attributeLocation, variable.second.second, variable.second.first);
+        setupInstanceStateAttribute(vao, attributeLocation, variable.second.second, static_cast<GLuint>(variable.second.first));
     }
 
     // Set up vertex index buffer
@@ -117,6 +116,11 @@ void OpenGLRenderModel::draw(int instanceCount) const
 const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>>& OpenGLRenderModel::textures() const { return m_textures; }
 
 const RenderResourceID& OpenGLRenderModel::shaderID() const { return m_shaderID; }
+
+const DataBufferView& OpenGLRenderModel::uniformBuffer() const
+{
+	return m_shaderUniforms;
+}
 
 uint32_t OpenGLRenderModel::indexCount() const { return m_indexCount; }
 

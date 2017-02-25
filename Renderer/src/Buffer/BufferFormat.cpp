@@ -1,4 +1,4 @@
-#include "Renderer/BufferFormat.h"
+#include "Buffer/BufferFormat.h"
 #include <algorithm>
 //#include <assert.h>
 
@@ -33,65 +33,79 @@ namespace {
 	};
 }
 
-BufferFormat::BufferFormat() : m_size(0)
+BufferFormat::BufferFormat() : m_size(0), m_arrayType(BufferElementType::UNKNOWN), m_arrayElementFormat(nullptr)
 {
 }
 
-BufferFormat::BufferFormat(std::vector<std::pair<std::string, BufferElementType>>& format)
+BufferFormat::BufferFormat(uint64_t arraySize, BufferElementType arrayType, const std::shared_ptr<BufferFormat> arrayElementFormat)
+	: m_size(arraySize * (arrayElementFormat == nullptr ? typeSizes.at(arrayType) : arrayElementFormat->size())), m_arrayType(arrayType), m_arrayElementFormat(arrayElementFormat)
 {
-	uint16_t offset = 0;
+}
+
+BufferFormat::BufferFormat(std::vector<std::pair<std::string, BufferElementType>>& format, std::unordered_map<std::string, const std::shared_ptr<BufferFormat>> nestedBufferFormats)
+	: m_nestedBufferFormats(nestedBufferFormats), m_arrayType(BufferElementType::UNKNOWN), m_arrayElementFormat(nullptr)
+{
+	uint64_t offset = 0;
 	for (auto& value : format) {
 		m_offsets[value.first] = std::make_pair(offset, value.second);
-		offset += typeSizes.at(value.second);
+		if (value.second == BufferElementType::BUFFER || value.second == BufferElementType::ARRAY) {
+			assert(nestedBufferFormats.count(value.first) != 0);
+			offset += nestedBufferFormats[value.first]->size();
+		}
+		else {
+			offset += typeSizes.at(value.second);
+		}
 	}
 
 	m_size = offset;
 }
 
-void BufferFormat::setState(DataBuffer& instanceData, std::string name, BufferElementType type, uint8_t * data) const
-{
-	//assert(m_offsets.at(name).second == type);
-	std::copy(data, data + typeSizes.at(type), instanceData.begin() + m_offsets.at(name).first);
-}
 
-const std::pair<uint16_t, BufferElementType>& BufferFormat::operator[](std::string name) const
+const std::pair<BufferOffet, BufferElementType>& BufferFormat::at(std::string name) const
 {
 	return m_offsets.at(name);
 }
 
-const std::unordered_map<std::string, std::pair<uint16_t, BufferElementType>>& BufferFormat::offsets() const
+const std::unordered_map<std::string, std::pair<BufferOffet, BufferElementType>>& BufferFormat::offsets() const
 {
 	return m_offsets;
 }
 
-DataBuffer BufferFormat::initialData() const
-{
-	DataBuffer data(m_size);
-
-	for (auto& field : m_offsets) {
-		switch (field.second.second) {
-			case BufferElementType::MAT4: {
-				const uint8_t* matrix = reinterpret_cast<const uint8_t*>(glm::value_ptr(glm::mat4()));
-				std::copy(matrix, matrix + typeSizes.at(BufferElementType::MAT4), data.begin() + field.second.first);
-				break;
-			}
-			case BufferElementType::MAT3: {
-				const uint8_t* matrix = reinterpret_cast<const uint8_t*>(glm::value_ptr(glm::mat3()));
-				std::copy(matrix, matrix + typeSizes.at(BufferElementType::MAT3), data.begin() + field.second.first);
-				break;
-			}
-		}
-	}
-
-	return data;
-}
-
-uint16_t BufferFormat::size() const
+uint64_t BufferFormat::size() const
 {
 	return m_size;
 }
 
 BufferElementTypeSize BufferFormat::sizeOfType(BufferElementType type)
 {
+	assert(typeSizes.count(type) != 0);
 	return typeSizes.at(type);
+}
+
+const std::shared_ptr<BufferFormat> BufferFormat::nestedFormat(std::string name) const
+{
+	return m_nestedBufferFormats.at(name);
+}
+
+BufferElementType BufferFormat::arrayType() const
+{
+	assert(m_arrayType != BufferElementType::UNKNOWN);
+	return m_arrayType;
+}
+
+uint64_t BufferFormat::arraySize() const
+{
+	assert(m_arrayType != BufferElementType::UNKNOWN);
+
+	if (m_arrayType == BufferElementType::BUFFER) {
+		return m_size / m_arrayElementFormat->size();
+	}
+	else {
+		return m_size / typeSizes.at(m_arrayType);
+	}
+}
+
+const std::shared_ptr<BufferFormat> BufferFormat::arrayElementFormat() const
+{
+	return m_arrayElementFormat;
 }

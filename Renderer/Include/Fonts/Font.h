@@ -14,7 +14,7 @@ class Font
 {
 private:
 	float scale;
-	int lineHeight;
+	float lineHeight;
 	std::unique_ptr<stbtt_packedchar_DIDNT_NAME_THIS_STRUCT[]> packedCharData;
 	std::shared_ptr<TextureBuffer> m_bitmap;	
 	std::shared_ptr<Model> m_model;

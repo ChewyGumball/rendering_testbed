@@ -111,7 +111,9 @@ void RenderPass::addModelInstance(std::shared_ptr<ModelInstance> modelInstance) 
 	addModelInstances({ modelInstance });
 }
 
-void RenderPass::addPointLight(PointLight light) { renderer->addPointLight(light); }
+void RenderPass::addPointLight(PointLight light) { 
+	renderer->addPointLight(light); 
+}
 
 void RenderPass::removeModelInstances(std::vector<std::shared_ptr<ModelInstance>> modelInstances)
 {

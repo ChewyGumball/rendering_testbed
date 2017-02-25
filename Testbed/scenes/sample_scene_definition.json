@@ -19,15 +19,41 @@
   "shaders": {
     "phong": {
       "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/normal.vert" ],
-      "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/normal.frag" ]
+      "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/normal.frag" ],
+      "instanceDataFormat": { "transform": "mat4" },
+      "constantDataFormat": {
+        "projection": "mat4",
+        "view": "mat4",
+        "cameraPosition": "float3",
+        "lightCount": "int1",
+        "pointLights": {
+          "type": "array",
+          "arrayCount": 2,
+          "arrayType": {
+            "type": "buffer",
+            "format": {
+              "position": "float3",
+              "intensity": "float3",
+              "power": "float1"
+            }
+          }
+        }
+      }
     },
     "texture": {
       "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/texture.vert" ],
-      "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/texture.frag" ]
+      "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/texture.frag" ],
+      "instanceDataFormat": { "transform": "mat4" },
+      "constantDataFormat": {        
+        "projection": "mat4",
+        "view": "mat4"
+      }
     },
     "finalShader": {
       "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/final.vert" ],
-      "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/final.frag" ]
+      "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/final.frag" ],
+      "instanceDataFormat": { "transform": "mat4" },
+      "constantDataFormat": { }
     }
   },
   "textures": {
@@ -212,7 +238,7 @@
         "cull": true,
         "clearColour": { "r":  0.1, "g": 0.1, "b": 0.1, "a": 1},
         "bufferOverrides": {
-          "colour": "screenColourBufferA",
+          "colour0": "screenColourBufferA",
           "depth": "screenDepthBuffer"
         }
       },
@@ -225,7 +251,7 @@
         "wireframe": true,
         "clearColour": { "r":  0.2, "g": 0.2, "b": 0.2, "a": 1},
         "bufferOverrides": {
-          "colour": "screenColourBufferB",
+          "colour0": "screenColourBufferB",
           "depth": "screenDepthBuffer"
         }
       },

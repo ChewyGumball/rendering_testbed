@@ -14,7 +14,8 @@ namespace {
 	GLuint uniformLocation(GLuint program, const std::string& uniformName)
 	{
 		if (uniformLocationCache[program].count(uniformName) == 0) {
-			GLint location = glGetUniformLocation(program, uniformName.c_str());
+			const char* s = uniformName.c_str();
+			GLint location = glGetUniformLocation(program, s);
 			if (location == -1 && uniformErrors[program].count(uniformName) == 0) {
 				uniformErrors[program].insert(uniformName);
 				std::cout << "Could not find uniform '" << uniformName << "' in shader!" << std::endl;
@@ -25,61 +26,67 @@ namespace {
 		return uniformLocationCache[program][uniformName];
 	}
 
-	GLuint compileShader(std::string& source, GLenum type)
+	std::vector<GLuint> compileShaders(std::vector<std::string>& sources, GLenum type, bool& successful)
 	{
-		GLuint        shader = glCreateShader(type);
-		const GLchar* code = source.c_str();
-		glShaderSource(shader, 1, &code, NULL);
-		glCompileShader(shader);
+		std::vector<GLuint> shaders;
+		for(std::string source : sources) {
+			GLuint        shader = glCreateShader(type);
+			shaders.push_back(shader);
+			const GLchar* code = source.c_str();
+			glShaderSource(shader, 1, &code, NULL);
+			glCompileShader(shader);
 
-		GLint successful;
-		glGetShaderiv(shader, GL_COMPILE_STATUS, &successful);
-		if (!successful) {
-			GLchar log[512];
-			glGetShaderInfoLog(shader, 512, NULL, log);
-			std::cout << "Shader Compilation Error [" << enumNames[type] << "]: " << log << std::endl;
-
-			return 0;
+			GLint good;
+			glGetShaderiv(shader, GL_COMPILE_STATUS, &good);
+			if (!good) {
+				GLchar log[512];
+				glGetShaderInfoLog(shader, 512, NULL, log);
+				std::cout << "Shader Compilation Error [" << enumNames[type] << "]: " << log << std::endl;
+				successful = false;
+			}
 		}
-
-		return shader;
+		return shaders;
 	}
 
 	GLuint createProgram(std::vector<std::string> vertexSources, std::vector<std::string> fragmentSources)
 	{
 		GLuint program = glCreateProgram();
-		for (std::string source : vertexSources) {
-			GLuint vertexProgram = compileShader(source, GL_VERTEX_SHADER);
-			if (vertexProgram != 0) {
-				glAttachShader(program, vertexProgram);
-			}
-			else {
-				glDeleteShader(vertexProgram);
-				return 0;
-			}
-		}
-		for (std::string source : fragmentSources) {
-			GLuint fragmentProgram = compileShader(source, GL_FRAGMENT_SHADER);
-			if (fragmentProgram != 0) {
-				glAttachShader(program, fragmentProgram);
-			}
-			else {
-				glDeleteShader(fragmentProgram);
-				return 0;
-			}
+		bool successful = true;
+		std::vector<GLuint> allShaders;
+
+		std::vector<GLuint> vertexShaders = compileShaders(vertexSources, GL_VERTEX_SHADER, successful);
+		allShaders.insert(allShaders.end(), vertexShaders.begin(), vertexShaders.end());
+
+		if (successful) {
+			std::vector<GLuint> fragmentShaders = compileShaders(fragmentSources, GL_FRAGMENT_SHADER, successful);
+			allShaders.insert(allShaders.end(), fragmentShaders.begin(), fragmentShaders.end());
 		}
 
-		glLinkProgram(program);
-		GLint successful;
-		glGetProgramiv(program, GL_LINK_STATUS, &successful);
-		if (!successful) {
-			GLchar log[512];
-			glGetProgramInfoLog(program, 512, NULL, log);
-			std::cout << "Program Link Error: " << log << std::endl;
+		if (successful) {
+			for (GLuint shader : allShaders) {
+				glAttachShader(program, shader);
+			}
+			glLinkProgram(program);
+			for (GLuint shader : allShaders) {
+				glDetachShader(program, shader);
+			}
 
-			return 0;
+			GLint good;
+			glGetProgramiv(program, GL_LINK_STATUS, &good);
+			if (!good) {
+				GLchar log[512];
+				glGetProgramInfoLog(program, 512, NULL, log);
+				std::cout << "Program Link Error: " << log << std::endl;
+
+				glDeleteProgram(program);
+				program = 0;
+			}
 		}
-		return successful ? program : 0;
+		for (GLuint shader : allShaders) {
+			glDeleteShader(shader);
+		}
+
+		return program;
 	}
 
 	GLuint createProgram(std::string& vertexSource, std::string& fragmentSource) { return createProgram(std::vector<std::string>{ vertexSource }, std::vector<std::string>{ fragmentSource }); }
@@ -116,6 +123,9 @@ OpenGLShader::OpenGLShader(std::shared_ptr<const Shader> shader) : programHandle
 
 OpenGLShader::~OpenGLShader()
 {
+	if (programHandle != 0) {
+		glDeleteProgram(programHandle);
+	}
 }
 
 const std::shared_ptr<const Shader> OpenGLShader::shader() const
@@ -128,23 +138,23 @@ void OpenGLShader::bind()
 	glUseProgram(programHandle);
 }
 
-void OpenGLShader::setUniform1i(const std::string uniformName, int data) const
+void OpenGLShader::setUniform1i(const std::string uniformName, const GLint& data) const
 {
 	GLint location = uniformLocation(programHandle, uniformName);
 	if (location != -1) {
-		glUniform1i(location, data);
+		glUniform1iv(location, 1, &data);
 	}
 }
 
-void OpenGLShader::setUniform1f(const std::string uniformName, float data) const
+void OpenGLShader::setUniform1f(const std::string uniformName, const GLfloat& data) const
 {
 	GLint location = uniformLocation(programHandle, uniformName);
 	if (location != -1) {
-		glUniform1f(location, data);
+		glUniform1fv(location, 1, &data);
 	}
 }
 
-void OpenGLShader::setUniform2f(const std::string uniformName, glm::vec2 data) const
+void OpenGLShader::setUniform2f(const std::string uniformName, const glm::vec2& data) const
 {
 	GLint location = uniformLocation(programHandle, uniformName);
 	if (location != -1) {
@@ -152,7 +162,7 @@ void OpenGLShader::setUniform2f(const std::string uniformName, glm::vec2 data) c
 	}
 }
 
-void OpenGLShader::setUniform3f(const std::string uniformName, glm::vec3 data) const
+void OpenGLShader::setUniform3f(const std::string uniformName, const glm::vec3& data) const
 {
 	GLint location = uniformLocation(programHandle, uniformName);
 	if (location != -1) {
@@ -160,7 +170,7 @@ void OpenGLShader::setUniform3f(const std::string uniformName, glm::vec3 data) c
 	}
 }
 
-void OpenGLShader::setUniform4f(const std::string uniformName, glm::vec4 data) const
+void OpenGLShader::setUniform4f(const std::string uniformName, const glm::vec4& data) const
 {
 	GLint location = uniformLocation(programHandle, uniformName);
 	if (location != -1) {
@@ -168,7 +178,7 @@ void OpenGLShader::setUniform4f(const std::string uniformName, glm::vec4 data) c
 	}
 }
 
-void OpenGLShader::setUniformMatrix4f(const std::string  uniformName, glm::mat4 data) const
+void OpenGLShader::setUniformMatrix4f(const std::string  uniformName, const glm::mat4& data) const
 {
 	GLint location = uniformLocation(programHandle, uniformName);
 	if (location != -1) {

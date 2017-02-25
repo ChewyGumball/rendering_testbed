@@ -10,6 +10,16 @@ QuaternionCamera::QuaternionCamera() :m_position(glm::vec3(0, 0, 0)), m_pitch(0)
 {
 }
 
+QuaternionCamera::QuaternionCamera(glm::vec3 position, glm::vec3 target, glm::vec3 up, glm::vec4 clippingPlanes) 
+	: m_position(position),	m_projection(glm::ortho(clippingPlanes.x, clippingPlanes.y, clippingPlanes.z, clippingPlanes.w, 0.1f, 10000.0f))
+{
+	glm::vec3 view = glm::normalize(target - position);
+
+	m_yaw = glm::atan(view.x, view.z);
+	m_pitch = glm::asin(view.y);
+	m_roll = up.y == 0 ? 0 : glm::acos(glm::dot(glm::vec3(0, 1, 0), glm::normalize(glm::vec3(up.x, up.y, 0))));
+}
+
 QuaternionCamera::QuaternionCamera(glm::vec3 position, glm::vec3 target, glm::vec3 up, float fov, float aspectRatio)
 	: m_position(position), m_projection(glm::perspective(fov, aspectRatio, 0.1f, 10000.0f))
 {

@@ -18,6 +18,9 @@
     <ClCompile Include="src\Testbed.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Test1.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="scenes\sample_scene_definition.json" />
@@ -30,5 +33,11 @@
     <None Include="shaders\normal.vert" />
     <None Include="shaders\texture.frag" />
     <None Include="shaders\texture.vert" />
+    <None Include="scenes\ssao.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\Test1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

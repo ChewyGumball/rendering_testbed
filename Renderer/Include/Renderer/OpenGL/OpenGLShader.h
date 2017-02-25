@@ -18,14 +18,14 @@ public:
 
 	void bind();
 
-	void setUniform1i(const std::string uniformName, int data) const;
+	void setUniform1i(const std::string uniformName, const GLint& data) const;
 
-	void setUniform1f(const std::string uniformName, float data) const;
-	void setUniform2f(const std::string uniformName, glm::vec2 data) const;
-	void setUniform3f(const std::string uniformName, glm::vec3 data) const;
-	void setUniform4f(const std::string uniformName, glm::vec4 data) const;
-	void setUniformMatrix4f(const std::string uniformName, glm::mat4 data) const;
-
+	void setUniform1f(const std::string uniformName, const GLfloat& data) const;
+	void setUniform2f(const std::string uniformName, const glm::vec2& data) const;
+	void setUniform3f(const std::string uniformName, const glm::vec3& data) const;
+	void setUniform4f(const std::string uniformName, const glm::vec4& data) const;
+	void setUniformMatrix4f(const std::string uniformName, const glm::mat4& data) const;
+	
 	GLint getAttributeLocation(const std::string name) const;
 };
 

@@ -25,8 +25,8 @@ vec3 pointLightContribution(PointLight light, vec3 normal, vec3 position, vec3 v
 	vec3 reflectedDirection = reflect(-lightDirection, normal);
 	vec3 h = normalize(lightDirection + viewDirection);
 	float ndoth = dot(normal, h);
-	float specularPower = pow(clamp(ndoth,0.0,1.0), 512);
-	//float specularPower = pow(max(dot(viewDirection, reflectedDirection), 0.0), 256);
+	//float specularPower = pow(clamp(ndoth,0.0,1.0), 512);
+	float specularPower = pow(max(dot(viewDirection, reflectedDirection), 0.0), 256);
 
 	vec3 diffuse = (vec3(1) - light.intensity) * diffusePower;
 	vec3 specular = light.intensity * specularPower;
