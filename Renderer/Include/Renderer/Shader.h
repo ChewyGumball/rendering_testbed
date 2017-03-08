@@ -31,7 +31,7 @@ public:
 	const std::unordered_map<ShaderSourceType, std::vector<std::string>>& filenames() const;
 	const VertexFormat& expectedVertexFormat() const;
 	const std::shared_ptr<BufferFormat> expectedInstanceStateFormat() const;
-	const std::shared_ptr<BufferFormat> expectedUniformStateFormat() const;
+	const std::shared_ptr<BufferFormat> expectedConstantStateFormat() const;
 
 	~Shader();
 };

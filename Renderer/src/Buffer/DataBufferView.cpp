@@ -9,7 +9,7 @@ namespace {
 	template<typename T>
 	void setState(uint8_t* instanceData, std::string name, T* data, BufferElementType type, const std::shared_ptr<BufferFormat> format)
 	{
-		auto& details = format->offsets().at(name);
+		auto& details = format->at(name);
 		assert(details.second == type);
 
 		uint64_t dataSize;
@@ -24,7 +24,7 @@ namespace {
 	}
 
 	template<typename T>
-	T& getReferenceToData(uint8_t* data, BufferElementType expectedType, const std::pair<BufferElementTypeSize, BufferElementType>& details) {
+	T& getReferenceToData(uint8_t* data, BufferElementType expectedType, const std::pair<BufferOffset, BufferElementType>& details) {
 		assert(details.second == expectedType);
 
 		//As far as I can tell, this is safe for glm types because glm::value_ptr returns a pointer to the first member which is required to be the
@@ -53,7 +53,16 @@ void DataBufferView::set(std::string name, const glm::vec2& value)
 
 void DataBufferView::set(std::string name, const glm::vec3& value)
 {
-	setState(data, name, glm::value_ptr(value), BufferElementType::FLOAT_VEC3, m_format);
+	switch (m_format->packingType()) {
+	case BufferPackingType::OPENGL_STD140: {
+		glm::vec4 wrapped(value, 0);
+		setState(data, name, glm::value_ptr(wrapped), BufferElementType::FLOAT_VEC3, m_format);
+	}
+	default: {
+		setState(data, name, glm::value_ptr(value), BufferElementType::FLOAT_VEC3, m_format);
+		break;
+	}
+	}
 }
 
 void DataBufferView::set(std::string name, const glm::vec4& value)
@@ -83,7 +92,16 @@ void DataBufferView::set(std::string name, const float& value)
 
 void DataBufferView::set(std::string name, const glm::mat3& value)
 {
-	setState(data, name, glm::value_ptr(value), BufferElementType::MAT3, m_format);
+	switch (m_format->packingType()) {
+	case BufferPackingType::OPENGL_STD140: {
+		glm::mat3x4 wrapped(value);
+		setState(data, name, glm::value_ptr(wrapped), BufferElementType::MAT3, m_format);
+	}
+	default: {
+		setState(data, name, glm::value_ptr(value), BufferElementType::MAT3, m_format);
+		break;
+	}
+	}
 }
 
 void DataBufferView::set(std::string name, const glm::mat4& value)
@@ -138,6 +156,7 @@ const float& DataBufferView::getFloat(std::string name) const
 
 const glm::mat3& DataBufferView::getMat3(std::string name) const
 {
+	assert(m_format->packingType() != BufferPackingType::OPENGL_STD140); //std140 stores mat3s as mat3x4 so this doesnt work
 	return getReferenceToData<const glm::mat3>(data, BufferElementType::MAT3, m_format->at(name));
 }
 

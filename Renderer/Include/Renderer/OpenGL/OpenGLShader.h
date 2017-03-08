@@ -7,6 +7,7 @@ class OpenGLShader
 {
 private:
 	GLuint programHandle; 
+	std::unordered_map<std::string, GLuint> boundUniformBufferBindPoints;
 	std::shared_ptr<const Shader> m_shader;
 
 public:
@@ -26,6 +27,9 @@ public:
 	void setUniform4f(const std::string uniformName, const glm::vec4& data) const;
 	void setUniformMatrix4f(const std::string uniformName, const glm::mat4& data) const;
 	
+	GLuint program() const;
 	GLint getAttributeLocation(const std::string name) const;
+	
+	void bindUniformBufferToBindPoint(const std::string name, GLuint bindPoint);
 };
 

@@ -4,7 +4,7 @@ namespace {
 	GLuint tempVAO = -1;
 }
 
-OpenGLRenderMesh::OpenGLRenderMesh(): m_indexCount(0), m_format(VertexFormats::Unknown)
+OpenGLRenderMesh::OpenGLRenderMesh(): m_vbo(0), m_ebo(0), m_indexCount(0), m_format(VertexFormats::Unknown)
 {
 }
 
@@ -22,6 +22,8 @@ OpenGLRenderMesh::OpenGLRenderMesh(std::shared_ptr<const Mesh> mesh) : m_indexCo
 
 OpenGLRenderMesh::~OpenGLRenderMesh()
 {
+	glDeleteBuffers(1, &m_vbo);
+	glDeleteBuffers(1, &m_ebo);
 }
 
 uint32_t OpenGLRenderMesh::indexCount() const

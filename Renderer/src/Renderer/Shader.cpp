@@ -41,7 +41,7 @@ const std::shared_ptr<BufferFormat> Shader::expectedInstanceStateFormat() const
 	return m_expectedInstanceStateFormat;
 }
 
-const std::shared_ptr<BufferFormat> Shader::expectedUniformStateFormat() const
+const std::shared_ptr<BufferFormat> Shader::expectedConstantStateFormat() const
 {
 	return m_expectedUniformStateFormat;
 }

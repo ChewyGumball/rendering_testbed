@@ -1,7 +1,7 @@
 #include "Renderer/Model.h"
 
-Model::Model(std::shared_ptr<const Mesh> mesh, std::shared_ptr<const Shader> shader, std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures) 
-	: m_mesh(mesh), m_shader(shader), m_textures(textures), m_shaderConstants(shader->expectedUniformStateFormat())
+Model::Model(std::shared_ptr<const Mesh> mesh, std::shared_ptr<const Shader> shader, std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures, std::unordered_map<std::string, std::shared_ptr<ShaderConstantBuffer>> shaderConstants)
+	: m_mesh(mesh), m_shader(shader), m_textures(textures), m_shaderConstants(shaderConstants)
 {
 }
 
@@ -19,17 +19,12 @@ std::shared_ptr<const Shader> Model::shader() const
 	return m_shader;
 }
 
-const DataBufferView Model::shaderConstants() const
+const std::unordered_map<std::string, std::shared_ptr<ShaderConstantBuffer>>& Model::shaderConstants() const
 {
 	return m_shaderConstants;
 }
 
-DataBufferView Model::shaderConstants()
-{
-	return m_shaderConstants;
-}
-
-const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> Model::textures() const
+const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>>& Model::textures() const
 {
 	return m_textures;
 }

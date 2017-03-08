@@ -248,6 +248,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Renderer\OpenGL\OpenGLShaderConstantBuffer.cpp" />
+    <ClCompile Include="src\Renderer\ShaderConstantBuffer.cpp" />
+    <ClCompile Include="src\Renderer\ModelInstanceGroup.cpp" />
     <ClCompile Include="src\Buffer\DataBufferArray.cpp" />
     <ClCompile Include="src\Buffer\DataBufferArrayView.cpp" />
     <ClCompile Include="src\Buffer\DataBufferView.cpp" />
@@ -357,6 +360,9 @@
     <ClInclude Include="Include\Renderer\RenderOptions.h" />
     <ClInclude Include="Include\Renderer\RenderResource.h" />
     <ClInclude Include="Include\Buffer\BufferFormat.h" />
+    <ClInclude Include="Include\Renderer\ModelInstanceGroup.h" />
+    <ClInclude Include="Include\Renderer\ShaderConstantBuffer.h" />
+    <ClInclude Include="Include\Renderer\OpenGL\OpenGLShaderConstantBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="sample_render_graph.json" />

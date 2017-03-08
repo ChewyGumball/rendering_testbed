@@ -10,6 +10,7 @@ namespace {
 	std::unordered_map<GLenum, std::string>                     enumNames = { { GL_VERTEX_SHADER, "VERTEX" },{ GL_FRAGMENT_SHADER, "FRAGMENT" } };
 	std::unordered_map<GLuint, std::unordered_set<std::string>> uniformErrors;
 	std::unordered_map<GLuint, std::unordered_map<std::string, GLuint>> uniformLocationCache;
+	std::unordered_map<GLuint, std::unordered_map<std::string, GLuint>> uniformBufferLocationCache;
 
 	GLuint uniformLocation(GLuint program, const std::string& uniformName)
 	{
@@ -24,6 +25,21 @@ namespace {
 		}
 
 		return uniformLocationCache[program][uniformName];
+	}
+
+	GLuint uniformBufferLocation(GLuint program, const std::string& uniformBufferName)
+	{
+		if (uniformBufferLocationCache[program].count(uniformBufferName) == 0) {
+			const char* s = uniformBufferName.c_str();
+			GLuint location = glGetUniformBlockIndex(program, s);
+			if (location == GL_INVALID_INDEX && uniformErrors[program].count(uniformBufferName) == 0) {
+				uniformErrors[program].insert(uniformBufferName);
+				std::cout << "Could not find uniform buffer '" << uniformBufferName << "' in shader!" << std::endl;
+			}
+			uniformBufferLocationCache[program][uniformBufferName] = location;
+		}
+
+		return uniformBufferLocationCache[program][uniformBufferName];
 	}
 
 	std::vector<GLuint> compileShaders(std::vector<std::string>& sources, GLenum type, bool& successful)
@@ -89,7 +105,9 @@ namespace {
 		return program;
 	}
 
-	GLuint createProgram(std::string& vertexSource, std::string& fragmentSource) { return createProgram(std::vector<std::string>{ vertexSource }, std::vector<std::string>{ fragmentSource }); }
+	GLuint createProgram(std::string& vertexSource, std::string& fragmentSource) { 
+		return createProgram(std::vector<std::string>{ vertexSource }, std::vector<std::string>{ fragmentSource }); 
+	}
 
 	GLuint createProgramFromFiles(const std::unordered_map<ShaderSourceType, std::vector<std::string>>& filenames)
 	{
@@ -114,7 +132,7 @@ namespace {
 	}
 }
 
-OpenGLShader::OpenGLShader()
+OpenGLShader::OpenGLShader() : programHandle(0), m_shader(nullptr)
 {
 }
 
@@ -123,9 +141,7 @@ OpenGLShader::OpenGLShader(std::shared_ptr<const Shader> shader) : programHandle
 
 OpenGLShader::~OpenGLShader()
 {
-	if (programHandle != 0) {
-		glDeleteProgram(programHandle);
-	}
+	glDeleteProgram(programHandle);
 }
 
 const std::shared_ptr<const Shader> OpenGLShader::shader() const
@@ -186,7 +202,24 @@ void OpenGLShader::setUniformMatrix4f(const std::string  uniformName, const glm:
 	}
 }
 
+GLuint OpenGLShader::program() const
+{
+	return programHandle;
+}
+
 GLint OpenGLShader::getAttributeLocation(const std::string name) const
 {
 	return glGetAttribLocation(programHandle, name.data());
+}
+
+void OpenGLShader::bindUniformBufferToBindPoint(const std::string name, GLuint bindPoint)
+{
+	GLuint location = uniformBufferLocation(programHandle, name);
+	if (location != GL_INVALID_INDEX) {
+		auto currentBindPoint = boundUniformBufferBindPoints.find(name);
+		if (currentBindPoint == boundUniformBufferBindPoints.end() || currentBindPoint->second != bindPoint) {
+			glUniformBlockBinding(programHandle, location, bindPoint);
+			boundUniformBufferBindPoints[name] = bindPoint;
+		}
+	}
 }

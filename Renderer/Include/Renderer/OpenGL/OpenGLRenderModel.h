@@ -11,23 +11,23 @@ class OpenGLRenderModel
 {
 private:
 	GLuint vao, m_transformVBO;
-	RenderResourceID m_shaderID;
-	//TODO: Make these OpenGLTextureBuffer handles
-	std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> m_textures;
 	uint32_t m_indexCount;
-	DataBufferView m_shaderUniforms;
+	RenderResourceID m_shaderID;
+	const std::unordered_map<std::string, RenderResourceID> m_textures;
+	const std::unordered_map<std::string, RenderResourceID> m_shaderConstants;
 
 public:
 
 	OpenGLRenderModel();
-	OpenGLRenderModel(const OpenGLRenderMesh& mesh, const OpenGLShader& shader, const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures, DataBufferView shaderUniforms);
+	OpenGLRenderModel(std::shared_ptr<OpenGLRenderMesh> mesh, std::shared_ptr<OpenGLShader> shader, const std::unordered_map<std::string, RenderResourceID> textures, const std::unordered_map<std::string, RenderResourceID> shaderConstants);
 	~OpenGLRenderModel();
 
 	void draw(int instanceCount) const;
 
-	const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>>& textures() const;
+	const std::unordered_map<std::string, RenderResourceID>& textures() const;
+	const std::unordered_map<std::string, RenderResourceID>& shaderConstants() const;
+
 	const RenderResourceID& shaderID() const;
-	const DataBufferView& uniformBuffer() const;
 	uint32_t indexCount() const;
 
 	GLuint transformVBO() const;
