@@ -7,7 +7,7 @@
 
 namespace {
 	template<typename T>
-	void setState(uint8_t* instanceData, std::string name, T* data, BufferElementType type, const std::shared_ptr<BufferFormat> format)
+	void setState(uint8_t* instanceData, std::string name, T* data, BufferElementType type, std::shared_ptr<const BufferFormat> format)
 	{
 		auto& details = format->at(name);
 		assert(details.second == type);
@@ -17,7 +17,7 @@ namespace {
 			dataSize = format->nestedFormat(name)->size();
 		}
 		else {
-			dataSize = format->sizeOfType(type);
+			dataSize = BufferFormat::sizeOfType(type, format->packingType());
 		}
 		const uint8_t* actualData = reinterpret_cast<const uint8_t*>(data);
 		std::copy(actualData, actualData + dataSize, instanceData + details.first);
@@ -33,7 +33,7 @@ namespace {
 	}
 }
 
-DataBufferView::DataBufferView(uint8_t * data, const std::shared_ptr<BufferFormat> format) : data(data), m_format(format)
+DataBufferView::DataBufferView(uint8_t * data, std::shared_ptr<const BufferFormat> format) : data(data), m_format(format)
 {
 }
 
@@ -41,7 +41,7 @@ DataBufferView::~DataBufferView()
 {
 }
 
-const std::shared_ptr<BufferFormat> DataBufferView::format() const
+std::shared_ptr<const BufferFormat> DataBufferView::format() const
 {
 	return m_format;
 }

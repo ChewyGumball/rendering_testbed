@@ -66,6 +66,16 @@ void ShaderConstantBuffer::set(std::string name, const glm::mat4 & value)
 	m_buffer.set(name, value);
 }
 
+DataBufferView ShaderConstantBuffer::getBuffer(std::string name)
+{
+	return m_buffer.getBuffer(name);
+}
+
+DataBufferArrayView ShaderConstantBuffer::getArray(std::string name)
+{
+	return m_buffer.getArray(name);
+}
+
 void ShaderConstantBuffer::set(std::string name, const DataBufferView & value)
 {
 	m_dirty = true;
@@ -86,6 +96,21 @@ const std::string & ShaderConstantBuffer::name() const
 const DataBufferView & ShaderConstantBuffer::buffer() const
 {
 	return m_buffer;
+}
+
+void ShaderConstantBuffer::addUpdater(std::string tag, std::function<void(ShaderConstantBuffer&)> updater)
+{
+	updateFunctions[tag] = updater;
+}
+
+void ShaderConstantBuffer::removeUpdated(std::string tag)
+{
+	updateFunctions.erase(tag);
+}
+
+void ShaderConstantBuffer::makeDirty()
+{
+	m_dirty = true;
 }
 
 bool ShaderConstantBuffer::isDirty() const

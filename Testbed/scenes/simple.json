@@ -1,0 +1,81 @@
+{
+  "screen": {
+    "width": 800,
+    "height": 800
+  },
+  "meshes": {
+    "plane": {
+      "filename": "F:/Users/Ben/Desktop/plane.obj",
+      "format": "Position_Texture"
+    }
+  },
+  "shaders": {
+    "simple": {
+      "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/simple.vert" ],
+      "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/simple.frag" ],
+      "instanceDataFormat": { "transform": "mat4" },
+      "systemConstantBuffers": [
+        "camera"
+      ]
+    }
+  },
+  "materials": {
+    "simple": {
+      "shader": "simple"
+    }
+  },
+  "models": {
+    "plane": {
+      "mesh": "plane",
+      "material": "simple"
+    }
+  },
+  "scene": {
+    "cameras": {
+      "layer1CameraQuaternion": {
+        "type": "quaternion",
+        "fov": 45,
+        "aspectRatio": 0.5,
+        "position": {
+          "x": 5,
+          "y": 0,
+          "z": 0
+        },
+        "target": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "up": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      }
+    },
+    "lights": { },
+    "models": {
+      "layer1Models": [
+        {
+          "model": "plane",
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          }
+        }
+      ]
+    },
+    "passes": {
+      "cameraTestB": {
+        "dependencies": [ ],
+        "lights": [],
+        "models": [ "layer1Models" ],
+        "camera": "layer1CameraQuaternion",
+        "cull": false,
+        "wireframe": false,
+        "clearColour": { "r":  0.2, "g": 0.2, "b": 0.2, "a": 1}
+      }
+    }
+  }
+}

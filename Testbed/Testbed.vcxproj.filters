@@ -34,6 +34,9 @@
     <None Include="shaders\texture.frag" />
     <None Include="shaders\texture.vert" />
     <None Include="scenes\ssao.json" />
+    <None Include="scenes\simple.json" />
+    <None Include="shaders\simple.frag" />
+    <None Include="shaders\simple.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Test1.h">

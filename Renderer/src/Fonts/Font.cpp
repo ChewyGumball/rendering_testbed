@@ -12,6 +12,9 @@
 
 #include "Renderer/TextureBuffer.h"
 #include "Renderer/ModelInstance.h"
+#include <Renderer/Shader.h>
+#include <Renderer/Mesh.h>
+#include <Renderer/Material.h>
 
 namespace {
 	//font infos require the font data to stick around so it has to be stored somewhere
@@ -21,6 +24,7 @@ namespace {
 	std::shared_ptr<Mesh> quad;
 
 	std::shared_ptr<Shader> fontShader;
+	std::shared_ptr<Material> fontMaterial;
 
 	int atlasWidth = 512;
 	int atlasHeight = 512;
@@ -42,15 +46,19 @@ namespace {
 			});
 
 			fontShader = std::make_shared<Shader>(
-				"F:/Users/Ben/Documents/Projects/RenderingTestbed/Renderer/src/Fonts/font.vert",
-				"F:/Users/Ben/Documents/Projects/RenderingTestbed/Renderer/src/Fonts/font.frag",
+				std::vector<std::string> { "F:/Users/Ben/Documents/Projects/RenderingTestbed/Renderer/src/Fonts/font.vert" },
+				std::vector<std::string> { "F:/Users/Ben/Documents/Projects/RenderingTestbed/Renderer/src/Fonts/font.frag" },
 				std::make_shared<BufferFormat>(std::vector<std::pair<std::string, BufferElementType>> {
 					{ "transform", BufferElementType::MAT4},
 					{ "meshBounds", BufferElementType::FLOAT_VEC4 },
 					{ "textureBounds", BufferElementType::FLOAT_VEC4 },
 					{ "letterColour", BufferElementType::FLOAT_VEC4 }
-				})
+				}),
+				std::unordered_map<std::string, std::shared_ptr<const BufferFormat>>(),
+				std::vector<std::string> {"camera"}
 			);
+
+			fontMaterial = std::make_shared<Material>(fontShader);
 
 			initialized = true;
 		}
@@ -91,7 +99,7 @@ Font::Font(std::string fontFile, uint16_t height) : m_height(height), fontFile(f
 	stbtt_PackEnd(&context);
 	
 	m_bitmap = std::make_shared<TextureBuffer>(glm::ivec2(atlasWidth, atlasHeight), TextureFormat::GREYSCALE, pixelData);
-	m_model = std::make_shared<Model>(quad, fontShader, std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> {{ "font", m_bitmap }});
+	m_model = std::make_shared<Model>(quad, fontMaterial, std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> {{ "font", m_bitmap }});
 }
 
 
@@ -170,7 +178,7 @@ void Font::modifyString(const std::vector<std::shared_ptr<ModelInstance>>& curre
 	}
 }
 
-std::vector<std::shared_ptr<ModelInstance>> Font::createInstances(int instanceCount) const
+std::vector<std::shared_ptr<ModelInstance>> Font::createInstances(size_t instanceCount) const
 {
 	std::vector<std::shared_ptr<ModelInstance>> instances;
 	instances.reserve(instanceCount);

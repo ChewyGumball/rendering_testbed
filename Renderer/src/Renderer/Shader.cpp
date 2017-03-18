@@ -1,26 +1,14 @@
 #include "Renderer/Shader.h"
 
-#include <algorithm>
-#include <iostream>
-#include <thread>
-#include <unordered_map>
-#include <unordered_set>
-
-#include <glm/gtc/type_ptr.hpp>
-
-#include <lib/SimpleFileWatcher/FileWatcher/FileWatcher.h>
-
-#include "Util/FileUtils.h"
-
-Shader::Shader(std::string vertexFilename, std::string fragmentFilename, std::shared_ptr<BufferFormat> expectedInstanceStateFormat, std::shared_ptr<BufferFormat> expectedUniformStateFormat, VertexFormat expectedVertexFormat)
-	: m_expectedVertexFormat(expectedVertexFormat), m_expectedInstanceStateFormat(expectedInstanceStateFormat), m_expectedUniformStateFormat(expectedUniformStateFormat)
+Shader::Shader(std::vector<std::string> vertexFilenames, std::vector<std::string> fragmentFilenames, std::shared_ptr<const BufferFormat> instanceStateFormat, VertexFormat expectedVertexFormat)
+	: m_expectedVertexFormat(expectedVertexFormat), m_instanceStateFormat(instanceStateFormat)
 {
-	m_filenames[ShaderSourceType::VERTEX].push_back(vertexFilename);
-	m_filenames[ShaderSourceType::FRAGMENT].push_back(fragmentFilename);
+	m_filenames[ShaderSourceType::VERTEX] = vertexFilenames;
+	m_filenames[ShaderSourceType::FRAGMENT] = fragmentFilenames;
 }
 
-Shader::Shader(std::vector<std::string> vertexFilenames, std::vector<std::string> fragmentFilenames, std::shared_ptr<BufferFormat> expectedInstanceStateFormat, std::shared_ptr<BufferFormat> expectedUniformStateFormat, VertexFormat expectedVertexFormat)
-	: m_expectedVertexFormat(expectedVertexFormat), m_expectedInstanceStateFormat(expectedInstanceStateFormat), m_expectedUniformStateFormat(expectedUniformStateFormat)
+Shader::Shader(std::vector<std::string> vertexFilenames, std::vector<std::string> fragmentFilenames, std::shared_ptr<const BufferFormat> instanceStateFormat, std::unordered_map<std::string, std::shared_ptr<const BufferFormat>> materialConstantBufferFormats, std::vector<std::string> systemConstantBufferNames, VertexFormat expectedVertexFormat)
+	: m_expectedVertexFormat(expectedVertexFormat), m_instanceStateFormat(instanceStateFormat), m_materialConstantBufferFormats(materialConstantBufferFormats), m_systemConstantBufferNames(systemConstantBufferNames)
 {
 	m_filenames[ShaderSourceType::VERTEX] = vertexFilenames;
 	m_filenames[ShaderSourceType::FRAGMENT] = fragmentFilenames;
@@ -36,14 +24,19 @@ const VertexFormat& Shader::expectedVertexFormat() const
 	return m_expectedVertexFormat;
 }
 
-const std::shared_ptr<BufferFormat> Shader::expectedInstanceStateFormat() const
+std::shared_ptr<const BufferFormat> Shader::instanceStateFormat() const
 {
-	return m_expectedInstanceStateFormat;
+	return m_instanceStateFormat;
 }
 
-const std::shared_ptr<BufferFormat> Shader::expectedConstantStateFormat() const
+const std::unordered_map<std::string, std::shared_ptr<const BufferFormat>>& Shader::materialConstantBufferFormats() const
 {
-	return m_expectedUniformStateFormat;
+	return m_materialConstantBufferFormats;
+}
+
+const std::vector<std::string>& Shader::systemConstantBufferNames() const
+{
+	return m_systemConstantBufferNames;
 }
 
 Shader::~Shader() {}

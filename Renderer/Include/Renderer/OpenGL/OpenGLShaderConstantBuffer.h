@@ -18,6 +18,7 @@ public:
 	OpenGLShaderConstantBuffer(std::shared_ptr<const ShaderConstantBuffer> shaderConstantBuffer);
 	~OpenGLShaderConstantBuffer();
 
+	void bindTo(GLuint bindPoint);
 	void uploadIfDirty() const;
 };
 

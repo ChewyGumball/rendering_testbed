@@ -21,39 +21,32 @@
       "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/normal.vert" ],
       "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/normal.frag" ],
       "instanceDataFormat": { "transform": "mat4" },
-      "constantDataFormat": {
-        "projection": "mat4",
-        "view": "mat4",
-        "cameraPosition": "float3",
-        "lightCount": "int1",
-        "pointLights": {
-          "type": "array",
-          "arrayCount": 2,
-          "arrayType": {
-            "type": "buffer",
-            "format": {
-              "position": "float3",
-              "intensity": "float3",
-              "power": "float1"
-            }
-          }
-        }
-      }
+      "systemConstantBuffers": [
+        "camera",
+        "lights"
+      ]
     },
     "texture": {
       "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/texture.vert" ],
       "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/texture.frag" ],
       "instanceDataFormat": { "transform": "mat4" },
-      "constantDataFormat": {        
-        "projection": "mat4",
-        "view": "mat4"
-      }
+      "systemConstantBuffers": [
+        "camera"
+      ]
     },
     "finalShader": {
       "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/final.vert" ],
       "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/final.frag" ],
       "instanceDataFormat": { "transform": "mat4" },
-      "constantDataFormat": { }
+      "constantBufferFormats": {}
+    }
+  },
+  "materials": {
+    "phong": {
+      "shader": "phong"
+    },
+    "renderTexture": {
+      "shader": "texture"
     }
   },
   "textures": {
@@ -64,34 +57,51 @@
     },
     "screenColourBufferB": {
       "width": "{screen.width}",
-      "height":  "{screen.height}",
-	    "format": "rgb"
+      "height": "{screen.height}",
+      "format": "rgb"
     },
     "screenDepthBuffer": {
       "width": "{screen.width}",
-      "height":  "{screen.height}",
-	    "format": "depth"
+      "height": "{screen.height}",
+      "format": "depth"
+    }
+  },
+  "constantBuffers": {
+    "camera1": {
+      "format": "{phong.Camera}"
+    },
+    "camera2": {
+      "format": "{phong.Camera}"
+    },
+    "camera3": {
+      "format": "{phong.Camera}"
+    },
+    "orthoCamera": {
+      "format": "{phong.Camera}"
+    },
+    "lights": {
+      "format": "{phong.Lights}"
     }
   },
   "models": {
-    "cube": {
-      "mesh": "cube",
-      "shader": "phong"
-    },
     "buddha": {
       "mesh": "buddha",
-      "shader": "phong"
+      "material": "phong"
+    },
+    "buddha2": {
+      "mesh": "buddha",
+      "material": "phong"
     },
     "cameraTestA": {
       "mesh": "plane",
-      "shader": "texture",
+      "material": "renderTexture",
       "textures": {
         "screenTexture": "screenColourBufferA"
       }
     },
     "cameraTestB": {
       "mesh": "plane",
-      "shader": "texture",
+      "material": "renderTexture",
       "textures": {
         "screenTexture": "screenColourBufferB"
       }
@@ -176,7 +186,7 @@
           "position": {
             "x": 1,
             "y": 1,
-            "z": 1
+            "z": -1
           }
         },
         {
@@ -193,6 +203,16 @@
       "layer1Models": [
         {
           "model": "buddha",
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          }
+        }
+      ],
+      "layer2Models": [
+        {
+          "model": "buddha2",
           "position": {
             "x": 0,
             "y": 0,

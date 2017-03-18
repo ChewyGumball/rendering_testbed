@@ -3,6 +3,7 @@
 #include <Renderer/Model.h>
 #include <glm/glm.hpp>
 #include <Buffer/DataBuffer.h>
+#include <Culling/BoundingSphere.h>
 
 class ModelInstance
 {

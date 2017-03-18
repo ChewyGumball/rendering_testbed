@@ -5,7 +5,11 @@
 #include <Buffer/BufferFormat.h>
 #include <glm/gtc/type_ptr.hpp>
 
-ModelInstance::ModelInstance(std::shared_ptr<Model> model) : baseModel(model), m_instanceData(model->shader()->expectedInstanceStateFormat())
+#include <Renderer/Material.h>
+#include <Renderer/Mesh.h>
+#include <Renderer/Shader.h>
+
+ModelInstance::ModelInstance(std::shared_ptr<Model> model) : baseModel(model), m_instanceData(model->material()->shader()->instanceStateFormat())
 {
 }
 

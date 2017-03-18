@@ -22,7 +22,7 @@ namespace {
 	}
 }
 
-DataBufferArrayView::DataBufferArrayView(uint8_t* data, uint64_t elementCount, BufferElementType elementType, std::shared_ptr<BufferFormat> elementFormat)
+DataBufferArrayView::DataBufferArrayView(uint8_t* data, uint64_t elementCount, BufferElementType elementType, std::shared_ptr<const BufferFormat> elementFormat)
 	:data(data), m_type(elementType), m_elementFormat(elementFormat), m_count(elementCount)
 {
 }

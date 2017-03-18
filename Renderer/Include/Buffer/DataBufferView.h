@@ -8,14 +8,14 @@ class DataBufferArrayView;
 class DataBufferView
 {
 protected:
-	const std::shared_ptr<BufferFormat> m_format;
+	std::shared_ptr<const BufferFormat> m_format;
 	uint8_t* data;
 
 public:
-	DataBufferView(uint8_t* data, const std::shared_ptr<BufferFormat> format);
+	DataBufferView(uint8_t* data, std::shared_ptr<const BufferFormat> format);
 	~DataBufferView();
 
-	const std::shared_ptr<BufferFormat> format() const;
+	std::shared_ptr<const BufferFormat> format() const;
 
 	void set(std::string name, const glm::vec2& value);
 	void set(std::string name, const glm::vec3& value);

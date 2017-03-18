@@ -4,6 +4,7 @@
 #include <Util/StringUtils.h>
 
 #include <Scene/SceneLoader.h>
+#include <Renderer/ModelInstance.h>
 
 void Test1::handleKeyboardInput(int key, int scancode, int action, int mods) {
 

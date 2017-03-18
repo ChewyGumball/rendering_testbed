@@ -1,7 +1,9 @@
 #include "Renderer/Model.h"
 
-Model::Model(std::shared_ptr<const Mesh> mesh, std::shared_ptr<const Shader> shader, std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures, std::unordered_map<std::string, std::shared_ptr<ShaderConstantBuffer>> shaderConstants)
-	: m_mesh(mesh), m_shader(shader), m_textures(textures), m_shaderConstants(shaderConstants)
+#include <Renderer/Mesh.h>
+
+Model::Model(std::shared_ptr<const Mesh> mesh, std::shared_ptr<const Material> material, std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures)
+	: m_mesh(mesh), m_material(material), m_textures(textures)
 {
 }
 
@@ -14,14 +16,9 @@ std::shared_ptr<const Mesh> Model::mesh() const
 	return m_mesh;
 }
 
-std::shared_ptr<const Shader> Model::shader() const
+std::shared_ptr<const Material> Model::material() const
 {
-	return m_shader;
-}
-
-const std::unordered_map<std::string, std::shared_ptr<ShaderConstantBuffer>>& Model::shaderConstants() const
-{
-	return m_shaderConstants;
+	return m_material;
 }
 
 const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>>& Model::textures() const

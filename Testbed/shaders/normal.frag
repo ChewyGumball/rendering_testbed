@@ -1,15 +1,21 @@
 #version 330 core
 
-const int MAX_LIGHTS = 2;
 struct PointLight {
 	vec3 position;
 	vec3 intensity;
 	float power;
 };
-uniform PointLight pointLights[MAX_LIGHTS];
 
-uniform vec3 cameraPosition;
-uniform int lightCount;
+layout(std140) uniform camera {
+	mat4 projection;
+	mat4 view;
+	vec3 position;
+} Camera;
+
+const int MAX_LIGHTS = 2;
+layout(std140) uniform lights {
+	PointLight pointLights[MAX_LIGHTS];
+} Lights;
 
 in vec3 FragPos;
 in vec3 Normal;
@@ -39,12 +45,12 @@ vec3 pointLightContribution(PointLight light, vec3 normal, vec3 position, vec3 v
 void main()
 {
 	vec3 norm = normalize(Normal);
-	vec3 viewDirection = normalize(cameraPosition - FragPos);
+	vec3 viewDirection = normalize(Camera.position - FragPos);
 
 	vec3 result = vec3(0.1,0.1,0.1);
 	for(int i = 0; i < MAX_LIGHTS; i++)
 	{
-		result += pointLightContribution(pointLights[i], norm, FragPos, viewDirection);
+		result += pointLightContribution(Lights.pointLights[i], norm, FragPos, viewDirection);
 	}
 
 	colour = vec4(result, 1.0); 

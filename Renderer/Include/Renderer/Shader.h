@@ -3,7 +3,6 @@
 #include <string>
 #include <unordered_map>
 #include <Renderer/RenderResource.h>
-#include <Buffer/BufferFormat.h>
 #include <Renderer/Vertex.h>
 
 #include <GL\glew.h>
@@ -14,24 +13,27 @@ enum struct ShaderSourceType {
 	FRAGMENT
 };
 
+class BufferFormat;
 
 class Shader : public RenderResource
 {
 private:
 	std::unordered_map<ShaderSourceType, std::vector<std::string>> m_filenames;
 	VertexFormat m_expectedVertexFormat;
-	std::shared_ptr<BufferFormat> m_expectedInstanceStateFormat;
-	std::shared_ptr<BufferFormat> m_expectedUniformStateFormat;
+	std::shared_ptr<const BufferFormat> m_instanceStateFormat;
+	std::unordered_map<std::string, std::shared_ptr<const BufferFormat>> m_materialConstantBufferFormats;
+	std::vector<std::string> m_systemConstantBufferNames;
 	bool m_isfileShader;
 
 public:
-	Shader(std::string vertexFilename, std::string fragmentFilename, std::shared_ptr<BufferFormat> expectedInstanceStateFormat, std::shared_ptr<BufferFormat> expectedUniformStateFormat = std::make_shared<BufferFormat>(), VertexFormat expectedVertexFormat = VertexFormats::Unknown);
-	Shader(std::vector<std::string> vertexFilenames, std::vector<std::string> fragmentFilenames, std::shared_ptr<BufferFormat> expectedInstanceStateFormat, std::shared_ptr<BufferFormat> expectedUniformStateFormat = std::make_shared<BufferFormat>(), VertexFormat expectedVertexFormat = VertexFormats::Unknown);
+	Shader(std::vector<std::string> vertexFilenames, std::vector<std::string> fragmentFilenames, std::shared_ptr<const BufferFormat> instanceStateFormat, VertexFormat expectedVertexFormat = VertexFormats::Unknown);
+	Shader(std::vector<std::string> vertexFilenames, std::vector<std::string> fragmentFilenames, std::shared_ptr<const BufferFormat> instanceStateFormat, std::unordered_map<std::string, std::shared_ptr<const BufferFormat>> materialConstantBufferFormats, std::vector<std::string> systemConstantBufferNames, VertexFormat expectedVertexFormat = VertexFormats::Unknown);
 
 	const std::unordered_map<ShaderSourceType, std::vector<std::string>>& filenames() const;
 	const VertexFormat& expectedVertexFormat() const;
-	const std::shared_ptr<BufferFormat> expectedInstanceStateFormat() const;
-	const std::shared_ptr<BufferFormat> expectedConstantStateFormat() const;
+	std::shared_ptr<const BufferFormat> instanceStateFormat() const;
+	const std::unordered_map<std::string, std::shared_ptr<const BufferFormat>>& materialConstantBufferFormats() const;
+	const std::vector<std::string>& systemConstantBufferNames() const;
 
 	~Shader();
 };

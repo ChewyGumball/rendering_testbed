@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include <Renderer/ModelInstance.h>
 #include <Renderer/RenderPass.h>
 
 RenderableText::RenderableText(std::string text, std::shared_ptr<Font> font, glm::vec3 position, glm::vec4 colour) 

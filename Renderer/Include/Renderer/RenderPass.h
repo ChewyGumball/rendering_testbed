@@ -17,7 +17,9 @@ private:
 	RenderOptions options;
 	bool cullingEnabled;
 	
+	std::unordered_map<std::string, std::shared_ptr<ShaderConstantBuffer>> passConstants;
 	std::vector<std::shared_ptr<const ModelInstance>> m_modelInstances;
+	std::vector<PointLight> lights;
 
 public:
 	RenderPass();

@@ -3,6 +3,8 @@
 #include <Renderer/OpenGL/OpenGLShader.h>
 #include <Renderer/ShaderConstantBuffer.h>
 
+#include <iostream>
+
 OpenGLShaderConstantBuffer::OpenGLShaderConstantBuffer(): m_handle(0), m_deviceBufferSize(0), constantBuffer(nullptr)
 {
 }
@@ -17,6 +19,11 @@ OpenGLShaderConstantBuffer::OpenGLShaderConstantBuffer(std::shared_ptr<const Sha
 OpenGLShaderConstantBuffer::~OpenGLShaderConstantBuffer()
 {
 	glDeleteBuffers(1, &m_handle);
+}
+
+void OpenGLShaderConstantBuffer::bindTo(GLuint bindPoint)
+{
+	glBindBufferBase(GL_UNIFORM_BUFFER, bindPoint, m_handle);
 }
 
 void OpenGLShaderConstantBuffer::uploadIfDirty() const

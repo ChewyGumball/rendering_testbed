@@ -8,7 +8,7 @@
 
 namespace {
 
-	std::vector<uint8_t> initialData(const std::shared_ptr<BufferFormat> format)
+	std::vector<uint8_t> initialData(std::shared_ptr<const BufferFormat> format)
 	{
 		std::vector<uint8_t> data(format->size());
 
@@ -37,7 +37,7 @@ namespace {
 
 //Can't give the view a pointer to our buffer until the buffer is initialized, otherwise it could (will probably) move when 
 //	it is filled with data
-DataBuffer::DataBuffer(const std::shared_ptr<BufferFormat> format) : DataBufferView(nullptr, format), buffer(initialData(format))
+DataBuffer::DataBuffer(std::shared_ptr<const BufferFormat> format) : DataBufferView(nullptr, format), buffer(initialData(format))
 {
 	data = buffer.data();
 }

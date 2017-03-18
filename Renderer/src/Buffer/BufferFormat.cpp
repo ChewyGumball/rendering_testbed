@@ -32,6 +32,58 @@ namespace {
 		{ BufferElementType::MAT4, static_cast<BufferElementTypeSize>(sizeof(glm::mat4)) }
 	};
 
+	const std::unordered_map<BufferElementType, BufferElementTypeSize> typeAlignments{
+		{ BufferElementType::FLOAT_SCALAR, static_cast<BufferElementTypeSize>(1) },
+		{ BufferElementType::FLOAT_VEC2, static_cast<BufferElementTypeSize>(1) },
+		{ BufferElementType::FLOAT_VEC3, static_cast<BufferElementTypeSize>(1) },
+		{ BufferElementType::FLOAT_VEC4, static_cast<BufferElementTypeSize>(1) },
+		{ BufferElementType::DOUBLE_SCALAR, static_cast<BufferElementTypeSize>(1) },
+		{ BufferElementType::DOUBLE_VEC2, static_cast<BufferElementTypeSize>(1) },
+		{ BufferElementType::DOUBLE_VEC3, static_cast<BufferElementTypeSize>(1) },
+		{ BufferElementType::DOUBLE_VEC4, static_cast<BufferElementTypeSize>(1) },
+		{ BufferElementType::BOOL_SCALAR, static_cast<BufferElementTypeSize>(1) },
+		{ BufferElementType::BOOL_VEC2, static_cast<BufferElementTypeSize>(1) },
+		{ BufferElementType::BOOL_VEC3, static_cast<BufferElementTypeSize>(1) },
+		{ BufferElementType::BOOL_VEC4, static_cast<BufferElementTypeSize>(1) },
+		{ BufferElementType::INT_SCALAR, static_cast<BufferElementTypeSize>(1) },
+		{ BufferElementType::INT_VEC2, static_cast<BufferElementTypeSize>(1) },
+		{ BufferElementType::INT_VEC3, static_cast<BufferElementTypeSize>(1) },
+		{ BufferElementType::INT_VEC4, static_cast<BufferElementTypeSize>(1) },
+		{ BufferElementType::UINT_SCALAR, static_cast<BufferElementTypeSize>(1) },
+		{ BufferElementType::UINT_VEC2, static_cast<BufferElementTypeSize>(1) },
+		{ BufferElementType::UINT_VEC3, static_cast<BufferElementTypeSize>(1) },
+		{ BufferElementType::UINT_VEC4, static_cast<BufferElementTypeSize>(1) },
+		{ BufferElementType::MAT2, static_cast<BufferElementTypeSize>(1) },
+		{ BufferElementType::MAT3, static_cast<BufferElementTypeSize>(1) },
+		{ BufferElementType::MAT4, static_cast<BufferElementTypeSize>(1) }
+	};
+
+	const std::unordered_map<BufferElementType, BufferElementTypeSize> openglSTD140TypeSizes{
+		{ BufferElementType::FLOAT_SCALAR, static_cast<BufferElementTypeSize>(sizeof(float)) },
+		{ BufferElementType::FLOAT_VEC2, static_cast<BufferElementTypeSize>(sizeof(glm::vec2)) },
+		{ BufferElementType::FLOAT_VEC3, static_cast<BufferElementTypeSize>(sizeof(glm::vec3)) },
+		{ BufferElementType::FLOAT_VEC4, static_cast<BufferElementTypeSize>(sizeof(glm::vec4)) },
+		{ BufferElementType::DOUBLE_SCALAR, static_cast<BufferElementTypeSize>(sizeof(double)) },
+		{ BufferElementType::DOUBLE_VEC2, static_cast<BufferElementTypeSize>(sizeof(glm::dvec2)) },
+		{ BufferElementType::DOUBLE_VEC3, static_cast<BufferElementTypeSize>(sizeof(glm::dvec3)) },
+		{ BufferElementType::DOUBLE_VEC4, static_cast<BufferElementTypeSize>(sizeof(glm::dvec4)) },
+		{ BufferElementType::BOOL_SCALAR, static_cast<BufferElementTypeSize>(sizeof(bool)) },
+		{ BufferElementType::BOOL_VEC2, static_cast<BufferElementTypeSize>(sizeof(glm::bvec2)) },
+		{ BufferElementType::BOOL_VEC3, static_cast<BufferElementTypeSize>(sizeof(glm::bvec3)) },
+		{ BufferElementType::BOOL_VEC4, static_cast<BufferElementTypeSize>(sizeof(glm::bvec4)) },
+		{ BufferElementType::INT_SCALAR, static_cast<BufferElementTypeSize>(sizeof(int32_t)) },
+		{ BufferElementType::INT_VEC2, static_cast<BufferElementTypeSize>(sizeof(glm::ivec2)) },
+		{ BufferElementType::INT_VEC3, static_cast<BufferElementTypeSize>(sizeof(glm::ivec3)) },
+		{ BufferElementType::INT_VEC4, static_cast<BufferElementTypeSize>(sizeof(glm::ivec4)) },
+		{ BufferElementType::UINT_SCALAR, static_cast<BufferElementTypeSize>(sizeof(uint32_t)) },
+		{ BufferElementType::UINT_VEC2, static_cast<BufferElementTypeSize>(sizeof(glm::uvec2)) },
+		{ BufferElementType::UINT_VEC3, static_cast<BufferElementTypeSize>(sizeof(glm::uvec3)) },
+		{ BufferElementType::UINT_VEC4, static_cast<BufferElementTypeSize>(sizeof(glm::uvec4)) },
+		{ BufferElementType::MAT2, static_cast<BufferElementTypeSize>(2 * sizeof(glm::vec4)) },
+		{ BufferElementType::MAT3, static_cast<BufferElementTypeSize>(3 * sizeof(glm::vec4)) },
+		{ BufferElementType::MAT4, static_cast<BufferElementTypeSize>(4 * sizeof(glm::vec4)) }
+	};
+
 	const std::unordered_map<BufferElementType, BufferElementTypeSize> openglSTD140TypeAlignments {
 		{ BufferElementType::FLOAT_SCALAR, static_cast<BufferElementTypeSize>(sizeof(float)) },
 		{ BufferElementType::FLOAT_VEC2, static_cast<BufferElementTypeSize>(sizeof(glm::vec2)) },
@@ -53,15 +105,26 @@ namespace {
 		{ BufferElementType::UINT_VEC2, static_cast<BufferElementTypeSize>(sizeof(glm::uvec2)) },
 		{ BufferElementType::UINT_VEC3, static_cast<BufferElementTypeSize>(sizeof(glm::uvec4)) },
 		{ BufferElementType::UINT_VEC4, static_cast<BufferElementTypeSize>(sizeof(glm::uvec4)) },
-		{ BufferElementType::MAT2, static_cast<BufferElementTypeSize>(2 * sizeof(glm::vec4)) },
-		{ BufferElementType::MAT3, static_cast<BufferElementTypeSize>(3 * sizeof(glm::vec4)) },
-		{ BufferElementType::MAT4, static_cast<BufferElementTypeSize>(4 * sizeof(glm::vec4)) }
+		{ BufferElementType::MAT2, static_cast<BufferElementTypeSize>(sizeof(glm::vec4)) },
+		{ BufferElementType::MAT3, static_cast<BufferElementTypeSize>(sizeof(glm::vec4)) },
+		{ BufferElementType::MAT4, static_cast<BufferElementTypeSize>(sizeof(glm::vec4)) }
 	};
 
 	const std::unordered_map<BufferElementType, BufferElementTypeSize>& selectSizesFromPackingType(BufferPackingType packingType) {
 		switch (packingType) {
 		case BufferPackingType::PACKED : return typeSizes;
-		case BufferPackingType::OPENGL_STD140 : return openglSTD140TypeAlignments;
+		case BufferPackingType::OPENGL_STD140 : return openglSTD140TypeSizes;
+		default: {
+			assert(false); //Unknown packing type
+			return typeSizes;
+		}
+		}
+	}
+
+	const std::unordered_map<BufferElementType, BufferElementTypeSize>& selectAlignmentsFromPackingType(BufferPackingType packingType) {
+		switch (packingType) {
+		case BufferPackingType::PACKED: return typeAlignments;
+		case BufferPackingType::OPENGL_STD140: return openglSTD140TypeAlignments;
 		default: {
 			assert(false); //Unknown packing type
 			return typeSizes;
@@ -74,32 +137,48 @@ BufferFormat::BufferFormat() : m_size(0), m_arrayType(BufferElementType::UNKNOWN
 {
 }
 
-BufferFormat::BufferFormat(uint64_t arraySize, BufferElementType arrayType, const std::shared_ptr<BufferFormat> arrayElementFormat)
+BufferFormat::BufferFormat(uint64_t arraySize, BufferElementType arrayType, std::shared_ptr<const BufferFormat> arrayElementFormat)
 	: m_size(arraySize * (arrayElementFormat == nullptr ? typeSizes.at(arrayType) : arrayElementFormat->size())), m_arrayType(arrayType), m_arrayElementFormat(arrayElementFormat)
 {
 }
 
-BufferFormat::BufferFormat(std::vector<std::pair<std::string, BufferElementType>>& format, std::unordered_map<std::string, const std::shared_ptr<BufferFormat>> nestedBufferFormats, BufferPackingType packingType)
+BufferFormat::BufferFormat(std::vector<std::pair<std::string, BufferElementType>>& format, std::unordered_map<std::string, std::shared_ptr<const BufferFormat>> nestedBufferFormats, BufferPackingType packingType)
 	: m_nestedBufferFormats(nestedBufferFormats), m_arrayType(BufferElementType::UNKNOWN), m_arrayElementFormat(nullptr), m_packingType(packingType)
 {
 	uint64_t offset = 0;
 	const std::unordered_map<BufferElementType, BufferElementTypeSize>& sizes = selectSizesFromPackingType(packingType);
+	const std::unordered_map<BufferElementType, BufferElementTypeSize>& alignments = selectAlignmentsFromPackingType(packingType);
 
 	for (auto& value : format) {
-		m_offsets[value.first] = std::make_pair(offset, value.second);
+		uint64_t alignment;
+		uint64_t size;
 		if (value.second == BufferElementType::BUFFER || value.second == BufferElementType::ARRAY) {
 			assert(nestedBufferFormats.count(value.first) != 0);
-			offset += nestedBufferFormats[value.first]->size();
+
+			alignment = alignments.at(BufferElementType::FLOAT_VEC4);
+			size = nestedBufferFormats[value.first]->size();
 		}
 		else {
-			offset += sizes.at(value.second);
+			alignment = alignments.at(value.second);;
+			size = sizes.at(value.second);
 		}
+
+		uint64_t spill = offset % alignment;
+		if (spill != 0) {
+			offset += alignment - spill;
+		}
+
+		m_offsets[value.first] = std::make_pair(offset, value.second);
+		offset += size;
 	}
 
-	//the size is a multiple of vec4 so make sure to add extra if required
+	//the size is a multiple of vec4 alignment so make sure to add extra if required
 	if (packingType == BufferPackingType::OPENGL_STD140) {
-		BufferElementTypeSize vec4Size = typeSizes.at(BufferElementType::FLOAT_VEC4);
-		offset += vec4Size - (offset % vec4Size);
+		BufferElementTypeSize vec4Size = alignments.at(BufferElementType::FLOAT_VEC4);
+		long spill = (offset % vec4Size);
+		if (spill != 0) {
+			offset += vec4Size - spill;
+		}
 	}
 
 	m_size = offset;
@@ -141,7 +220,12 @@ BufferElementTypeSize BufferFormat::sizeOfType(BufferElementType type, BufferPac
 	return sizes.at(type);
 }
 
-const std::shared_ptr<BufferFormat> BufferFormat::nestedFormat(std::string name) const
+const std::unordered_map<std::string, std::shared_ptr<const BufferFormat>>& BufferFormat::nestedFormats() const
+{
+	return m_nestedBufferFormats;
+}
+
+std::shared_ptr<const BufferFormat> BufferFormat::nestedFormat(std::string name) const
 {
 	return m_nestedBufferFormats.at(name);
 }
@@ -165,7 +249,7 @@ uint64_t BufferFormat::arraySize() const
 	}
 }
 
-const std::shared_ptr<BufferFormat> BufferFormat::arrayElementFormat() const
+std::shared_ptr<const BufferFormat> BufferFormat::arrayElementFormat() const
 {
 	return m_arrayElementFormat;
 }

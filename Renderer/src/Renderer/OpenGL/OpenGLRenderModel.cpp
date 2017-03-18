@@ -1,5 +1,10 @@
 #include "Renderer/OpenGL/OpenGLRenderModel.h"
 
+#include <Renderer/OpenGL/OpenGLShader.h>
+#include <Renderer/OpenGL/OpenGLRenderMesh.h>
+#include <Renderer/ShaderConstantBuffer.h>
+#include <Buffer/BufferFormat.h>
+#include <Renderer/Material.h>
 namespace {
 
 const GLuint VERTEX_DATA_BINDING_POINT_INDEX    = 0;
@@ -85,22 +90,24 @@ void setupInstanceStateAttribute(GLuint vao, GLuint attribute, BufferElementType
 
 void setupInstanceStateAttributes(GLuint vao, GLuint vbo, std::shared_ptr<OpenGLShader> shader)
 {
-	auto format = shader->shader()->expectedInstanceStateFormat();
+	auto format = shader->shader()->instanceStateFormat();
 	glVertexArrayVertexBuffer(vao, TRANSFORM_DATA_BINDING_POINT_INDEX, vbo, 0, static_cast<GLsizei>(format->size()));
 	glVertexArrayBindingDivisor(vao, TRANSFORM_DATA_BINDING_POINT_INDEX, 1);
 
 	for (auto& variable : format->offsets()) {
 		GLint attributeLocation = shader->getAttributeLocation(variable.first);
-		setupInstanceStateAttribute(vao, attributeLocation, variable.second.second, static_cast<GLuint>(variable.second.first));
+		if (attributeLocation != -1) {
+			setupInstanceStateAttribute(vao, attributeLocation, variable.second.second, static_cast<GLuint>(variable.second.first));
+		}
 	}
 }
 
 }
 
-OpenGLRenderModel::OpenGLRenderModel() : m_shaderID(0), vao(0), m_transformVBO(0), m_indexCount(0) {}
+OpenGLRenderModel::OpenGLRenderModel() : vao(0), m_transformVBO(0), m_indexCount(0) {}
 
-OpenGLRenderModel::OpenGLRenderModel(std::shared_ptr<OpenGLRenderMesh> mesh, std::shared_ptr<OpenGLShader> shader, const std::unordered_map<std::string, RenderResourceID> textures, const std::unordered_map<std::string, RenderResourceID> shaderConstants)
-    : m_shaderID(shader->shader()->id()), m_textures(textures), m_indexCount(mesh->indexCount()), m_shaderConstants(shaderConstants)
+OpenGLRenderModel::OpenGLRenderModel(std::shared_ptr<OpenGLRenderMesh> mesh, std::shared_ptr<OpenGLShader> shader, const std::unordered_map<std::string, RenderResourceID> textures, std::shared_ptr<const Material> material)
+    : m_indexCount(mesh->indexCount()), m_shader(shader), m_textures(textures), m_material(material)
 {
     glCreateVertexArrays(1, &vao);
     glCreateBuffers(1, &m_transformVBO);
@@ -127,12 +134,15 @@ void OpenGLRenderModel::draw(int instanceCount) const
 
 const std::unordered_map<std::string, RenderResourceID>& OpenGLRenderModel::textures() const { return m_textures; }
 
-const std::unordered_map<std::string, RenderResourceID>& OpenGLRenderModel::shaderConstants() const
+const std::shared_ptr<const Material> OpenGLRenderModel::material() const
 {
-	return m_shaderConstants;
+	return m_material;
 }
 
-const RenderResourceID& OpenGLRenderModel::shaderID() const { return m_shaderID; }
+const std::shared_ptr<OpenGLShader> OpenGLRenderModel::shader() const
+{
+	return m_shader;
+}
 
 uint32_t OpenGLRenderModel::indexCount() const { return m_indexCount; }
 

@@ -14,6 +14,6 @@ private:
 	std::vector<uint8_t> buffer;
 
 public:
-	DataBuffer(const std::shared_ptr<BufferFormat> format);
+	DataBuffer(std::shared_ptr<const BufferFormat> format);
 	~DataBuffer();
 };

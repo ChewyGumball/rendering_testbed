@@ -1,14 +1,22 @@
 ﻿#include "Renderer/RenderPass.h"
+#include <iostream>
+#include <unordered_set>
 
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "Renderer/Camera.h"
+#include "Renderer/Model.h"
 #include "Renderer/ModelInstance.h"
+#include "Renderer/Material.h"
+#include "Renderer/ShaderConstantBuffer.h"
 #include "Renderer/FrameBuffer.h"
 #include "Culling/Frustum.h"
-
+#include "Culling/BoundingSphere.h"
+#include <Buffer/DataBufferArrayView.h>
 
 namespace {
-	std::unordered_map<RenderResourceID, std::vector<std::shared_ptr<const ModelInstance>>> cullAgainstCameraFrustum(const std::shared_ptr<Camera> camera, std::vector<std::shared_ptr<const ModelInstance>> instances) {
+	std::unordered_map<std::string, std::shared_ptr<BufferFormat>> systemBufferFormats;
+
+	std::unordered_map<std::shared_ptr<const Model>, std::vector<std::shared_ptr<const ModelInstance>>> cullAgainstCameraFrustum(const std::shared_ptr<Camera> camera, std::vector<std::shared_ptr<const ModelInstance>> instances) {
 		Culling::Frustum frustum(camera->projection() * camera->transform());
 
 		std::vector<glm::vec3> centers(instances.size());
@@ -22,19 +30,84 @@ namespace {
 
 		std::vector<bool> intersections = frustum.intersects(centers, radii);
 
-		std::unordered_map<RenderResourceID, std::vector<std::shared_ptr<const ModelInstance>>> visibleModels;
+		std::unordered_map<std::shared_ptr<const Model>, std::vector<std::shared_ptr<const ModelInstance>>> visibleModels;
 
 		for (size_t i = 0; i < instances.size(); ++i) {
 			if (intersections[i]) {
-				visibleModels[instances[i]->model()->id()].push_back(instances[i]);
+				visibleModels[instances[i]->model()].push_back(instances[i]);
 			}
 		}
 
 		return visibleModels;
 	}
+
+	void updatePassConstantBuffers(std::unordered_map<std::string, std::shared_ptr<ShaderConstantBuffer>> passConstants, std::shared_ptr<Camera> camera, std::vector<PointLight>& lights) {
+		auto cameraBuffer = passConstants["camera"];
+		cameraBuffer->set("projection", camera->projection());
+		cameraBuffer->set("view", camera->transform());
+		cameraBuffer->set("position", camera->position());
+
+		if (lights.size() > 0) {
+			auto& lightsBuffer = passConstants["lights"]->getArray("pointLights");
+			for (int i = 0; i < 2; i++) {
+				PointLight light = lights[i];
+				auto& lightBuffer = lightsBuffer.getBufferAt(i);
+				lightBuffer.set("position", light.position());
+				lightBuffer.set("intensity", light.intensity());
+				lightBuffer.set("power", light.power());
+			}
+
+			passConstants["lights"]->makeDirty();
+		}
+	}
+	bool isInitialized = false;
+	void initialize() {
+		if (isInitialized) return;
+
+		isInitialized = true;
+		systemBufferFormats = std::unordered_map<std::string, std::shared_ptr<BufferFormat>>{
+			{"camera", std::make_shared<BufferFormat>(
+				std::vector<std::pair<std::string, BufferElementType>> {
+					std::make_pair("projection", BufferElementType::MAT4),
+					std::make_pair("view", BufferElementType::MAT4),
+					std::make_pair("position", BufferElementType::FLOAT_VEC3)
+				},
+				std::unordered_map<std::string, std::shared_ptr<const BufferFormat>>(),
+				BufferPackingType::OPENGL_STD140
+			)},
+			{ "lights", std::make_shared<BufferFormat>(
+				std::vector<std::pair<std::string, BufferElementType>> {
+						std::make_pair("pointLights", BufferElementType::ARRAY)
+				},
+				std::unordered_map<std::string, std::shared_ptr<const BufferFormat>> {
+					{ "pointLights", std::make_shared<const BufferFormat>(
+						2,
+						BufferElementType::BUFFER,
+						std::make_shared<BufferFormat>(
+							std::vector<std::pair<std::string, BufferElementType>> {
+								std::make_pair("position", BufferElementType::FLOAT_VEC3),
+								std::make_pair("intensity", BufferElementType::FLOAT_VEC3),
+								std::make_pair("power", BufferElementType::FLOAT_SCALAR)
+							},
+							std::unordered_map<std::string, std::shared_ptr<const BufferFormat>>(),
+							BufferPackingType::OPENGL_STD140
+						)
+					)}
+				},
+				BufferPackingType::OPENGL_STD140
+			)}
+		};
+	}
 }
 
-RenderPass::RenderPass() : renderer(new OpenGLRenderer()), m_camera(std::make_shared<Camera>()), options(RenderOptions()), cullingEnabled(false) {}
+RenderPass::RenderPass() : renderer(new OpenGLRenderer()), m_camera(std::make_shared<Camera>()), options(RenderOptions()), cullingEnabled(false) 
+{
+	initialize();
+	passConstants;
+	for(auto& constant : systemBufferFormats) {
+		passConstants[constant.first] = std::make_shared<ShaderConstantBuffer>(constant.first, constant.second);
+	}
+}
 
 RenderPass::~RenderPass()
 {
@@ -45,20 +118,47 @@ uint64_t RenderPass::draw()
 {
 	uint64_t trianglesDrawn = 0;
 
-	std::unordered_map<RenderResourceID, std::vector<std::shared_ptr<const ModelInstance>>> culledInstances;
+	std::unordered_map<std::shared_ptr<const Model>, std::vector<std::shared_ptr<const ModelInstance>>> culledInstances;
+
+	//Cull (or not) instances against the camera
 	if (cullingEnabled) {
 		culledInstances = cullAgainstCameraFrustum(m_camera, m_modelInstances);
 	}
 	else {
-		for (size_t i = 0; i < m_modelInstances.size(); ++i) {
-			culledInstances[m_modelInstances[i]->model()->id()].push_back(m_modelInstances[i]);
+		for (auto instance : m_modelInstances) {
+			culledInstances[instance->model()].push_back(instance);
 		}
 	}
 
+	//Set up renderer with rendering options
 	renderer->processRenderingOptions(options);
 
-	for (auto instanceList : culledInstances) {
-		renderer->draw(instanceList.second, m_camera);
+	updatePassConstantBuffers(passConstants, m_camera, lights);
+	std::unordered_set<std::shared_ptr<ShaderConstantBuffer>> constantBuffersToUpdate;
+	//update system constant buffer data
+	for (auto s : passConstants) {
+		//insert camera and shit into the buffers
+		constantBuffersToUpdate.insert(s.second);
+	}
+
+	//Update shader constant buffers
+	for (auto& instanceList : culledInstances) {
+		for (auto& shaderConstant : instanceList.first->material()->constants()) {
+			if (shaderConstant.second->isDirty()) {
+				constantBuffersToUpdate.insert(shaderConstant.second);
+			}
+		}
+	}
+
+	renderer->updateConstantBuffers(constantBuffersToUpdate);
+
+	for (auto shaderConstantBuffer : constantBuffersToUpdate) {
+		shaderConstantBuffer->clean();
+	}
+
+	//Draw instances
+	for (auto& instanceList : culledInstances) {
+		renderer->draw(instanceList.second, passConstants);
 		trianglesDrawn += instanceList.second.size() * instanceList.second[0]->model()->triangleCount();
 	}
 
@@ -112,7 +212,7 @@ void RenderPass::addModelInstance(std::shared_ptr<ModelInstance> modelInstance) 
 }
 
 void RenderPass::addPointLight(PointLight light) { 
-	renderer->addPointLight(light); 
+	lights.push_back(light);
 }
 
 void RenderPass::removeModelInstances(std::vector<std::shared_ptr<ModelInstance>> modelInstances)

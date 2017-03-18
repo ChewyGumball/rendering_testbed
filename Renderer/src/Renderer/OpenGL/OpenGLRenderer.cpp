@@ -1,5 +1,7 @@
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 
+#include <iostream>
+
 #include <random>
 
 #include "Util/FileUtils.h"
@@ -14,6 +16,8 @@
 #include "Renderer/Camera.h"
 #include "Renderer/FrameBuffer.h"
 #include "Renderer/RenderOptions.h"
+#include "Renderer/Material.h"
+#include "Renderer/ShaderConstantBuffer.h"
 
 #include "Renderer/OpenGL/OpenGLRenderMesh.h"
 #include "Renderer/OpenGL/OpenGLRenderModel.h"
@@ -38,18 +42,7 @@ namespace {
 
 	std::unordered_map<RenderResourceID, int> boundShaderConstantBuffers;
 	std::vector<RenderResourceID> shaderConstantBufferBindings;
-
-
-	void addLightUniforms(std::shared_ptr<OpenGLShader> shader, std::vector<PointLight>& lights)
-	{
-		for (int i = 0; i < lights.size(); i++) {
-			PointLight& light = lights[i];
-			shader->setUniform3f(Util::String::Format("pointLights[%d].position", i), light.position());
-			shader->setUniform3f(Util::String::Format("pointLights[%d].intensity", i), light.intensity());
-			shader->setUniform1f(Util::String::Format("pointLights[%d].power", i), light.power());
-		}
-	}
-
+	
 	void bindTextures(std::shared_ptr<OpenGLShader> shader, std::unordered_map<std::string, RenderResourceID> modelTextures)
 	{
 		int textureUnit = 0;
@@ -64,25 +57,45 @@ namespace {
 		}
 	}
 
-	void bindShaderConstants(std::shared_ptr<OpenGLShader> shader, std::unordered_map<std::string, RenderResourceID> shaderConstantBuffersToBind)
+	void bindShaderConstants(std::shared_ptr<OpenGLShader> shader, std::shared_ptr<OpenGLRenderModel> model, const std::unordered_map<std::string, std::shared_ptr<ShaderConstantBuffer>>& renderPassConstantBuffers)
 	{
-		for (auto buffer : shaderConstantBuffersToBind) {
+		std::vector<std::pair<std::string, RenderResourceID>> buffersToBind;
+		for (auto& buffer : model->material()->constants()) {
+			buffersToBind.push_back(std::make_pair(buffer.first, buffer.second->id()));
+		}
+		for (auto& buffer : model->material()->shader()->systemConstantBufferNames()) {
+			buffersToBind.push_back(std::make_pair(buffer, renderPassConstantBuffers.at(buffer)->id()));
+		}
+
+		std::unordered_set<GLint> requiredSlots;
+		std::vector<std::pair<std::string, RenderResourceID>> unboundBuffers;
+		for(auto& buffer : buffersToBind) {
 			int bindPoint = boundShaderConstantBuffers[buffer.second];
-
-			//If the buffer is not currently bound, pick a random bind point to bind it to
-			//TODO: Look into better bind piont picking strategy
 			if (bindPoint == -1) {
-				bindPoint = distribution(mt);
-				boundShaderConstantBuffers[shaderConstantBufferBindings[bindPoint]] = -1;
-				boundShaderConstantBuffers[buffer.second] = bindPoint;
-				shaderConstantBufferBindings[bindPoint] = buffer.second;
+				unboundBuffers.push_back(buffer);
 			}
+			else {
+				requiredSlots.insert(bindPoint);
+				//Make sure the shader has the correct bind point just in case the buffer is still bound but has moved
+				shader->bindUniformBufferToBindPoint(buffer.first, bindPoint);
+			}
+		}
 
-			//Make sure the shader has the correct bind point just in case the buffer is still bound but has moved
+		//If the buffer is not currently bound, pick a random bind point to bind it to (but don't unbind a buffer that is also required by this shader)
+		//TODO: Look into better bind piont picking strategy
+		for(auto& buffer : unboundBuffers) {
+			int bindPoint = boundShaderConstantBuffers[buffer.second];
+			do {
+				bindPoint = distribution(mt);
+			} while (requiredSlots.count(bindPoint) != 0);
+			requiredSlots.insert(bindPoint);
+
+			boundShaderConstantBuffers[shaderConstantBufferBindings[bindPoint]] = -1;
+			boundShaderConstantBuffers[buffer.second] = bindPoint;
+			shaderConstantBufferBindings[bindPoint] = buffer.second;
+			shaderConstantBuffers[buffer.second]->bindTo(bindPoint);
+
 			shader->bindUniformBufferToBindPoint(buffer.first, bindPoint);
-
-			//Upload data if it is dirty
-			shaderConstantBuffers[buffer.second]->uploadIfDirty();
 		}
 	}
 
@@ -143,31 +156,30 @@ namespace {
 		}
 	}
 
-	void createModelIfRequired(std::shared_ptr<const Model> model)
-	{
-		createMeshIfRequired(model->mesh());
-		createShaderIfRequired(model->shader());
-
-		for (auto texture : model->textures()) {
-			createTextureIfRequired(texture.second);
-		}
-
-		for (auto constant : model->shaderConstants()) {
+	void createMaterialIfRequired(std::shared_ptr<const Material> material) {
+		createShaderIfRequired(material->shader());
+		for (auto& constant : material->constants()) {
 			createConstantBufferIfRequired(constant.second);
 		}
+	}
 
+	void createModelIfRequired(std::shared_ptr<const Model> model)
+	{
 		if (models.count(model->id()) == 0) {
+			createMeshIfRequired(model->mesh());
+			createMaterialIfRequired(model->material());
+
+			OpenGLRenderer::checkGLError();
+			for (auto texture : model->textures()) {
+				createTextureIfRequired(texture.second);
+			}
+
 			std::unordered_map<std::string, RenderResourceID> modelTextures;
 			for (auto texture : model->textures()) {
 				modelTextures[texture.first] = texture.second->id();
 			}
 
-			std::unordered_map<std::string, RenderResourceID> shaderConstants;
-			for (auto constants : model->shaderConstants()) {
-				shaderConstants[constants.first] = constants.second->id();
-			}
-
-			models.emplace(model->id(), std::make_shared<OpenGLRenderModel>(meshes[model->mesh()->id()], shaders[model->shader()->id()], modelTextures, shaderConstants));
+			models.emplace(model->id(), std::make_shared<OpenGLRenderModel>(meshes[model->mesh()->id()], shaders[model->material()->shader()->id()], modelTextures, model->material()));
 		}
 	}
 
@@ -200,14 +212,29 @@ namespace {
 	}
 }
 
-OpenGLRenderer::OpenGLRenderer() 
+void OpenGLRenderer::checkGLError()
+{
+	GLenum err;
+	while (err = glGetError() != GL_NO_ERROR) {
+		std::string error;
+		switch (err) {
+		case GL_INVALID_OPERATION:      error = "INVALID_OPERATION";      break;
+		case GL_INVALID_ENUM:           error = "INVALID_ENUM";           break;
+		case GL_INVALID_VALUE:          error = "INVALID_VALUE";          break;
+		case GL_OUT_OF_MEMORY:          error = "OUT_OF_MEMORY";          break;
+		case GL_INVALID_FRAMEBUFFER_OPERATION:  error = "INVALID_FRAMEBUFFER_OPERATION";  break;
+		default: error = "unknown";
+		}
+		std::cout << error << std::endl;
+	}
+}
+
+OpenGLRenderer::OpenGLRenderer()
 {
 	initialize();
 }
 
 OpenGLRenderer::~OpenGLRenderer() {}
-
-void OpenGLRenderer::addPointLight(PointLight light) { lights.push_back(light); }
 
 void OpenGLRenderer::processRenderingOptions(RenderOptions & options)
 {
@@ -234,26 +261,29 @@ void OpenGLRenderer::processRenderingOptions(RenderOptions & options)
 	glPolygonMode(GL_BACK, polygonMode);
 }
 
-void OpenGLRenderer::draw(const std::vector<std::shared_ptr<const ModelInstance>>& instances, const std::shared_ptr<Camera> camera)
+void OpenGLRenderer::updateConstantBuffers(std::unordered_set<std::shared_ptr<ShaderConstantBuffer>>& constantBuffers)
 {
+	for (std::shared_ptr<ShaderConstantBuffer> constantBuffer : constantBuffers)
+	{
+		createConstantBufferIfRequired(constantBuffer);
+		shaderConstantBuffers[constantBuffer->id()]->uploadIfDirty();
+	}
+}
+
+void OpenGLRenderer::draw(const std::vector<std::shared_ptr<const ModelInstance>>& instances, const std::unordered_map<std::string, std::shared_ptr<ShaderConstantBuffer>>& renderPassConstants)
+{
+	checkGLError();
 	std::shared_ptr<const ModelInstance> firstInstance = instances[0];
 	createModelIfRequired(firstInstance->model());
 
 	std::shared_ptr<OpenGLRenderModel> model = models[instances[0]->model()->id()];
 	uploadInstanceData(model->transformVBO(), instances);
 
-	std::shared_ptr<OpenGLShader> shader = shaders[model->shaderID()];
+	std::shared_ptr<OpenGLShader> shader = model->shader();
 	shader->bind();
-
 	bindTextures(shader, model->textures());
-	bindShaderConstants(shader, model->shaderConstants());
+	bindShaderConstants(shader, model, renderPassConstants);
 
-    shader->setUniformMatrix4f("view", camera->transform());
-    shader->setUniformMatrix4f("projection", camera->projection());
-    shader->setUniform3f("cameraPosition", camera->position());
-
-	
-    addLightUniforms(shader, lights);
-	
     model->draw(static_cast<int>(instances.size()));
+	checkGLError();
 }

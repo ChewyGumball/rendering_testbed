@@ -4,7 +4,7 @@
 
 namespace {
 
-	std::vector<uint8_t> initialData(const std::shared_ptr<BufferFormat> format)
+	std::vector<uint8_t> initialData(std::shared_ptr<const BufferFormat> format)
 	{
 		std::vector<uint8_t> data(format->size());
 

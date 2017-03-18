@@ -3,13 +3,19 @@
 #include <iostream>
 #include <string>
 
-#include <Renderer\QuaternionCamera.h>
+#include <Renderer/Shader.h>
+#include <Renderer/Material.h>
+#include <Renderer/QuaternionCamera.h>
+#include <Renderer/Model.h>
+#include <Renderer/ModelInstance.h>
 
-#include <lib\rapidjson\document.h>
+#include <Buffer/BufferFormat.h>
 
-#include <Renderer\ModelLoader.h>
-#include <Util\FileUtils.h>
-#include <Util\StringUtils.h>
+#include <lib/rapidjson/document.h>
+
+#include <Renderer/ModelLoader.h>
+#include <Util/FileUtils.h>
+#include <Util/StringUtils.h>
 
 namespace {
 std::unordered_map<std::string, TextureFormat> textureFormats{ { "rgb", TextureFormat::RGB8 }, { "depth", TextureFormat::DEPTH } };
@@ -43,9 +49,9 @@ int getIntFromPath(rapidjson::Value* json, std::string path)
     return v->GetInt();
 }
 
-std::shared_ptr<BufferFormat> readFormat(rapidjson::Value& json) {
+std::shared_ptr<const BufferFormat> readFormat(rapidjson::Value& json, BufferPackingType packingType = BufferPackingType::PACKED) {
 	std::vector<std::pair<std::string, BufferElementType>> format; 
-	std::unordered_map<std::string, const std::shared_ptr<BufferFormat>> nestedBufferFormats;
+	std::unordered_map<std::string, std::shared_ptr<const BufferFormat>> nestedBufferFormats;
 
 	for (auto& member : json.GetObject()) {
 		std::string name(member.name.GetString());
@@ -53,7 +59,21 @@ std::shared_ptr<BufferFormat> readFormat(rapidjson::Value& json) {
 		if (member.value.IsObject()) {
 			BufferElementType type = elementTypes[member.value["type"].GetString()];
 			if (type == BufferElementType::BUFFER) {
-				nestedBufferFormats.emplace(name, readFormat(member.value["format"]));
+				BufferPackingType nestedPackingType = packingType;
+				if (member.value.HasMember("packing")) {
+					std::string packingTypeString(member.value["packing"].GetString());
+					if (packingTypeString == "std140") {
+						nestedPackingType = BufferPackingType::OPENGL_STD140;
+					}
+					else if (packingTypeString == "packed") {
+						nestedPackingType = BufferPackingType::PACKED;
+					}
+					else {
+						assert(false); //unknown packing type
+					}
+				}
+
+				nestedBufferFormats.emplace(name, readFormat(member.value["format"], nestedPackingType));
 			}
 			if (type == BufferElementType::ARRAY) {
 				auto& arrayType = member.value["arrayType"];
@@ -103,29 +123,34 @@ std::unordered_map<std::string, std::shared_ptr<Mesh>> loadMeshes(rapidjson::Doc
 std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> loadTextures(rapidjson::Document& json)
 {
     std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures;
-    for (auto& texture : json["textures"].GetObject()) {
-        int width, height;
+	if (json.HasMember("textures")) {
+		for (auto& texture : json["textures"].GetObject()) {
+			int width, height;
 
-        if (texture.value["width"].IsInt()) {
-            width = texture.value["width"].GetInt();
-        } else {
-            std::string widthString(texture.value["width"].GetString());
-            width = getIntFromPath(&json, widthString.substr(1, widthString.size() - 2));
-        }
-        if (texture.value["height"].IsInt()) {
-            height = texture.value["height"].GetInt();
-        } else {
-            std::string heightString(texture.value["height"].GetString());
-            height = getIntFromPath(&json, heightString.substr(1, heightString.size() - 2));
-        }
+			if (texture.value["width"].IsInt()) {
+				width = texture.value["width"].GetInt();
+			}
+			else {
+				std::string widthString(texture.value["width"].GetString());
+				width = getIntFromPath(&json, widthString.substr(1, widthString.size() - 2));
+			}
+			if (texture.value["height"].IsInt()) {
+				height = texture.value["height"].GetInt();
+			}
+			else {
+				std::string heightString(texture.value["height"].GetString());
+				height = getIntFromPath(&json, heightString.substr(1, heightString.size() - 2));
+			}
 
-        std::string name(texture.name.GetString());
-        std::string format(texture.value["format"].GetString());
-        if (texture.value.HasMember("filename")) {
-        } else {
-            textures[name] = std::make_shared<TextureBuffer>(glm::vec2(width, height), textureFormats[format]);
-        }
-    }
+			std::string name(texture.name.GetString());
+			std::string format(texture.value["format"].GetString());
+			if (texture.value.HasMember("filename")) {
+			}
+			else {
+				textures[name] = std::make_shared<TextureBuffer>(glm::vec2(width, height), textureFormats[format]);
+			}
+		}
+	}
     return textures;
 }
 
@@ -289,12 +314,30 @@ std::unordered_map<std::string, std::shared_ptr<Shader>> loadShaders(
         for (auto& filename : shader.value["vertexFiles"].GetArray()) {
             vertexFiles.push_back(filename.GetString());
         }
+
         std::vector<std::string> fragmentFiles;
         for (auto& filename : shader.value["fragmentFiles"].GetArray()) {
             fragmentFiles.push_back(filename.GetString());
         }
 
-		shaders[shader.name.GetString()] = std::make_shared<Shader>(vertexFiles, fragmentFiles, readFormat(shader.value["instanceDataFormat"]), readFormat(shader.value["constantDataFormat"]));
+		std::shared_ptr<const BufferFormat> instanceDataFormat = std::make_shared<BufferFormat>();
+		if (shader.value.HasMember("instanceDataFormat")) {
+			instanceDataFormat = readFormat(shader.value["instanceDataFormat"]);
+		}
+
+		std::unordered_map<std::string, std::shared_ptr<const BufferFormat>> materialConstantBufferFormats;
+		if (shader.value.HasMember("materialConstantBufferFormats")) {
+			materialConstantBufferFormats = readFormat(shader.value["materialConstantBufferFormats"])->nestedFormats();
+		}
+
+		std::vector<std::string> systemConstantBufferNames;
+		if (shader.value.HasMember("systemConstantBuffers")) {
+			for (auto& name : shader.value["systemConstantBuffers"].GetArray()) {
+				systemConstantBufferNames.push_back(name.GetString());
+			}
+		}
+
+		shaders[shader.name.GetString()] = std::make_shared<Shader>(vertexFiles, fragmentFiles, instanceDataFormat, materialConstantBufferFormats, systemConstantBufferNames);
     }
     return shaders;
 }
@@ -302,14 +345,25 @@ std::unordered_map<std::string, std::shared_ptr<Shader>> loadShaders(
 std::unordered_map<std::string, PointLight> loadLights(rapidjson::Document& json)
 {
     std::unordered_map<std::string, PointLight> lights;
-    for (auto& light : json["lights"].GetObject()) {
-        glm::vec3 colour(light.value["colour"]["r"].GetFloat(), light.value["colour"]["g"].GetFloat(), light.value["colour"]["b"].GetFloat());
-        float     power = light.value["power"].GetFloat();
+	if (json.HasMember("lights")) {
+		for (auto& light : json["lights"].GetObject()) {
+			glm::vec3 colour(light.value["colour"]["r"].GetFloat(), light.value["colour"]["g"].GetFloat(), light.value["colour"]["b"].GetFloat());
+			float     power = light.value["power"].GetFloat();
 
-        lights[light.name.GetString()] = PointLight(glm::vec3(), colour, power);
-    }
+			lights[light.name.GetString()] = PointLight(glm::vec3(), colour, power);
+		}
+	}
     return lights;
 }
+}
+
+std::unordered_map<std::string, std::shared_ptr<Material>> loadMaterials(rapidjson::Document& json, std::unordered_map<std::string, std::shared_ptr<Shader>>& shaders) {
+	std::unordered_map<std::string, std::shared_ptr<Material>> materials;
+	for (auto& material : json["materials"].GetObject()) {
+		materials[material.name.GetString()] = std::make_shared<Material>(shaders[material.value["shader"].GetString()]);
+	}
+
+	return materials;
 }
 
 Scene SceneLoader::loadScene(std::string filename)
@@ -329,6 +383,7 @@ Scene SceneLoader::loadScene(std::string filename)
     std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures(loadTextures(json));
     std::unordered_map<std::string, std::shared_ptr<Shader>> shaders(loadShaders(json, textures));
     std::unordered_map<std::string, PointLight> lights(loadLights(json));
+	std::unordered_map<std::string, std::shared_ptr<Material>> materials(loadMaterials(json, shaders));
 
     std::unordered_map<std::string, std::shared_ptr<Model>> models;
 
@@ -340,7 +395,7 @@ Scene SceneLoader::loadScene(std::string filename)
 				modelTextures.emplace(texture.name.GetString(), textures[texture.value.GetString()]);
 			}
 		}
-        models[name] = std::make_shared<Model>(meshes[model.value["mesh"].GetString()], shaders[model.value["shader"].GetString()], modelTextures);
+        models[name] = std::make_shared<Model>(meshes[model.value["mesh"].GetString()], materials[model.value["material"].GetString()], modelTextures);
     }
 
     rapidjson::Value scene = json["scene"].GetObject();

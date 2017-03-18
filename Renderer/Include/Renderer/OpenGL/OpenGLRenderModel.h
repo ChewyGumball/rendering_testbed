@@ -1,33 +1,36 @@
 #pragma once
 #include <unordered_map>
 
-#include "OpenGLShader.h"
-#include "OpenGLRenderMesh.h"
-#include "OpenGLShader.h"
-#include "Renderer/TextureBuffer.h"
-#include <Buffer/DataBufferView.h>
+#include <GL\glew.h>
+#include <memory>
+#include <unordered_map>
+
+#include <Renderer/RenderResource.h>
+
+class OpenGLRenderMesh;
+class OpenGLShader;
+class Material;
 
 class OpenGLRenderModel
 {
 private:
 	GLuint vao, m_transformVBO;
 	uint32_t m_indexCount;
-	RenderResourceID m_shaderID;
+	const std::shared_ptr<OpenGLShader> m_shader;
 	const std::unordered_map<std::string, RenderResourceID> m_textures;
-	const std::unordered_map<std::string, RenderResourceID> m_shaderConstants;
+	const std::shared_ptr<const Material> m_material;
 
 public:
 
 	OpenGLRenderModel();
-	OpenGLRenderModel(std::shared_ptr<OpenGLRenderMesh> mesh, std::shared_ptr<OpenGLShader> shader, const std::unordered_map<std::string, RenderResourceID> textures, const std::unordered_map<std::string, RenderResourceID> shaderConstants);
+	OpenGLRenderModel(std::shared_ptr<OpenGLRenderMesh> mesh, std::shared_ptr<OpenGLShader> shader, const std::unordered_map<std::string, RenderResourceID> textures, std::shared_ptr<const Material> material);
 	~OpenGLRenderModel();
 
 	void draw(int instanceCount) const;
 
 	const std::unordered_map<std::string, RenderResourceID>& textures() const;
-	const std::unordered_map<std::string, RenderResourceID>& shaderConstants() const;
-
-	const RenderResourceID& shaderID() const;
+	const std::shared_ptr<const Material> material() const;
+	const std::shared_ptr<OpenGLShader> shader() const;
 	uint32_t indexCount() const;
 
 	GLuint transformVBO() const;

@@ -1,9 +1,9 @@
 #pragma once
 #include <memory>
+#include <unordered_set>
 #include <vector>
 
 #include <Renderer/Renderer.h>
-#include <Renderer/PointLight.h>
 
 class Camera;
 class ModelInstance;
@@ -12,16 +12,14 @@ struct RenderOptions;
 
 class OpenGLRenderer : public Renderer
 {
-private:
-	std::vector<PointLight> lights;
-
 public:
+	static void checkGLError();
+
 	OpenGLRenderer();
 	~OpenGLRenderer();
 
-	void addPointLight(PointLight light);
-
-	void processRenderingOptions(RenderOptions& options);
-	void draw(const std::vector<std::shared_ptr<const ModelInstance>>& instances, const std::shared_ptr<Camera> camera);
+	void processRenderingOptions(RenderOptions& options); 
+	void updateConstantBuffers(std::unordered_set<std::shared_ptr<ShaderConstantBuffer>>& constantBuffers);
+	void draw(const std::vector<std::shared_ptr<const ModelInstance>>& instances, const std::unordered_map<std::string, std::shared_ptr<ShaderConstantBuffer>>& renderPassConstants);
 };
 

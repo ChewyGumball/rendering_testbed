@@ -8,11 +8,11 @@ class DataBufferArrayView
 {
 protected:
 	BufferElementType m_type;
-	std::shared_ptr<BufferFormat> m_elementFormat;
+	std::shared_ptr<const BufferFormat> m_elementFormat;
 	uint8_t* data;
 	uint64_t m_count;
 public:
-	DataBufferArrayView(uint8_t* data, uint64_t elementCount, BufferElementType elementType, std::shared_ptr<BufferFormat> elementFormat = nullptr);
+	DataBufferArrayView(uint8_t* data, uint64_t elementCount, BufferElementType elementType, std::shared_ptr<const BufferFormat> elementFormat = nullptr);
 	~DataBufferArrayView();
 
 	BufferElementType elementType() const;
