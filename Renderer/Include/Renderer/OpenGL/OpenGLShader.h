@@ -1,5 +1,5 @@
 #pragma once
-#include "Renderer/Shader.h"
+#include "Resources/Shader.h"
 
 #include <memory>
 

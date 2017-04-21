@@ -10,14 +10,13 @@
 #include <Buffer/DataBufferView.h>
 #include <Buffer/DataBufferArrayView.h>
 
-#include "Renderer/Mesh.h"
-#include "Renderer/Model.h"
-#include "Renderer/ModelInstance.h"
-#include "Renderer/Camera.h"
-#include "Renderer/FrameBuffer.h"
+#include "Resources/Mesh.h"
+#include "Resources/Model.h"
+#include "Resources/ModelInstance.h"
+#include "Resources/FrameBuffer.h"
 #include "Renderer/RenderOptions.h"
-#include "Renderer/Material.h"
-#include "Renderer/ShaderConstantBuffer.h"
+#include "Resources/Material.h"
+#include "Resources/ShaderConstantBuffer.h"
 
 #include "Renderer/OpenGL/OpenGLRenderMesh.h"
 #include "Renderer/OpenGL/OpenGLRenderModel.h"
@@ -207,7 +206,7 @@ namespace {
 		GLint maxShaderConstantBufferBindingPoints;
 		glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &maxShaderConstantBufferBindingPoints);	
 
-		distribution = std::uniform_int_distribution<GLint>(0, maxShaderConstantBufferBindingPoints);
+		distribution = std::uniform_int_distribution<GLint>(0, maxShaderConstantBufferBindingPoints - 1);
 		shaderConstantBufferBindings.resize(maxShaderConstantBufferBindingPoints);
 	}
 }
@@ -270,20 +269,20 @@ void OpenGLRenderer::updateConstantBuffers(std::unordered_set<std::shared_ptr<Sh
 	}
 }
 
-void OpenGLRenderer::draw(const std::vector<std::shared_ptr<const ModelInstance>>& instances, const std::unordered_map<std::string, std::shared_ptr<ShaderConstantBuffer>>& renderPassConstants)
+void OpenGLRenderer::draw(const std::vector<std::shared_ptr<const ModelInstance>>& modelInstances, const std::unordered_map<std::string, std::shared_ptr<ShaderConstantBuffer>>& globalShaderConstantBuffers)
 {
-	checkGLError();
-	std::shared_ptr<const ModelInstance> firstInstance = instances[0];
+	//checkGLError();
+	std::shared_ptr<const ModelInstance> firstInstance = modelInstances[0];
 	createModelIfRequired(firstInstance->model());
 
-	std::shared_ptr<OpenGLRenderModel> model = models[instances[0]->model()->id()];
-	uploadInstanceData(model->transformVBO(), instances);
+	std::shared_ptr<OpenGLRenderModel> model = models[modelInstances[0]->model()->id()];
+	uploadInstanceData(model->transformVBO(), modelInstances);
 
 	std::shared_ptr<OpenGLShader> shader = model->shader();
 	shader->bind();
 	bindTextures(shader, model->textures());
-	bindShaderConstants(shader, model, renderPassConstants);
+	bindShaderConstants(shader, model, globalShaderConstantBuffers);
 
-    model->draw(static_cast<int>(instances.size()));
-	checkGLError();
+    model->draw(static_cast<int>(modelInstances.size()));
+	//checkGLError();
 }

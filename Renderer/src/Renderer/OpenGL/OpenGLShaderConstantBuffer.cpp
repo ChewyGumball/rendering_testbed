@@ -1,7 +1,7 @@
 #include "Renderer/OpenGL/OpenGLShaderConstantBuffer.h"
 
 #include <Renderer/OpenGL/OpenGLShader.h>
-#include <Renderer/ShaderConstantBuffer.h>
+#include <Resources/ShaderConstantBuffer.h>
 
 #include <iostream>
 

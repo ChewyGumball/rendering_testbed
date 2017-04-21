@@ -3,7 +3,7 @@
 #include <glm\vec2.hpp>
 #include <glm\vec4.hpp>
 
-#include <Renderer\FrameBuffer.h>
+#include <Resources\FrameBuffer.h>
 
 struct RenderOptions
 {

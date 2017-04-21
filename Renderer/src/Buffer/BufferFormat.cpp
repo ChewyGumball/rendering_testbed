@@ -131,6 +131,14 @@ namespace {
 		}
 		}
 	}
+
+	uint64_t align(uint64_t offset, uint64_t alignment) {
+		uint64_t spill = offset % alignment;
+		if (spill > 0) {
+			return offset + alignment - spill;
+		}
+		return offset;
+	}
 }
 
 BufferFormat::BufferFormat() : m_size(0), m_arrayType(BufferElementType::UNKNOWN), m_arrayElementFormat(nullptr)
@@ -150,22 +158,19 @@ BufferFormat::BufferFormat(std::vector<std::pair<std::string, BufferElementType>
 	const std::unordered_map<BufferElementType, BufferElementTypeSize>& alignments = selectAlignmentsFromPackingType(packingType);
 
 	for (auto& value : format) {
-		uint64_t alignment;
 		uint64_t size;
 		if (value.second == BufferElementType::BUFFER || value.second == BufferElementType::ARRAY) {
 			assert(nestedBufferFormats.count(value.first) != 0);
 
-			alignment = alignments.at(BufferElementType::FLOAT_VEC4);
+			//align the offset to a vec4:
+			//	std140 requires this, packed has the same alignment for all types so it doesn't matter which type's alignment is used
+			offset = align(offset, alignments.at(BufferElementType::FLOAT_VEC4));
 			size = nestedBufferFormats[value.first]->size();
 		}
 		else {
-			alignment = alignments.at(value.second);;
+			//align the offset according to the alignment of the element type
+			offset = align(offset, alignments.at(value.second));
 			size = sizes.at(value.second);
-		}
-
-		uint64_t spill = offset % alignment;
-		if (spill != 0) {
-			offset += alignment - spill;
 		}
 
 		m_offsets[value.first] = std::make_pair(offset, value.second);
@@ -174,11 +179,7 @@ BufferFormat::BufferFormat(std::vector<std::pair<std::string, BufferElementType>
 
 	//the size is a multiple of vec4 alignment so make sure to add extra if required
 	if (packingType == BufferPackingType::OPENGL_STD140) {
-		BufferElementTypeSize vec4Size = alignments.at(BufferElementType::FLOAT_VEC4);
-		long spill = (offset % vec4Size);
-		if (spill != 0) {
-			offset += vec4Size - spill;
-		}
+		offset = align(offset, alignments.at(BufferElementType::FLOAT_VEC4));
 	}
 
 	m_size = offset;
@@ -214,10 +215,7 @@ uint64_t BufferFormat::size() const
 
 BufferElementTypeSize BufferFormat::sizeOfType(BufferElementType type, BufferPackingType packingType)
 {
-	const std::unordered_map<BufferElementType, BufferElementTypeSize>& sizes = selectSizesFromPackingType(packingType);
-
-	assert(sizes.count(type) != 0);
-	return sizes.at(type);
+	return selectSizesFromPackingType(packingType).at(type);
 }
 
 const std::unordered_map<std::string, std::shared_ptr<const BufferFormat>>& BufferFormat::nestedFormats() const

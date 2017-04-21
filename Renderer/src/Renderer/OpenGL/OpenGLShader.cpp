@@ -219,8 +219,6 @@ void OpenGLShader::bindUniformBufferToBindPoint(const std::string name, GLuint b
 		auto currentBindPoint = boundUniformBufferBindPoints.find(name);
 		if (currentBindPoint == boundUniformBufferBindPoints.end() || currentBindPoint->second != bindPoint) {
 			glUniformBlockBinding(programHandle, location, bindPoint);
-			GLint minSize;
-			glGetActiveUniformBlockiv(programHandle, location, GL_UNIFORM_BLOCK_DATA_SIZE, &minSize);
 			boundUniformBufferBindPoints[name] = bindPoint;
 		}
 	}

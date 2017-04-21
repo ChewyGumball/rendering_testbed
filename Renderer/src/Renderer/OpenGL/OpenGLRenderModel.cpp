@@ -2,9 +2,9 @@
 
 #include <Renderer/OpenGL/OpenGLShader.h>
 #include <Renderer/OpenGL/OpenGLRenderMesh.h>
-#include <Renderer/ShaderConstantBuffer.h>
+#include <Resources/ShaderConstantBuffer.h>
 #include <Buffer/BufferFormat.h>
-#include <Renderer/Material.h>
+#include <Resources/Material.h>
 namespace {
 
 const GLuint VERTEX_DATA_BINDING_POINT_INDEX    = 0;

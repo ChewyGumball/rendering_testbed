@@ -1,7 +1,7 @@
 #pragma once
 #include <GL\glew.h>
 #include <memory>
-#include <Renderer\TextureBuffer.h>
+#include <Resources\TextureBuffer.h>
 
 class OpenGLTextureBuffer
 {

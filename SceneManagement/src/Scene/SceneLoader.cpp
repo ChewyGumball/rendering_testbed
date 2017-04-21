@@ -3,17 +3,17 @@
 #include <iostream>
 #include <string>
 
-#include <Renderer/Shader.h>
-#include <Renderer/Material.h>
-#include <Renderer/QuaternionCamera.h>
-#include <Renderer/Model.h>
-#include <Renderer/ModelInstance.h>
+#include <Resources/Shader.h>
+#include <Resources/Material.h>
+#include <Cameras/QuaternionCamera.h>
+#include <Resources/Model.h>
+#include <Resources/ModelInstance.h>
 
 #include <Buffer/BufferFormat.h>
 
 #include <lib/rapidjson/document.h>
 
-#include <Renderer/ModelLoader.h>
+#include <ModelLoader.h>
 #include <Util/FileUtils.h>
 #include <Util/StringUtils.h>
 
@@ -154,18 +154,18 @@ std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> loadTextures(rap
     return textures;
 }
 
-std::unordered_map<std::string, std::shared_ptr<Camera>> loadCameras(rapidjson::Value& json)
+std::unordered_map<std::string, std::shared_ptr<Scene::Cameras::Camera>> loadCameras(rapidjson::Value& json)
 {
-    std::unordered_map<std::string, std::shared_ptr<Camera>> cameras;
+    std::unordered_map<std::string, std::shared_ptr<Scene::Cameras::Camera>> cameras;
     for (auto& camera : json["cameras"].GetObject()) {
         if (camera.value.HasMember("type") && std::string(camera.value["type"].GetString()) == "quaternion") {
-            cameras[camera.name.GetString()] = std::make_shared<QuaternionCamera>(objectToVec3(camera.value["position"]),
+            cameras[camera.name.GetString()] = std::make_shared<Scene::Cameras::QuaternionCamera>(objectToVec3(camera.value["position"]),
                 objectToVec3(camera.value["target"]),
                 objectToVec3(camera.value["up"]),
                 camera.value["fov"].GetFloat(),
                 camera.value["aspectRatio"].GetFloat());
         } else {
-            cameras[camera.name.GetString()] = std::make_shared<Camera>(objectToVec3(camera.value["position"]),
+            cameras[camera.name.GetString()] = std::make_shared<Scene::Cameras::Camera>(objectToVec3(camera.value["position"]),
                 objectToVec3(camera.value["target"]),
                 objectToVec3(camera.value["up"]),
                 camera.value["fov"].GetFloat(),
@@ -211,16 +211,16 @@ std::unordered_map<std::string, std::vector<PointLight>> loadLightGroups(rapidjs
     return lightGroups;
 }
 
-std::unordered_map<std::string, std::shared_ptr<RenderPass>> loadPasses(rapidjson::Value& json,
+std::unordered_map<std::string, std::shared_ptr<Scene::RenderPass>> loadPasses(rapidjson::Value& json,
     std::unordered_map<std::string, std::vector<std::shared_ptr<ModelInstance>>>          modelGroups,
     std::unordered_map<std::string, std::vector<PointLight>>                              lightGroups,
-    std::unordered_map<std::string, std::shared_ptr<Camera>>                              cameras,
+    std::unordered_map<std::string, std::shared_ptr<Scene::Cameras::Camera>>                              cameras,
     std::unordered_map<std::string, std::shared_ptr<TextureBuffer>>                       textures)
 {
-    std::unordered_map<std::string, std::shared_ptr<RenderPass>> passes;
+    std::unordered_map<std::string, std::shared_ptr<Scene::RenderPass>> passes;
     for (auto& pass : json["passes"].GetObject()) {
         std::string                 name = pass.name.GetString();
-        std::shared_ptr<RenderPass> p    = std::make_shared<RenderPass>();
+        std::shared_ptr<Scene::RenderPass> p    = std::make_shared<Scene::RenderPass>();
 
         for (auto& modelGroup : pass.value["models"].GetArray()) {
             for (auto& model : modelGroups[modelGroup.GetString()]) {
@@ -366,45 +366,47 @@ std::unordered_map<std::string, std::shared_ptr<Material>> loadMaterials(rapidjs
 	return materials;
 }
 
-Scene SceneLoader::loadScene(std::string filename)
-{
-    std::string             file = Util::File::ReadWholeFile(filename);
-    rapidjson::StringStream s(file.c_str());
-    rapidjson::Document     json;
-    json.Parse(file.c_str());
+namespace Scene {
+	World SceneLoader::loadWorld(std::string filename)
+	{
+		std::string             file = Util::File::ReadWholeFile(filename);
+		rapidjson::StringStream s(file.c_str());
+		rapidjson::Document     json;
+		json.Parse(file.c_str());
 
-    if (json.HasParseError()) {
-        rapidjson::ParseErrorCode errorCode   = json.GetParseError();
-        size_t                    errorOffset = json.GetErrorOffset();
-        std::cout << "ERROR: " << errorCode << " , " << errorOffset << std::endl;
-    }
-
-    std::unordered_map<std::string, std::shared_ptr<Mesh>> meshes(loadMeshes(json));
-    std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures(loadTextures(json));
-    std::unordered_map<std::string, std::shared_ptr<Shader>> shaders(loadShaders(json, textures));
-    std::unordered_map<std::string, PointLight> lights(loadLights(json));
-	std::unordered_map<std::string, std::shared_ptr<Material>> materials(loadMaterials(json, shaders));
-
-    std::unordered_map<std::string, std::shared_ptr<Model>> models;
-
-    for (auto& model : json["models"].GetObject()) {
-        std::string name(model.name.GetString());
-		std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> modelTextures;
-		if (model.value.HasMember("textures")) {
-			for (auto& texture : model.value["textures"].GetObject()) {
-				modelTextures.emplace(texture.name.GetString(), textures[texture.value.GetString()]);
-			}
+		if (json.HasParseError()) {
+			rapidjson::ParseErrorCode errorCode = json.GetParseError();
+			size_t                    errorOffset = json.GetErrorOffset();
+			std::cout << "ERROR: " << errorCode << " , " << errorOffset << std::endl;
 		}
-        models[name] = std::make_shared<Model>(meshes[model.value["mesh"].GetString()], materials[model.value["material"].GetString()], modelTextures);
-    }
 
-    rapidjson::Value scene = json["scene"].GetObject();
+		std::unordered_map<std::string, std::shared_ptr<Mesh>> meshes(loadMeshes(json));
+		std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures(loadTextures(json));
+		std::unordered_map<std::string, std::shared_ptr<Shader>> shaders(loadShaders(json, textures));
+		std::unordered_map<std::string, PointLight> lights(loadLights(json));
+		std::unordered_map<std::string, std::shared_ptr<Material>> materials(loadMaterials(json, shaders));
 
-    std::unordered_map<std::string, std::shared_ptr<Camera>> cameras(loadCameras(scene));
-    std::unordered_map<std::string, std::vector<PointLight>> lightInstances(loadLightGroups(scene, lights));
-    std::unordered_map<std::string, std::vector<std::shared_ptr<ModelInstance>>> modelInstances(loadModelGroups(scene, models));
-    std::unordered_map<std::string, std::shared_ptr<RenderPass>> passes(loadPasses(scene, modelInstances, lightInstances, cameras, textures));
-    std::unordered_map<std::string, std::vector<std::string>> passDependencies(loadPassDepencencies(scene));
+		std::unordered_map<std::string, std::shared_ptr<Model>> models;
 
-    return Scene(passes, passDependencies, cameras, modelInstances);
+		for (auto& model : json["models"].GetObject()) {
+			std::string name(model.name.GetString());
+			std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> modelTextures;
+			if (model.value.HasMember("textures")) {
+				for (auto& texture : model.value["textures"].GetObject()) {
+					modelTextures.emplace(texture.name.GetString(), textures[texture.value.GetString()]);
+				}
+			}
+			models[name] = std::make_shared<Model>(meshes[model.value["mesh"].GetString()], materials[model.value["material"].GetString()], modelTextures);
+		}
+
+		rapidjson::Value scene = json["scene"].GetObject();
+
+		std::unordered_map<std::string, std::shared_ptr<Scene::Cameras::Camera>> cameras(loadCameras(scene));
+		std::unordered_map<std::string, std::vector<PointLight>> lightInstances(loadLightGroups(scene, lights));
+		std::unordered_map<std::string, std::vector<std::shared_ptr<ModelInstance>>> modelInstances(loadModelGroups(scene, models));
+		std::unordered_map<std::string, std::shared_ptr<RenderPass>> passes(loadPasses(scene, modelInstances, lightInstances, cameras, textures));
+		std::unordered_map<std::string, std::vector<std::string>> passDependencies(loadPassDepencencies(scene));
+
+		return World(passes, passDependencies, cameras, modelInstances);
+	}
 }

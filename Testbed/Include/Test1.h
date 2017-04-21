@@ -5,30 +5,31 @@
 #include <GL\glew.h>
 #include <GLFW\glfw3.h>
 
-#include <Renderer/Camera.h>
-#include <Fonts/Font.h>
+#include <Cameras/Camera.h>
+#include <Text/Font.h>
 
-#include <Scene/Scene.h>
-#include <Scene/RenderableText.h>
+#include <Scene/World.h>
+#include <Text/RenderableText.h>
 
 class Test1
 {
 private:
 	GLFWwindow* window;
-	Scene scene;
+	Scene::World scene;
 
 	double mouseX, mouseY;
 	bool rotateInstances;
 	bool wireframe;
+	bool vsync;
 
-	std::shared_ptr<Font> f;
+	std::shared_ptr<Scene::Text::Font> f;
 	std::string formatString;
-	RenderableText fpsCounter;
+	Scene::Text::RenderableText fpsCounter;
 
-	std::shared_ptr<Camera> guiCamera;
-	std::shared_ptr<RenderPass> gui;
+	std::shared_ptr<Scene::Cameras::Camera> guiCamera;
+	std::shared_ptr<Scene::RenderPass> gui;
 
-	std::vector<std::shared_ptr<Camera>> cameras;
+	std::vector<std::shared_ptr<Scene::Cameras::Camera>> cameras;
 	std::vector<std::shared_ptr<ModelInstance>> instances;
 	
 	void doCameraMovement();

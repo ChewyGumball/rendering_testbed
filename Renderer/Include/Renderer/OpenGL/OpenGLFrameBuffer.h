@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <memory>
 
-#include <Renderer/FrameBuffer.h>
+#include <Resources/FrameBuffer.h>
 #include <Renderer\OpenGL/OpenGLTextureBuffer.h>
 
 class OpenGLFrameBuffer

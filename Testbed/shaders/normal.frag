@@ -47,7 +47,7 @@ void main()
 	vec3 norm = normalize(Normal);
 	vec3 viewDirection = normalize(Camera.position - FragPos);
 
-	vec3 result = vec3(0.1,0.1,0.1);
+	vec3 result = vec3(0,0,0);
 	for(int i = 0; i < MAX_LIGHTS; i++)
 	{
 		result += pointLightContribution(Lights.pointLights[i], norm, FragPos, viewDirection);

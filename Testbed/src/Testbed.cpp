@@ -10,14 +10,14 @@
 
 #include <fstream>
 
-#include <Renderer\RenderPass.h>
-#include <Renderer\ModelInstance.h>
-#include <Renderer\Camera.h>
+#include <Drawing\RenderPass.h>
+#include <Resources\ModelInstance.h>
+#include <Cameras\Camera.h>
 #include <Scene\SceneLoader.h>
-#include <Renderer\ModelLoader.h>
-#include <Fonts\Font.h>
+#include <ModelLoader.h>
+#include <Text\Font.h>
 
-#include <Scene/RenderableText.h>
+#include <Text/RenderableText.h>
 
 #include <Util\FileUtils.h>
 #include <Util\StringUtils.h>

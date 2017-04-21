@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
-#include <Scene\Scene.h>
-namespace SceneLoader {
-	Scene loadScene(std::string filename);
+#include <Scene\World.h>
+namespace Scene::SceneLoader {
+	World loadWorld(std::string filename);
 }
 

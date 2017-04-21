@@ -5,7 +5,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include <Renderer/RenderResource.h>
+#include <Resources/RenderResource.h>
 
 class OpenGLRenderMesh;
 class OpenGLShader;

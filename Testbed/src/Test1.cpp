@@ -4,7 +4,7 @@
 #include <Util/StringUtils.h>
 
 #include <Scene/SceneLoader.h>
-#include <Renderer/ModelInstance.h>
+#include <Resources/ModelInstance.h>
 
 void Test1::handleKeyboardInput(int key, int scancode, int action, int mods) {
 
@@ -16,6 +16,16 @@ void Test1::handleKeyboardInput(int key, int scancode, int action, int mods) {
 
 		if (key == GLFW_KEY_M) {
 			rotateInstances = !rotateInstances;
+		}
+
+		if (key == GLFW_KEY_V) {
+			vsync = !vsync;
+			if (vsync) {
+				glfwSwapInterval(1);
+			}
+			else {
+				glfwSwapInterval(0);
+			}
 		}
 	}
 }
@@ -42,6 +52,7 @@ void Test1::handleMouseInput(double xPos, double yPos)
 
 void Test1::draw()
 {
+	vsync = false;
 	glfwSwapInterval(0);
 
 	double lastTime = glfwGetTime();
@@ -62,7 +73,7 @@ void Test1::draw()
 		}
 		
 		uint64_t tricount = 0;
-		for (std::shared_ptr<RenderPass> pass : scene.passes())
+		for (std::shared_ptr<Scene::RenderPass> pass : scene.passes())
 		{
 			tricount += pass->draw();
 		}
@@ -75,7 +86,7 @@ void Test1::draw()
 		if (cumulative >= 1)
 		{
 			Util::File::MonitorFiles();
-			fpsCounter.text(Util::String::Format(formatString, cumulative / frames, frames, frames / cumulative, tricount));
+			fpsCounter.text(Util::String::Format(formatString, cumulative / frames, frames, frames / cumulative, tricount, vsync ? "on" : "off"));
 			cumulative = 0;
 			frames = 0;
 		}
@@ -113,20 +124,19 @@ void Test1::doCameraMovement()
 }
 
 Test1::Test1(GLFWwindow* window, int windowWidth, int windowHeight, std::string sceneFileName)
-	: window(window), 
-	scene(SceneLoader::loadScene(sceneFileName)), 
+	: window(window),
+	scene(Scene::SceneLoader::loadWorld(sceneFileName)),
 	cameras({ scene.camera("layer1Camera"), scene.camera("layer1CameraQuaternion") }),
 	instances(scene.modelInstances("layer1Models")),
 	rotateInstances(false),
 	wireframe(false),
-	guiCamera(std::make_shared<Camera>(glm::vec3(0, 0, 5), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec4(0, windowWidth, 0, windowHeight))),
-	gui(std::make_shared<RenderPass>()), 
-	f(std::make_shared<Font>("F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/consola.ttf", 16)),
-	formatString("%4.4fms per frame\r\n%d frames, %5.4f fps, %I64d triangles"), 
-	fpsCounter(Util::String::Format(formatString, 0, 0, 0.f, 0ull), f, glm::vec3(5, windowHeight, 0), glm::vec4(0.4, 0.7, 1, 1))
+	guiCamera(std::make_shared<Scene::Cameras::Camera>(glm::vec3(0, 0, 5), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec4(0, windowWidth, 0, windowHeight))),
+	gui(std::make_shared<Scene::RenderPass>()),
+	f(std::make_shared<Scene::Text::Font>("F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/consola.ttf", 16)),
+	formatString("%4.4fms per frame\r\n%d frames, %5.4f fps, %I64d triangles\nVSYNC: %s"),
+	fpsCounter(Util::String::Format(formatString, 0, 0, 0.f, 0ull, "off"), f, glm::vec3(5, windowHeight, 0), glm::vec4(0.4, 0.7, 1, 1))
 {
 	gui->clearBuffers(false);
-	gui->cull(false);
 	gui->depthTest(false);
 	gui->camera(guiCamera);
 	gui->wireframe(wireframe);

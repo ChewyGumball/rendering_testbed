@@ -211,14 +211,24 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\Scene\Scene.h" />
+    <ClInclude Include="Include\Cameras\Camera.h" />
+    <ClInclude Include="Include\Cameras\QuaternionCamera.h" />
+    <ClInclude Include="Include\Drawing\RenderPass.h" />
+    <ClInclude Include="Include\Lights\PointLight.h" />
+    <ClInclude Include="Include\Scene\World.h" />
     <ClInclude Include="Include\Scene\SceneLoader.h" />
-    <ClInclude Include="Include\Scene\RenderableText.h" />
+    <ClInclude Include="Include\Text\RenderableText.h" />
+    <ClInclude Include="Include\Text\Font.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Scene\RenderableText.cpp" />
-    <ClCompile Include="src\Scene\Scene.cpp" />
+    <ClCompile Include="src\Cameras\Camera.cpp" />
+    <ClCompile Include="src\Cameras\QuaternionCamera.cpp" />
+    <ClCompile Include="src\Drawing\RenderPass.cpp" />
+    <ClCompile Include="src\Lights\PointLight.cpp" />
+    <ClCompile Include="src\Text\RenderableText.cpp" />
+    <ClCompile Include="src\Scene\World.cpp" />
     <ClCompile Include="src\Scene\SceneLoader.cpp" />
+    <ClCompile Include="src\Text\Font.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

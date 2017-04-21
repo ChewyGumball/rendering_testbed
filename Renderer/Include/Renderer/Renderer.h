@@ -3,7 +3,6 @@
 #include <vector>
 #include <unordered_set>
 
-#include <Renderer/PointLight.h>
 #include <Renderer/RenderOptions.h>
 
 class ShaderConstantBuffer;
