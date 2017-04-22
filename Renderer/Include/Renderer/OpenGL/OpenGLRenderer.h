@@ -3,14 +3,14 @@
 #include <unordered_set>
 #include <vector>
 
-#include <Renderer/Renderer.h>
+#include <Renderer/IRenderer.h>
 
 class Camera;
 class ModelInstance;
 class FrameBuffer;
 struct RenderOptions;
 
-class OpenGLRenderer : public Renderer
+class OpenGLRenderer : public IRenderer
 {
 public:
 	static void checkGLError();

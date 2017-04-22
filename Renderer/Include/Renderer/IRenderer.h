@@ -8,11 +8,11 @@
 class ShaderConstantBuffer;
 class ModelInstance;
 
-class Renderer
+class IRenderer
 {
 public:
-	Renderer() {};
-	virtual ~Renderer() {};
+	IRenderer() {};
+	virtual ~IRenderer() {};
 
 	virtual void processRenderingOptions(RenderOptions& options) = 0;
 	virtual void updateConstantBuffers(std::unordered_set<std::shared_ptr<ShaderConstantBuffer>>& constantBuffers) = 0;

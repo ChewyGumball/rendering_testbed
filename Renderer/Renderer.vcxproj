@@ -334,7 +334,7 @@
     <ClInclude Include="Include\Resources\Shader.h" />
     <ClInclude Include="Include\ModelLoader.h" />
     <ClInclude Include="Include\Util\StringUtils.h" />
-    <ClInclude Include="Include\Renderer\Renderer.h" />
+    <ClInclude Include="Include\Renderer\IRenderer.h" />
     <ClInclude Include="Include\Resources\ModelInstance.h" />
     <ClInclude Include="Include\Resources\TextureBuffer.h" />
     <ClInclude Include="Include\Resources\Vertex.h" />

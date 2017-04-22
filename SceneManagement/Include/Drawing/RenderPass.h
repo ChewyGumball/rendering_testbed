@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-#include <Renderer\Renderer.h>
+#include <Renderer\IRenderer.h>
 #include <Renderer\RenderOptions.h>
 
 #include <Lights\PointLight.h>
@@ -16,7 +16,7 @@ namespace Scene {
 	class RenderPass
 	{
 	private:
-		Renderer *renderer;
+		IRenderer *renderer;
 		std::shared_ptr<Cameras::Camera> m_camera;
 		RenderOptions options;
 		bool cullingEnabled;
