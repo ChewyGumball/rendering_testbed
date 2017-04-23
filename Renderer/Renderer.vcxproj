@@ -248,6 +248,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Renderer\DirectX10\DirectX10Renderer.cpp" />
     <ClCompile Include="src\Resources\Material.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\OpenGLShaderConstantBuffer.cpp" />
     <ClCompile Include="src\Resources\ShaderConstantBuffer.cpp" />
@@ -281,6 +282,7 @@
     <ClCompile Include="src\Resources\Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Include\Renderer\DirectX10\DirectX10Renderer.h" />
     <ClInclude Include="Include\Buffer\DataBufferArray.h" />
     <ClInclude Include="Include\Buffer\DataBufferArrayView.h" />
     <ClInclude Include="Include\Buffer\DataBufferView.h" />

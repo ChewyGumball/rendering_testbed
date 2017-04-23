@@ -5,6 +5,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+using namespace Renderer;
+
 namespace {
 	template<typename T>
 	void setState(uint8_t* instanceData, std::string name, T* data, BufferElementType type, std::shared_ptr<const BufferFormat> format)

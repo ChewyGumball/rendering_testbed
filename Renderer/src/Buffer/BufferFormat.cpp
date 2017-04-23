@@ -5,6 +5,8 @@
 #include <glm\glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+using namespace Renderer;
+
 namespace {
 	const std::unordered_map<BufferElementType, BufferElementTypeSize> typeSizes {
 		{ BufferElementType::FLOAT_SCALAR, static_cast<BufferElementTypeSize>(sizeof(float)) },

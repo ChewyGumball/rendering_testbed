@@ -45,7 +45,7 @@ namespace Scene::Text {
 
 		//Instances need to be created and added to render passes
 		if (newSize > oldSize) {
-			std::vector<std::shared_ptr<ModelInstance>> instancesToAdd = m_font->createInstances(newSize - oldSize);
+			std::vector<std::shared_ptr<Renderer::ModelInstance>> instancesToAdd = m_font->createInstances(newSize - oldSize);
 			//the new instances need to be positioned properly
 			for (auto instance : instancesToAdd) {
 				instance->translate(m_position);
@@ -59,7 +59,7 @@ namespace Scene::Text {
 		}
 		//Instances need to be removed from render passes
 		else if (newSize < oldSize) {
-			std::vector<std::shared_ptr<ModelInstance>> instancesToErase(instances.begin() + newSize, instances.end());
+			std::vector<std::shared_ptr<Renderer::ModelInstance>> instancesToErase(instances.begin() + newSize, instances.end());
 			instances.erase(instances.begin() + newSize, instances.end());
 
 			for (auto pass : passesContainingThisText) {

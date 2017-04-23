@@ -3,6 +3,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+using namespace Renderer;
+
 namespace {
 	template<typename T>
 	void setState(uint8_t* instanceData, T* data, BufferElementType requestedType, BufferElementType arrayType, uint64_t index)	{

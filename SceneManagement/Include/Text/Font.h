@@ -5,9 +5,12 @@
 #include <vector>
 #include <glm\vec4.hpp>
 
-class TextureBuffer;
-class ModelInstance;
-class Model;
+namespace Renderer {
+	class TextureBuffer;
+	class ModelInstance;
+	class Model;
+}
+
 struct stbtt_packedchar_DIDNT_NAME_THIS_STRUCT;
 
 namespace Scene::Text {
@@ -17,22 +20,22 @@ namespace Scene::Text {
 		float scale;
 		float lineHeight;
 		std::unique_ptr<stbtt_packedchar_DIDNT_NAME_THIS_STRUCT[]> packedCharData;
-		std::shared_ptr<TextureBuffer> m_bitmap;
-		std::shared_ptr<Model> m_model;
+		std::shared_ptr<Renderer::TextureBuffer> m_bitmap;
+		std::shared_ptr<Renderer::Model> m_model;
 		uint16_t m_height;
 		std::string fontFile;
 	public:
 		Font(std::string fontFile, uint16_t height);
 		~Font();
 
-		const std::shared_ptr<TextureBuffer> bitmap();
+		const std::shared_ptr<Renderer::TextureBuffer> bitmap();
 		uint16_t height();
 
-		std::vector<std::shared_ptr<ModelInstance>> createString(std::string string, glm::vec4 colour = glm::vec4(1, 1, 1, 1)) const;
+		std::vector<std::shared_ptr<Renderer::ModelInstance>> createString(std::string string, glm::vec4 colour = glm::vec4(1, 1, 1, 1)) const;
 
-		void modifyColour(std::vector<std::shared_ptr<ModelInstance>>& text, int startInclusive, int endExclusive, glm::vec4 newColour) const;
-		void modifyString(const std::vector<std::shared_ptr<ModelInstance>>& currentText, std::string newString, glm::vec4 colour = glm::vec4(1, 1, 1, 1)) const;
-		std::vector<std::shared_ptr<ModelInstance>> createInstances(size_t instanceCount) const;
+		void modifyColour(std::vector<std::shared_ptr<Renderer::ModelInstance>>& text, int startInclusive, int endExclusive, glm::vec4 newColour) const;
+		void modifyString(const std::vector<std::shared_ptr<Renderer::ModelInstance>>& currentText, std::string newString, glm::vec4 colour = glm::vec4(1, 1, 1, 1)) const;
+		std::vector<std::shared_ptr<Renderer::ModelInstance>> createInstances(size_t instanceCount) const;
 
 		uint32_t drawableCharacters(std::string& string) const;
 	};

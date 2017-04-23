@@ -5,6 +5,9 @@
 
 #include <iostream>
 
+using namespace Renderer;
+using namespace Renderer::OpenGL;
+
 OpenGLShaderConstantBuffer::OpenGLShaderConstantBuffer(): m_handle(0), m_deviceBufferSize(0), constantBuffer(nullptr)
 {
 }

@@ -1,5 +1,8 @@
 #include "Renderer/OpenGL/OpenGLRenderMesh.h"
 
+using namespace Renderer;
+using namespace Renderer::OpenGL;
+
 namespace {
 	GLuint tempVAO = -1;
 }
@@ -31,7 +34,7 @@ uint32_t OpenGLRenderMesh::indexCount() const
 	return m_indexCount;
 }
 
-VertexFormat OpenGLRenderMesh::vertexFormat() const
+Renderer::VertexFormat OpenGLRenderMesh::vertexFormat() const
 {
 	return m_format;
 }

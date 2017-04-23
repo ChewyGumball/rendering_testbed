@@ -25,6 +25,8 @@
 
 #include "Test1.h"
 
+using namespace Renderer;
+
 int width = 800;
 int height = 800;
 

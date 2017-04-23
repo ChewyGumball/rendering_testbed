@@ -25,6 +25,9 @@
 #include "Renderer/OpenGL/OpenGLTextureBuffer.h"
 #include "Renderer/OpenGL/OpenGLShaderConstantBuffer.h"
 
+using namespace Renderer;
+using namespace Renderer::OpenGL;
+
 namespace {
 	std::random_device r;
 	std::mt19937 mt(r());

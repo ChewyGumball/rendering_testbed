@@ -8,12 +8,14 @@
 
 //typedef uint16_t DataBufferOffset;
 
-class DataBuffer : public DataBufferView {
+namespace Renderer {
+	class DataBuffer : public DataBufferView {
 
-private:
-	std::vector<uint8_t> buffer;
+	private:
+		std::vector<uint8_t> buffer;
 
-public:
-	DataBuffer(std::shared_ptr<const BufferFormat> format);
-	~DataBuffer();
-};
+	public:
+		DataBuffer(std::shared_ptr<const BufferFormat> format);
+		~DataBuffer();
+	};
+}

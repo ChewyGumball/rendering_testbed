@@ -6,6 +6,9 @@
 #include <unordered_map>
 #include <glm/gtc/type_ptr.hpp>
 
+using namespace Renderer;
+using namespace Renderer::OpenGL;
+
 namespace {
 	std::unordered_map<GLenum, std::string>                     enumNames = { { GL_VERTEX_SHADER, "VERTEX" },{ GL_FRAGMENT_SHADER, "FRAGMENT" } };
 	std::unordered_map<GLuint, std::unordered_set<std::string>> uniformErrors;

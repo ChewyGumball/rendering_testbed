@@ -9,20 +9,23 @@
 namespace Scene::Cameras {
 	class Camera;
 }
-class ModelInstance;
-class FrameBuffer;
+
+namespace Renderer {
+	class ModelInstance;
+	class FrameBuffer;
+}
 
 namespace Scene {
 	class RenderPass
 	{
 	private:
-		IRenderer *renderer;
+		Renderer::IRenderer *renderer;
 		std::shared_ptr<Cameras::Camera> m_camera;
-		RenderOptions options;
+		Renderer::RenderOptions options;
 		bool cullingEnabled;
 
-		std::unordered_map<std::string, std::shared_ptr<ShaderConstantBuffer>> passConstants;
-		std::vector<std::shared_ptr<const ModelInstance>> m_modelInstances;
+		std::unordered_map<std::string, std::shared_ptr<Renderer::ShaderConstantBuffer>> passConstants;
+		std::vector<std::shared_ptr<const Renderer::ModelInstance>> m_modelInstances;
 		std::vector<PointLight> lights;
 
 	public:
@@ -38,14 +41,14 @@ namespace Scene {
 		void cull(bool enabled);
 		void wireframe(bool enabled);
 		void camera(std::shared_ptr<Cameras::Camera> c);
-		void frameBuffer(std::shared_ptr<FrameBuffer> buffer);
+		void frameBuffer(std::shared_ptr<Renderer::FrameBuffer> buffer);
 
-		void addModelInstances(std::vector<std::shared_ptr<ModelInstance>> modelInstances);
-		void addModelInstance(std::shared_ptr<ModelInstance> modelInstance);
+		void addModelInstances(std::vector<std::shared_ptr<Renderer::ModelInstance>> modelInstances);
+		void addModelInstance(std::shared_ptr<Renderer::ModelInstance> modelInstance);
 		void addPointLight(PointLight light);
 
-		void removeModelInstances(std::vector<std::shared_ptr<ModelInstance>> modelInstances);
-		void removeModelInstance(std::shared_ptr<ModelInstance> modelInstance);
+		void removeModelInstances(std::vector<std::shared_ptr<Renderer::ModelInstance>> modelInstances);
+		void removeModelInstance(std::shared_ptr<Renderer::ModelInstance> modelInstance);
 
 		void viewport(glm::vec2 origin, glm::vec2 size);
 	};

@@ -2,6 +2,9 @@
 
 #include <unordered_map>
 
+using namespace Renderer;
+using namespace Renderer::OpenGL;
+
 namespace {
 	std::unordered_map<TextureFormat, GLenum> formats{
 		{ TextureFormat::RGB8, GL_RGB },

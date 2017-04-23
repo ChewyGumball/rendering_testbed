@@ -16,7 +16,7 @@ namespace Scene::Text {
 		std::string m_text;
 		glm::vec4 m_colour;
 		std::shared_ptr<Scene::Text::Font> m_font;
-		std::vector<std::shared_ptr<ModelInstance>> instances;
+		std::vector<std::shared_ptr<Renderer::ModelInstance>> instances;
 		std::vector<std::shared_ptr<RenderPass>> passesContainingThisText;
 
 	public:

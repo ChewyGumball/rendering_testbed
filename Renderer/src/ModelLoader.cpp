@@ -11,6 +11,8 @@
 #include "Util/FileUtils.h"
 #include "Util/StringUtils.h"
 
+using namespace Renderer;
+
 namespace {
 // OBJ Indexes that are negative are offsets from the end of the list
 template <typename T> const T& objIndexFind(std::vector<T>& objs, int index)

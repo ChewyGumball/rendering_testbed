@@ -16,6 +16,8 @@
 #include <Resources/Mesh.h>
 #include <Resources/Material.h>
 
+using namespace Renderer;
+
 namespace {
 	//font infos require the font data to stick around so it has to be stored somewhere
 	std::unordered_map<std::string, std::vector<uint8_t>> fontData;

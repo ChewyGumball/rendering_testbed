@@ -5,7 +5,7 @@
 #include <glm/common.hpp>
 
 namespace {
-	Culling::BoundingSphere calculateBoundingSphere(VertexFormat& format, std::vector<float>& verts)
+	Renderer::Culling::BoundingSphere calculateBoundingSphere(Renderer::VertexFormat& format, std::vector<float>& verts)
 	{
 		float infinity = std::numeric_limits<float>::infinity();
 		glm::vec3 max(std::numeric_limits<float>::min(), std::numeric_limits<float>::min(), std::numeric_limits<float>::min());
@@ -18,39 +18,41 @@ namespace {
 			min = glm::min(min, vertex);
 		}
 
-		return Culling::BoundingSphere(glm::vec3((max.x + min.x) / 2, (max.y + min.y) / 2, (max.z + min.z) / 2), glm::distance(min, max) / 2);
+		return Renderer::Culling::BoundingSphere(glm::vec3((max.x + min.x) / 2, (max.y + min.y) / 2, (max.z + min.z) / 2), glm::distance(min, max) / 2);
 	}
 }
 
-Mesh::Mesh(VertexFormat format, std::vector<float> vertices, std::vector<int> indices) : format(format), m_vertices(vertices), indices(indices), boundingSphere(calculateBoundingSphere(format, vertices))
-{
-}
+namespace Renderer {
+	Mesh::Mesh(VertexFormat format, std::vector<float> vertices, std::vector<int> indices) : format(format), m_vertices(vertices), indices(indices), boundingSphere(calculateBoundingSphere(format, vertices))
+	{
+	}
 
-Mesh::~Mesh()
-{
-}
+	Mesh::~Mesh()
+	{
+	}
 
-const std::vector<float>& Mesh::vertexData() const
-{
-	return m_vertices;
-}
+	const std::vector<float>& Mesh::vertexData() const
+	{
+		return m_vertices;
+	}
 
-const std::vector<int>& Mesh::indexData() const
-{
-	return indices;
-}
+	const std::vector<int>& Mesh::indexData() const
+	{
+		return indices;
+	}
 
-const VertexFormat Mesh::vertexFormat() const
-{
-	return format;
-}
+	const VertexFormat Mesh::vertexFormat() const
+	{
+		return format;
+	}
 
-Culling::BoundingSphere Mesh::bounds() const
-{
-	return boundingSphere;
-}
+	Culling::BoundingSphere Mesh::bounds() const
+	{
+		return boundingSphere;
+	}
 
-uint64_t Mesh::triangleCount() const
-{
-	return indices.size() / 3;
+	uint64_t Mesh::triangleCount() const
+	{
+		return indices.size() / 3;
+	}
 }

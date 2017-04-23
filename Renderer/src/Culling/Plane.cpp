@@ -1,7 +1,7 @@
 #include "Culling/Plane.h"
 #include <iostream>
 
-namespace Culling {
+namespace Renderer::Culling {
 
 	Plane::Plane(glm::vec4 equation) : coefficients(equation / glm::length(glm::vec3(equation)))
 	{ }

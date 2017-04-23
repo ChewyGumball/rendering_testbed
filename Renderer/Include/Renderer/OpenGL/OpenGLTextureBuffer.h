@@ -3,15 +3,16 @@
 #include <memory>
 #include <Resources\TextureBuffer.h>
 
-class OpenGLTextureBuffer
-{
-private:
-	GLuint m_handle;
-public:
-	OpenGLTextureBuffer();
-	OpenGLTextureBuffer(std::shared_ptr<TextureBuffer> texture);
-	~OpenGLTextureBuffer();
+namespace Renderer::OpenGL {
+	class OpenGLTextureBuffer
+	{
+	private:
+		GLuint m_handle;
+	public:
+		OpenGLTextureBuffer();
+		OpenGLTextureBuffer(std::shared_ptr<TextureBuffer> texture);
+		~OpenGLTextureBuffer();
 
-	GLuint handle();
-};
-
+		GLuint handle();
+	};
+}

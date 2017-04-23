@@ -5,6 +5,10 @@
 #include <Resources/ShaderConstantBuffer.h>
 #include <Buffer/BufferFormat.h>
 #include <Resources/Material.h>
+
+using namespace Renderer;
+using namespace Renderer::OpenGL;
+
 namespace {
 
 const GLuint VERTEX_DATA_BINDING_POINT_INDEX    = 0;

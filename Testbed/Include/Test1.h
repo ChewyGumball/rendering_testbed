@@ -30,7 +30,7 @@ private:
 	std::shared_ptr<Scene::RenderPass> gui;
 
 	std::vector<std::shared_ptr<Scene::Cameras::Camera>> cameras;
-	std::vector<std::shared_ptr<ModelInstance>> instances;
+	std::vector<std::shared_ptr<Renderer::ModelInstance>> instances;
 	
 	void doCameraMovement();
 

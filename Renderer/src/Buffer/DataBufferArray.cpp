@@ -2,6 +2,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+using namespace Renderer;
+
 namespace {
 
 	std::vector<uint8_t> initialData(std::shared_ptr<const BufferFormat> format)

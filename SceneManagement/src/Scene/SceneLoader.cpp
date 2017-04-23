@@ -17,6 +17,8 @@
 #include <Util/FileUtils.h>
 #include <Util/StringUtils.h>
 
+using namespace Renderer;
+
 namespace {
 std::unordered_map<std::string, TextureFormat> textureFormats{ { "rgb", TextureFormat::RGB8 }, { "depth", TextureFormat::DEPTH } };
 std::unordered_map<std::string, VertexFormat>  vertexFormats{ { "Position_Normal", VertexFormats::Position_Normal },

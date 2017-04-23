@@ -5,7 +5,7 @@
 
 #include "Culling/Plane.h"
 
-namespace Culling {
+namespace Renderer::Culling {
 	class Frustum
 	{
 		std::array<Plane, 6> planes;

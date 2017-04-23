@@ -2,7 +2,7 @@
 #include <vector>
 #include <glm\glm.hpp>
 
-namespace Culling {
+namespace Renderer::Culling {
 	class Plane
 	{
 		glm::vec4 coefficients;

@@ -2,7 +2,7 @@
 
 #include <glm/gtc/matrix_access.hpp>
 
-namespace Culling {
+namespace Renderer::Culling {
 	Frustum::Frustum(glm::mat4 transform): planes({
 		Plane(glm::row(transform, 3) - glm::row(transform, 0)), //left
 		Plane(glm::row(transform, 3) + glm::row(transform, 0)), //right

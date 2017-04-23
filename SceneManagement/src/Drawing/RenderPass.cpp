@@ -13,6 +13,8 @@
 #include "Culling/BoundingSphere.h"
 #include <Buffer/DataBufferArrayView.h>
 
+using namespace Renderer;
+
 namespace {
 	std::unordered_map<std::string, std::shared_ptr<BufferFormat>> systemBufferFormats;
 
@@ -101,7 +103,7 @@ namespace {
 }
 
 namespace Scene {
-	RenderPass::RenderPass() : renderer(new OpenGLRenderer()), m_camera(std::make_shared<Scene::Cameras::Camera>()), options(RenderOptions()), cullingEnabled(false)
+	RenderPass::RenderPass() : renderer(new OpenGL::OpenGLRenderer()), m_camera(std::make_shared<Scene::Cameras::Camera>()), options(RenderOptions()), cullingEnabled(false)
 	{
 		initialize();
 		passConstants;
