@@ -26,7 +26,7 @@ namespace {
 	}
 
 	template<typename T>
-	T& getReferenceToData(uint8_t* data, BufferElementType expectedType, const std::pair<BufferOffset, BufferElementType>& details) {
+	T& getReferenceToData(uint8_t* data, BufferElementType expectedType, const std::pair<uint64_t, BufferElementType>& details) {
 		assert(details.second == expectedType);
 
 		//As far as I can tell, this is safe for glm types because glm::value_ptr returns a pointer to the first member which is required to be the

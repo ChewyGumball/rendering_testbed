@@ -38,38 +38,41 @@ namespace Renderer {
 		BUFFER,
 		ARRAY
 	};
-
-	//TODO: I changed my mind, I don't like these typedefs
-	typedef uint64_t BufferElementTypeSize;
-	typedef uint64_t BufferOffset;
-
+	
 	class BufferFormat
 	{
 	private:
+
+		static const std::unordered_map<BufferPackingType, std::unordered_map<BufferElementType, uint64_t>> typeSizes;
+		static const std::unordered_map<BufferPackingType, std::unordered_map<BufferElementType, uint64_t>> typeAlignments;
+
 		uint64_t m_size;
+		BufferPackingType m_packingType;
+
 		std::unordered_map<std::string, std::shared_ptr<const BufferFormat>> m_nestedBufferFormats;
-		std::unordered_map<std::string, std::pair<BufferOffset, BufferElementType>> m_offsets;
+		std::unordered_map<std::string, std::pair<uint64_t, BufferElementType>> m_offsets;
+
 		BufferElementType m_arrayType;
 		std::shared_ptr<const BufferFormat> m_arrayElementFormat;
-		BufferPackingType m_packingType;
 
 	public:
 		BufferFormat();
-		BufferFormat(uint64_t arraySize, BufferElementType arrayType, std::shared_ptr<const BufferFormat> arrayElementFormat = nullptr);
+		BufferFormat(uint64_t arraySize, BufferElementType arrayElementType, BufferPackingType packingType);
+		BufferFormat(uint64_t arraySize, std::shared_ptr<const BufferFormat> arrayElementFormat);
 		BufferFormat(std::vector<std::pair<std::string, BufferElementType>>& format, std::unordered_map<std::string, std::shared_ptr<const BufferFormat>> nestedBufferFormats = std::unordered_map<std::string, std::shared_ptr<const BufferFormat>>(), BufferPackingType packingType = BufferPackingType::PACKED);
 
-		const std::pair<BufferOffset, BufferElementType>& at(std::string name) const;
+		const std::pair<uint64_t, BufferElementType>& at(std::string name) const;
 
-		std::vector<std::pair<std::string, std::pair<BufferOffset, BufferElementType>>> orderedOffsets() const;
+		std::vector<std::pair<std::string, std::pair<uint64_t, BufferElementType>>> orderedOffsets() const;
 
-		const std::unordered_map<std::string, std::pair<BufferOffset, BufferElementType>>& offsets() const;
+		const std::unordered_map<std::string, std::pair<uint64_t, BufferElementType>>& offsets() const;
 
 		const std::unordered_map<std::string, std::shared_ptr<const BufferFormat>>& nestedFormats() const;
 		std::shared_ptr<const BufferFormat> nestedFormat(std::string name) const;
 
 		BufferPackingType packingType() const;
 		uint64_t size() const;
-		static BufferElementTypeSize sizeOfType(BufferElementType type, BufferPackingType packingType = BufferPackingType::PACKED);
+		static uint64_t sizeOfType(BufferElementType type, BufferPackingType packingType = BufferPackingType::PACKED);
 
 		BufferElementType arrayType() const;
 		uint64_t arraySize() const;

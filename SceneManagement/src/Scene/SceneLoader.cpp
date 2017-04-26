@@ -60,31 +60,30 @@ std::shared_ptr<const BufferFormat> readFormat(rapidjson::Value& json, BufferPac
 
 		if (member.value.IsObject()) {
 			BufferElementType type = elementTypes[member.value["type"].GetString()];
-			if (type == BufferElementType::BUFFER) {
-				BufferPackingType nestedPackingType = packingType;
-				if (member.value.HasMember("packing")) {
-					std::string packingTypeString(member.value["packing"].GetString());
-					if (packingTypeString == "std140") {
-						nestedPackingType = BufferPackingType::OPENGL_STD140;
-					}
-					else if (packingTypeString == "packed") {
-						nestedPackingType = BufferPackingType::PACKED;
-					}
-					else {
-						assert(false); //unknown packing type
-					}
+			BufferPackingType nestedPackingType = packingType;
+			if (member.value.HasMember("packing")) {
+				std::string packingTypeString(member.value["packing"].GetString());
+				if (packingTypeString == "std140") {
+					nestedPackingType = BufferPackingType::OPENGL_STD140;
 				}
-
-				nestedBufferFormats.emplace(name, readFormat(member.value["format"], nestedPackingType));
-			}
-			if (type == BufferElementType::ARRAY) {
-				auto& arrayType = member.value["arrayType"];
-				if (arrayType.IsObject()) {
-					std::string s = member.value["arrayType"]["type"].GetString();
-					nestedBufferFormats.emplace(name, std::make_shared<BufferFormat>(member.value["arrayCount"].GetInt64(), elementTypes[member.value["arrayType"]["type"].GetString()], readFormat(member.value["arrayType"]["format"])));
+				else if (packingTypeString == "packed") {
+					nestedPackingType = BufferPackingType::PACKED;
 				}
 				else {
-					nestedBufferFormats.emplace(name, std::make_shared<BufferFormat>(member.value["arrayCount"].GetInt64(), elementTypes[member.value["arrayType"].GetString()]));
+					assert(false); //unknown packing type
+				}
+			}
+
+			if (type == BufferElementType::BUFFER) {
+				nestedBufferFormats.emplace(name, readFormat(member.value["format"], nestedPackingType));
+			}
+			else if (type == BufferElementType::ARRAY) {
+				auto& arrayType = member.value["arrayType"];
+				if (arrayType.IsObject()) {
+					nestedBufferFormats.emplace(name, std::make_shared<BufferFormat>(member.value["arrayCount"].GetInt64(), readFormat(member.value["arrayType"]["format"])));
+				}
+				else {
+					nestedBufferFormats.emplace(name, std::make_shared<BufferFormat>(member.value["arrayCount"].GetInt64(), elementTypes[member.value["arrayType"].GetString()], nestedPackingType));
 				}
 			}
 			format.push_back(std::make_pair(name, type));

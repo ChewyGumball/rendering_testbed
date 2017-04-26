@@ -84,7 +84,6 @@ namespace {
 				std::unordered_map<std::string, std::shared_ptr<const BufferFormat>> {
 					{ "pointLights", std::make_shared<const BufferFormat>(
 						2,
-						BufferElementType::BUFFER,
 						std::make_shared<BufferFormat>(
 							std::vector<std::pair<std::string, BufferElementType>> {
 								std::make_pair("position", BufferElementType::FLOAT_VEC3),

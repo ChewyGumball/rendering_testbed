@@ -23,54 +23,39 @@ namespace {
 	std::unordered_map<std::string, std::vector<uint8_t>> fontData;
 	std::unordered_map<std::string, stbtt_fontinfo> fontInfos;
 
-	std::shared_ptr<Mesh> quad;
+	std::shared_ptr<Mesh> quad = std::make_shared<Mesh>(VertexFormats::Position, std::vector<float> {
+		0.0f, 0.0f, 0.0f,
+			1.0f, 0.0f, 0.0f,
+			1.0f, 1.0f, 0.0f,
+			0.0f, 1.0f, 0.0f
+	}, std::vector<int> {
+		0, 1, 2,
+			0, 2, 3
+	});
 
-	std::shared_ptr<Shader> fontShader;
-	std::shared_ptr<Material> fontMaterial;
+	std::shared_ptr<Material> fontMaterial = std::make_shared<Material>(std::make_shared<Shader>(
+		std::vector<std::string> { "F:/Users/Ben/Documents/Projects/RenderingTestbed/Renderer/src/Fonts/font.vert" },
+		std::vector<std::string> { "F:/Users/Ben/Documents/Projects/RenderingTestbed/Renderer/src/Fonts/font.frag" },
+		std::make_shared<BufferFormat>(std::vector<std::pair<std::string, BufferElementType>> {
+			{ "transform", BufferElementType::MAT4},
+			{ "meshBounds", BufferElementType::FLOAT_VEC4 },
+			{ "textureBounds", BufferElementType::FLOAT_VEC4 },
+			{ "letterColour", BufferElementType::FLOAT_VEC4 }
+		}),
+		std::unordered_map<std::string, std::shared_ptr<const BufferFormat>>(),
+				std::vector<std::string> {"camera"}
+	));
 
 	int atlasWidth = 512;
 	int atlasHeight = 512;
 
 	char minCharacter = ' ';
 	char maxCharacter = '~';
-
-	bool initialized = false;
-	void initializeFonts() {
-		if (!initialized) {
-			quad = std::make_shared<Mesh>(VertexFormats::Position, std::vector<float> {
-				0.0f, 0.0f, 0.0f,
-				1.0f, 0.0f, 0.0f,
-				1.0f, 1.0f, 0.0f,
-				0.0f, 1.0f, 0.0f
-			}, std::vector<int> {
-				0, 1, 2,
-				0, 2, 3
-			});
-
-			fontShader = std::make_shared<Shader>(
-				std::vector<std::string> { "F:/Users/Ben/Documents/Projects/RenderingTestbed/Renderer/src/Fonts/font.vert" },
-				std::vector<std::string> { "F:/Users/Ben/Documents/Projects/RenderingTestbed/Renderer/src/Fonts/font.frag" },
-				std::make_shared<BufferFormat>(std::vector<std::pair<std::string, BufferElementType>> {
-					{ "transform", BufferElementType::MAT4},
-					{ "meshBounds", BufferElementType::FLOAT_VEC4 },
-					{ "textureBounds", BufferElementType::FLOAT_VEC4 },
-					{ "letterColour", BufferElementType::FLOAT_VEC4 }
-				}),
-				std::unordered_map<std::string, std::shared_ptr<const BufferFormat>>(),
-				std::vector<std::string> {"camera"}
-			);
-
-			fontMaterial = std::make_shared<Material>(fontShader);
-
-			initialized = true;
-		}
-	}
 }
 
 namespace Scene::Text {
 	Font::Font(std::string fontFile, uint16_t height) : m_height(height), fontFile(fontFile)
 	{
-		initializeFonts();
 		packedCharData = std::make_unique<stbtt_packedchar_DIDNT_NAME_THIS_STRUCT[]>(94);
 		if (fontData.count(fontFile) == 0) {
 			fontData[fontFile].swap(Util::File::ReadBinary(fontFile));
