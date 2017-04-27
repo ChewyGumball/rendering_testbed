@@ -149,12 +149,6 @@ namespace {
 	{
 		if (shaders.count(shader->id()) == 0) {
 			shaders.emplace(shader->id(), std::make_shared<OpenGLShader>(shader));
-
-			for (auto& type : shader->filenames()) {
-				for (auto& file : type.second) {
-					Util::File::WatchForChanges(file, [=]() { reloadShader(shader); });
-				}
-			}
 		}
 	}
 

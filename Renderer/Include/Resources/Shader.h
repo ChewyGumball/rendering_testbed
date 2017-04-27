@@ -19,7 +19,7 @@ namespace Renderer {
 	class Shader : public RenderResource
 	{
 	private:
-		std::unordered_map<ShaderSourceType, std::vector<std::string>> m_filenames;
+		std::unordered_map<ShaderSourceType, std::vector<std::string>> m_sources;
 		VertexFormat m_expectedVertexFormat;
 		std::shared_ptr<const BufferFormat> m_instanceStateFormat;
 		std::unordered_map<std::string, std::shared_ptr<const BufferFormat>> m_materialConstantBufferFormats;
@@ -27,10 +27,10 @@ namespace Renderer {
 		bool m_isfileShader;
 
 	public:
-		Shader(std::vector<std::string> vertexFilenames, std::vector<std::string> fragmentFilenames, std::shared_ptr<const BufferFormat> instanceStateFormat, VertexFormat expectedVertexFormat = VertexFormats::Unknown);
-		Shader(std::vector<std::string> vertexFilenames, std::vector<std::string> fragmentFilenames, std::shared_ptr<const BufferFormat> instanceStateFormat, std::unordered_map<std::string, std::shared_ptr<const BufferFormat>> materialConstantBufferFormats, std::vector<std::string> systemConstantBufferNames, VertexFormat expectedVertexFormat = VertexFormats::Unknown);
+		Shader(std::vector<std::string> vertexSources, std::vector<std::string> fragmentSources, std::shared_ptr<const BufferFormat> instanceStateFormat, VertexFormat expectedVertexFormat = VertexFormats::Unknown);
+		Shader(std::vector<std::string> vertexSources, std::vector<std::string> fragmentSources, std::shared_ptr<const BufferFormat> instanceStateFormat, std::unordered_map<std::string, std::shared_ptr<const BufferFormat>> materialConstantBufferFormats, std::vector<std::string> systemConstantBufferNames, VertexFormat expectedVertexFormat = VertexFormats::Unknown);
 
-		const std::unordered_map<ShaderSourceType, std::vector<std::string>>& filenames() const;
+		const std::unordered_map<ShaderSourceType, std::vector<std::string>>& sources() const;
 		const VertexFormat& expectedVertexFormat() const;
 		std::shared_ptr<const BufferFormat> instanceStateFormat() const;
 		const std::unordered_map<std::string, std::shared_ptr<const BufferFormat>>& materialConstantBufferFormats() const;

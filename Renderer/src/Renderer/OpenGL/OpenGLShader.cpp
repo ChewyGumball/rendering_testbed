@@ -112,26 +112,10 @@ namespace {
 		return createProgram(std::vector<std::string>{ vertexSource }, std::vector<std::string>{ fragmentSource }); 
 	}
 
-	GLuint createProgramFromFiles(const std::unordered_map<ShaderSourceType, std::vector<std::string>>& filenames)
+	GLuint createProgramFromSources(const std::unordered_map<ShaderSourceType, std::vector<std::string>>& sources)
 	{
-		std::vector<std::string> vertexSources;
-		std::vector<std::string> fragmentSources;
 
-		for (auto& source : filenames)
-		{
-			if (source.first == ShaderSourceType::VERTEX) {
-				for (const std::string& file : source.second) {
-					vertexSources.push_back(Util::File::ReadWholeFile(file));
-				}
-			}
-			if (source.first == ShaderSourceType::FRAGMENT) {
-				for (const std::string& file : source.second) {
-					fragmentSources.push_back(Util::File::ReadWholeFile(file));
-				}
-			}
-		}
-
-		return createProgram(vertexSources, fragmentSources);
+		return createProgram(sources.at(ShaderSourceType::VERTEX), sources.at(ShaderSourceType::FRAGMENT));
 	}
 }
 
@@ -139,7 +123,7 @@ OpenGLShader::OpenGLShader() : programHandle(0), m_shader(nullptr)
 {
 }
 
-OpenGLShader::OpenGLShader(std::shared_ptr<const Shader> shader) : programHandle(createProgramFromFiles(shader->filenames())), m_shader(shader)
+OpenGLShader::OpenGLShader(std::shared_ptr<const Shader> shader) : programHandle(createProgramFromSources(shader->sources())), m_shader(shader)
 { }
 
 OpenGLShader::~OpenGLShader()

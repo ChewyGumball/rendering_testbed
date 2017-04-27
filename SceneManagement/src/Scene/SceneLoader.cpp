@@ -311,14 +311,14 @@ std::unordered_map<std::string, std::shared_ptr<Shader>> loadShaders(
 {
     std::unordered_map<std::string, std::shared_ptr<Shader>> shaders;
     for (auto& shader : json["shaders"].GetObject()) {
-        std::vector<std::string> vertexFiles;
+        std::vector<std::string> vertexSources;
         for (auto& filename : shader.value["vertexFiles"].GetArray()) {
-            vertexFiles.push_back(filename.GetString());
+            vertexSources.push_back(Util::File::ReadWholeFile(filename.GetString()));
         }
 
-        std::vector<std::string> fragmentFiles;
+        std::vector<std::string> fragmentSources;
         for (auto& filename : shader.value["fragmentFiles"].GetArray()) {
-            fragmentFiles.push_back(filename.GetString());
+            fragmentSources.push_back(Util::File::ReadWholeFile(filename.GetString()));
         }
 
 		std::shared_ptr<const BufferFormat> instanceDataFormat = std::make_shared<BufferFormat>();
@@ -338,7 +338,7 @@ std::unordered_map<std::string, std::shared_ptr<Shader>> loadShaders(
 			}
 		}
 
-		shaders[shader.name.GetString()] = std::make_shared<Shader>(vertexFiles, fragmentFiles, instanceDataFormat, materialConstantBufferFormats, systemConstantBufferNames);
+		shaders[shader.name.GetString()] = std::make_shared<Shader>(vertexSources, fragmentSources, instanceDataFormat, materialConstantBufferFormats, systemConstantBufferNames);
     }
     return shaders;
 }
