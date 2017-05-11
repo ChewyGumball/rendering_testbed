@@ -1,4 +1,4 @@
-#include "ModelLoader.h"
+#include "Drawing/ModelLoader.h"
 
 #include <fstream>
 #include <glm/glm.hpp>
@@ -6,7 +6,7 @@
 #include <iostream>
 #include <vector>
 
-#include <fbxsdk.h>
+//#include <fbxsdk.h>
 
 #include "Util/FileUtils.h"
 #include "Util/StringUtils.h"
@@ -23,6 +23,8 @@ template <typename T> const T& objIndexFind(std::vector<T>& objs, int index)
         return objs[index];
     }
 }
+
+/*
 
 FbxManager*    lSdkManager = FbxManager::Create();
 FbxIOSettings* ios         = FbxIOSettings::Create(lSdkManager, IOSROOT);
@@ -81,6 +83,7 @@ void loadFBXMeshFromNode(FbxNode* node, std::vector<int>& indices, std::vector<V
         loadFBXMeshFromNode(node->GetChild(i), indices, vertices);
     }
 }
+*/
 }
 
 namespace ModelLoader {
@@ -176,6 +179,7 @@ std::shared_ptr<Mesh> loadBinFile(std::string filename)
     return std::make_shared<Mesh>(format, vertices, indices);
 }
 
+/*
 std::shared_ptr<Mesh> loadFBXFile(std::string filename, VertexFormat fileFormat, VertexFormat loadedFormat)
 {
     lSdkManager->SetIOSettings(ios);
@@ -206,4 +210,5 @@ std::shared_ptr<Mesh> loadFBXFile(std::string filename, VertexFormat fileFormat,
 
     return std::make_shared<Mesh>(format, Vertex::flatten(format, vertices), indices);
 }
+*/
 }

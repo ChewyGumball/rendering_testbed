@@ -39,9 +39,6 @@
     <ClCompile Include="src\Renderer\OpenGL\OpenGLRenderMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL\OpenGLShader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\lib\SimpleFileWatcher\FileWatcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -105,9 +102,6 @@
     <ClCompile Include="src\Resources\FrameBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ModelLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Resources\Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -118,6 +112,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\DirectX10\DirectX10Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resources\IResourceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resources\OpenGL\OpenGLMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resources\OpenGL\OpenGLResourceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resources\OpenGL\OpenGLShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL\OpenGLShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -135,9 +144,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\Renderer\OpenGL\OpenGLRenderMesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\Renderer\OpenGL\OpenGLShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcher.h">
@@ -326,13 +332,40 @@
     <ClInclude Include="Include\Resources\Material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\ModelLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Include\Renderer\IRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\Renderer\DirectX10\DirectX10Renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Resources\IResourceManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Resources\IMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Resources\IModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Resources\IShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Resources\ITextureBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Resources\IFrameBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Resources\OpenGL\OpenGLMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Resources\OpenGL\OpenGLResourceManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Resources\OpenGL\OpenGLShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Renderer\OpenGL\OpenGLShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

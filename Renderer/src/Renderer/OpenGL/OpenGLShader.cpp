@@ -1,9 +1,14 @@
 #include "Renderer/OpenGL/OpenGLShader.h"
 
 #include <unordered_set>
-#include <iostream>
-#include <Util/FileUtils.h>
 #include <unordered_map>
+#include <iostream>
+
+#include <Resources/Shader.h>
+
+#include <GL/glew.h>
+
+#include <Util/FileUtils.h>
 #include <glm/gtc/type_ptr.hpp>
 
 using namespace Renderer;
@@ -119,11 +124,11 @@ namespace {
 	}
 }
 
-OpenGLShader::OpenGLShader() : programHandle(0), m_shader(nullptr)
+OpenGLShader::OpenGLShader() : programHandle(0), m_instanceStateFormat(nullptr)
 {
 }
 
-OpenGLShader::OpenGLShader(std::shared_ptr<const Shader> shader) : programHandle(createProgramFromSources(shader->sources())), m_shader(shader)
+OpenGLShader::OpenGLShader(std::shared_ptr<const Shader> shader) : programHandle(createProgramFromSources(shader->sources())), m_instanceStateFormat(shader->instanceStateFormat())
 { }
 
 OpenGLShader::~OpenGLShader()
@@ -131,9 +136,9 @@ OpenGLShader::~OpenGLShader()
 	glDeleteProgram(programHandle);
 }
 
-const std::shared_ptr<const Shader> OpenGLShader::shader() const
+std::shared_ptr<const BufferFormat> Renderer::OpenGL::OpenGLShader::instanceStateFormat() const
 {
-	return m_shader;
+	return m_instanceStateFormat;
 }
 
 void OpenGLShader::bind()
@@ -141,7 +146,7 @@ void OpenGLShader::bind()
 	glUseProgram(programHandle);
 }
 
-void OpenGLShader::setUniform1i(const std::string uniformName, const GLint& data) const
+void OpenGLShader::setUniform1i(const std::string uniformName, const int32_t& data) const
 {
 	GLint location = uniformLocation(programHandle, uniformName);
 	if (location != -1) {
@@ -149,7 +154,7 @@ void OpenGLShader::setUniform1i(const std::string uniformName, const GLint& data
 	}
 }
 
-void OpenGLShader::setUniform1f(const std::string uniformName, const GLfloat& data) const
+void OpenGLShader::setUniform1f(const std::string uniformName, const float& data) const
 {
 	GLint location = uniformLocation(programHandle, uniformName);
 	if (location != -1) {
@@ -189,17 +194,17 @@ void OpenGLShader::setUniformMatrix4f(const std::string  uniformName, const glm:
 	}
 }
 
-GLuint OpenGLShader::program() const
+uint32_t OpenGLShader::program() const
 {
 	return programHandle;
 }
 
-GLint OpenGLShader::getAttributeLocation(const std::string name) const
+int32_t OpenGLShader::getAttributeLocation(const std::string name) const
 {
 	return glGetAttribLocation(programHandle, name.data());
 }
 
-void OpenGLShader::bindUniformBufferToBindPoint(const std::string name, GLuint bindPoint)
+void OpenGLShader::bindUniformBufferToBindPoint(const std::string name, uint32_t bindPoint)
 {
 	GLuint location = uniformBufferLocation(programHandle, name);
 	if (location != GL_INVALID_INDEX) {

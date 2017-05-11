@@ -14,7 +14,7 @@
 #include <Resources\ModelInstance.h>
 #include <Cameras\Camera.h>
 #include <Scene\SceneLoader.h>
-#include <ModelLoader.h>
+#include <Drawing/ModelLoader.h>
 #include <Text\Font.h>
 
 #include <Text/RenderableText.h>

@@ -94,7 +94,7 @@ void setupInstanceStateAttribute(GLuint vao, GLuint attribute, BufferElementType
 
 void setupInstanceStateAttributes(GLuint vao, GLuint vbo, std::shared_ptr<OpenGLShader> shader)
 {
-	auto format = shader->shader()->instanceStateFormat();
+	auto format = shader->instanceStateFormat();
 	glVertexArrayVertexBuffer(vao, TRANSFORM_DATA_BINDING_POINT_INDEX, vbo, 0, static_cast<GLsizei>(format->size()));
 	glVertexArrayBindingDivisor(vao, TRANSFORM_DATA_BINDING_POINT_INDEX, 1);
 

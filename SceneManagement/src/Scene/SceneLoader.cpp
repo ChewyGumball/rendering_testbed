@@ -13,7 +13,7 @@
 
 #include <lib/rapidjson/document.h>
 
-#include <ModelLoader.h>
+#include <Drawing/ModelLoader.h>
 #include <Util/FileUtils.h>
 #include <Util/StringUtils.h>
 
@@ -114,9 +114,12 @@ std::unordered_map<std::string, std::shared_ptr<Mesh>> loadMeshes(rapidjson::Doc
             meshes[name] = ModelLoader::loadOBJFile(filename, format);
         } else if (extension == "mbin") {
             meshes[name] = ModelLoader::loadBinFile(filename);
-        } else if (extension == "fbx") {
+        } 
+		/*
+		else if (extension == "fbx") {
             meshes[name] = ModelLoader::loadFBXFile(filename);
         }
+		*/
     }
     return meshes;
 }

@@ -12,6 +12,7 @@
 
 #include "Resources/Mesh.h"
 #include "Resources/Model.h"
+#include "Resources/Shader.h"
 #include "Resources/ModelInstance.h"
 #include "Resources/FrameBuffer.h"
 #include "Renderer/RenderOptions.h"
@@ -272,7 +273,7 @@ void OpenGLRenderer::draw(const std::vector<std::shared_ptr<const ModelInstance>
 	std::shared_ptr<const ModelInstance> firstInstance = modelInstances[0];
 	createModelIfRequired(firstInstance->model());
 
-	std::shared_ptr<OpenGLRenderModel> model = models[modelInstances[0]->model()->id()];
+	std::shared_ptr<OpenGLRenderModel> model = models[firstInstance->model()->id()];
 	uploadInstanceData(model->transformVBO(), modelInstances);
 
 	std::shared_ptr<OpenGLShader> shader = model->shader();

@@ -143,7 +143,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(LIB_DIR)/glm/include;$(LIB_DIR)/glfw-3.3.0\x64\debug\include;$(LIB_DIR)\glew-1.13.0\include;$(SolutionDir)SceneManagement\Include;$(SolutionDir)Renderer\Include;$(SolutionDir)Testbed\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(LIB_DIR)/fbx/2017.1\lib\vs2015\x64\debug;$(LIB_DIR)\glew-1.13.0\lib\Release\x64;$(LIB_DIR)/glfw-3.3.0/x64/debug/lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(LIB_DIR)\glew-1.13.0\lib\Release\x64;$(LIB_DIR)/glfw-3.3.0/x64/debug/lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -235,7 +235,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3dll.lib;glew32.lib;opengl32.lib;libfbxsdk.lib</AdditionalDependencies>
+      <AdditionalDependencies>glfw3dll.lib;glew32.lib;opengl32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

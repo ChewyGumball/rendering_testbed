@@ -205,8 +205,8 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>F:\Program Files\Autodesk\FBX\FBX SDK\2017.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>FBXSDK_SHARED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <Profile>true</Profile>
@@ -272,7 +272,6 @@
     <ClCompile Include="src\Renderer\OpenGL\OpenGLRenderModel.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\OpenGLRenderer.cpp" />
     <ClCompile Include="src\Resources\ModelInstance.cpp" />
-    <ClCompile Include="src\ModelLoader.cpp" />
     <ClCompile Include="src\Util\FileUtils.cpp" />
     <ClCompile Include="src\Resources\Shader.cpp" />
     <ClCompile Include="src\Resources\Mesh.cpp" />
@@ -334,7 +333,6 @@
     <ClInclude Include="Include\Resources\Mesh.h" />
     <ClInclude Include="Include\Resources\Model.h" />
     <ClInclude Include="Include\Resources\Shader.h" />
-    <ClInclude Include="Include\ModelLoader.h" />
     <ClInclude Include="Include\Util\StringUtils.h" />
     <ClInclude Include="Include\Renderer\IRenderer.h" />
     <ClInclude Include="Include\Resources\ModelInstance.h" />

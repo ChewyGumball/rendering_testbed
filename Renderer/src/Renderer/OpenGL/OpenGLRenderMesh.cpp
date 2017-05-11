@@ -3,10 +3,6 @@
 using namespace Renderer;
 using namespace Renderer::OpenGL;
 
-namespace {
-	GLuint tempVAO = -1;
-}
-
 OpenGLRenderMesh::OpenGLRenderMesh(): m_vbo(0), m_ebo(0), m_indexCount(0), m_format(VertexFormats::Unknown)
 {
 }
