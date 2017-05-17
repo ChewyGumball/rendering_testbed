@@ -5,6 +5,8 @@
 #include <Resources/ShaderConstantBuffer.h>
 #include <Buffer/BufferFormat.h>
 #include <Resources/Material.h>
+#include <Resources/Shader.h>
+#include <Resources/TextureBuffer.h>
 
 using namespace Renderer;
 using namespace Renderer::OpenGL;
@@ -92,14 +94,13 @@ void setupInstanceStateAttribute(GLuint vao, GLuint attribute, BufferElementType
     }
 }
 
-void setupInstanceStateAttributes(GLuint vao, GLuint vbo, std::shared_ptr<OpenGLShader> shader)
+void setupInstanceStateAttributes(GLuint vao, GLuint vbo, OpenGLShader& shader, std::shared_ptr<const BufferFormat> format)
 {
-	auto format = shader->instanceStateFormat();
 	glVertexArrayVertexBuffer(vao, TRANSFORM_DATA_BINDING_POINT_INDEX, vbo, 0, static_cast<GLsizei>(format->size()));
 	glVertexArrayBindingDivisor(vao, TRANSFORM_DATA_BINDING_POINT_INDEX, 1);
 
 	for (auto& variable : format->offsets()) {
-		GLint attributeLocation = shader->getAttributeLocation(variable.first);
+		GLint attributeLocation = shader.getAttributeLocation(variable.first);
 		if (attributeLocation != -1) {
 			setupInstanceStateAttribute(vao, attributeLocation, variable.second.second, static_cast<GLuint>(variable.second.first));
 		}
@@ -108,19 +109,17 @@ void setupInstanceStateAttributes(GLuint vao, GLuint vbo, std::shared_ptr<OpenGL
 
 }
 
-OpenGLRenderModel::OpenGLRenderModel() : vao(0), m_transformVBO(0), m_indexCount(0) {}
-
-OpenGLRenderModel::OpenGLRenderModel(std::shared_ptr<OpenGLRenderMesh> mesh, std::shared_ptr<OpenGLShader> shader, const std::unordered_map<std::string, RenderResourceID> textures, std::shared_ptr<const Material> material)
-    : m_indexCount(mesh->indexCount()), m_shader(shader), m_textures(textures), m_material(material)
+OpenGLRenderModel::OpenGLRenderModel(OpenGLRenderMesh& mesh, OpenGLShader& shader, const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures, std::shared_ptr<const Material> material)
+    : m_indexCount(mesh.indexCount()), m_textures(textures), m_material(material)
 {
     glCreateVertexArrays(1, &vao);
     glCreateBuffers(1, &m_transformVBO);
 
-	setupVertexAttributes(vao, mesh->vbo(), mesh->vertexFormat());
-	setupInstanceStateAttributes(vao, m_transformVBO, shader);
+	setupVertexAttributes(vao, mesh.vbo(), mesh.vertexFormat());
+	setupInstanceStateAttributes(vao, m_transformVBO, shader, material->shader()->instanceStateFormat());
 
     // Set up vertex index buffer
-    glVertexArrayElementBuffer(vao, mesh->ebo());
+    glVertexArrayElementBuffer(vao, mesh.ebo());
 }
 
 OpenGLRenderModel::~OpenGLRenderModel() 
@@ -136,16 +135,11 @@ void OpenGLRenderModel::draw(int instanceCount) const
     glBindVertexArray(0);
 }
 
-const std::unordered_map<std::string, RenderResourceID>& OpenGLRenderModel::textures() const { return m_textures; }
+const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>>& OpenGLRenderModel::textures() const { return m_textures; }
 
 const std::shared_ptr<const Material> OpenGLRenderModel::material() const
 {
 	return m_material;
-}
-
-const std::shared_ptr<OpenGLShader> OpenGLRenderModel::shader() const
-{
-	return m_shader;
 }
 
 uint32_t OpenGLRenderModel::indexCount() const { return m_indexCount; }

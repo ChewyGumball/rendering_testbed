@@ -124,21 +124,13 @@ namespace {
 	}
 }
 
-OpenGLShader::OpenGLShader() : programHandle(0), m_instanceStateFormat(nullptr)
-{
-}
-
-OpenGLShader::OpenGLShader(std::shared_ptr<const Shader> shader) : programHandle(createProgramFromSources(shader->sources())), m_instanceStateFormat(shader->instanceStateFormat())
+OpenGLShader::OpenGLShader(RenderResourceID id, std::unordered_map<ShaderSourceType, std::vector<std::string>>& sources)
+	: RenderResource(id), programHandle(createProgramFromSources(sources))
 { }
 
 OpenGLShader::~OpenGLShader()
 {
 	glDeleteProgram(programHandle);
-}
-
-std::shared_ptr<const BufferFormat> Renderer::OpenGL::OpenGLShader::instanceStateFormat() const
-{
-	return m_instanceStateFormat;
 }
 
 void OpenGLShader::bind()

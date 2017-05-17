@@ -8,17 +8,13 @@ namespace Renderer {
 	class Mesh : public RenderResource
 	{
 	protected:
-		VertexFormat format;
-		std::vector<float> m_vertices;
-		std::vector<int> indices;
+		uint64_t m_triangleCount;
+
 		Culling::BoundingSphere boundingSphere;
 	public:
-		Mesh(VertexFormat format, std::vector<float> vertexData, std::vector<int> indices);
+		Mesh(VertexFormat format, std::vector<float>& vertexData, std::vector<uint32_t>& indices);
 		~Mesh();
 
-		const std::vector<float>& vertexData() const;
-		const std::vector<int>& indexData() const;
-		const VertexFormat vertexFormat() const;
 		Culling::BoundingSphere bounds() const;
 
 		uint64_t triangleCount() const;

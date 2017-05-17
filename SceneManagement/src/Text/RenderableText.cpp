@@ -5,6 +5,8 @@
 #include <Resources/ModelInstance.h>
 #include <Drawing/RenderPass.h>
 
+#include <glm/gtc/matrix_transform.hpp>
+
 namespace Scene::Text {
 	RenderableText::RenderableText(std::string text, std::shared_ptr<Scene::Text::Font> font, glm::vec3 position, glm::vec4 colour)
 		: m_position(glm::vec3()), m_text(text), m_colour(colour), m_font(font), instances(font->createString(text, colour))
@@ -31,7 +33,7 @@ namespace Scene::Text {
 	void RenderableText::translate(glm::vec3 offset)
 	{
 		for (auto instance : instances) {
-			instance->translate(offset);
+			instance->instanceData().set("transform", glm::translate(instance->instanceData().getMat4("transform"), offset));
 		}
 		m_position += offset;
 	}
@@ -48,7 +50,7 @@ namespace Scene::Text {
 			std::vector<std::shared_ptr<Renderer::ModelInstance>> instancesToAdd = m_font->createInstances(newSize - oldSize);
 			//the new instances need to be positioned properly
 			for (auto instance : instancesToAdd) {
-				instance->translate(m_position);
+				instance->instanceData().set("transform", glm::translate(instance->instanceData().getMat4("transform"), m_position));
 			}
 
 			for (auto pass : passesContainingThisText) {

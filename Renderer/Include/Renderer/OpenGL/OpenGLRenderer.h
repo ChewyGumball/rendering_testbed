@@ -1,14 +1,9 @@
 #pragma once
-#include <memory>
-#include <unordered_set>
-#include <vector>
-
 #include <Renderer/IRenderer.h>
 
-namespace Renderer {
-	class ModelInstance;
-	class FrameBuffer;
-	struct RenderOptions;
+namespace Renderer {	
+	enum struct ShaderSourceType;
+
 	namespace OpenGL {
 		class OpenGLRenderer : public IRenderer
 		{
@@ -18,9 +13,13 @@ namespace Renderer {
 			OpenGLRenderer();
 			~OpenGLRenderer();
 
-			void processRenderingOptions(RenderOptions& options);
-			void updateConstantBuffers(std::unordered_set<std::shared_ptr<ShaderConstantBuffer>>& constantBuffers);
-			void draw(const std::vector<std::shared_ptr<const ModelInstance>>& modelInstances, const std::unordered_map<std::string, std::shared_ptr<ShaderConstantBuffer>>& globalShaderConstantBuffers);
+			void createPendingResources() override;
+			void destroyPendingResources() override;
+
+			void processRenderingOptions(RenderOptions& options) override;
+			void updateConstantBuffers(std::unordered_set<std::shared_ptr<ShaderConstantBuffer>>& constantBuffers) override;
+			void draw(const std::vector<std::shared_ptr<const ModelInstance>>& modelInstances, const std::unordered_map<std::string, std::shared_ptr<ShaderConstantBuffer>>& globalShaderConstantBuffers) override;
+
 		};
 	}
 }

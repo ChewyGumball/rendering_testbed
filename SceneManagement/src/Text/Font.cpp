@@ -15,6 +15,7 @@
 #include <Resources/Shader.h>
 #include <Resources/Mesh.h>
 #include <Resources/Material.h>
+#include <Buffer/BufferFormat.h>
 
 using namespace Renderer;
 
@@ -28,49 +29,54 @@ namespace {
 			1.0f, 0.0f, 0.0f,
 			1.0f, 1.0f, 0.0f,
 			0.0f, 1.0f, 0.0f
-	}, std::vector<int> {
+	}, std::vector<uint32_t> {
 		0, 1, 2,
-			0, 2, 3
+		0, 2, 3
 	});
 
 	std::shared_ptr<Material> fontMaterial = std::make_shared<Material>(std::make_shared<Shader>(
-		std::vector<std::string> { R"(
-			#version 330 core
-			layout(location = 0) in vec3 position;
-			layout(location = 1) in vec4 letterColour;
-			layout(location = 2) in vec4 meshBounds;
-			layout(location = 3) in vec4 textureBounds;
-			layout(location = 4) in mat4 transform;
-
-			layout(std140) uniform camera {
-				mat4 projection;
-				mat4 view;
-				vec3 position;
-			} Camera;
-
-			out vec2 TexCoords;
-			out vec4 LetterColour;
-
-			void main()
+		std::unordered_map<ShaderSourceType, std::vector<std::string>> {
 			{
-				gl_Position = Camera.projection * Camera.view * transform * vec4(mix(meshBounds.xy, meshBounds.zw, position.xy), 0, 1);
-				TexCoords = mix(textureBounds.xy, textureBounds.zw, position.xy);
-				LetterColour = letterColour;
-			}
-		)" },
-		std::vector<std::string> { R"(
-			#version 330 core
-			in vec2 TexCoords;
-			in vec4 LetterColour;
-			out vec4 color;
+				ShaderSourceType::VERTEX, std::vector<std::string> { R"(
+					#version 330 core
+					layout(location = 0) in vec3 position;
+					layout(location = 1) in vec4 letterColour;
+					layout(location = 2) in vec4 meshBounds;
+					layout(location = 3) in vec4 textureBounds;
+					layout(location = 4) in mat4 transform;
 
-			uniform sampler2D font;
+					layout(std140) uniform camera {
+						mat4 projection;
+						mat4 view;
+						vec3 position;
+					} Camera;
 
-			void main()
-			{
-				color = texture(font, TexCoords).r * LetterColour;
+					out vec2 TexCoords;
+					out vec4 LetterColour;
+
+					void main()
+					{
+						gl_Position = Camera.projection * Camera.view * transform * vec4(mix(meshBounds.xy, meshBounds.zw, position.xy), 0, 1);
+						TexCoords = mix(textureBounds.xy, textureBounds.zw, position.xy);
+						LetterColour = letterColour;
+					}
+				)"}
+			}, {
+				ShaderSourceType::FRAGMENT, std::vector<std::string> { R"(
+					#version 330 core
+					in vec2 TexCoords;
+					in vec4 LetterColour;
+					out vec4 color;
+
+					uniform sampler2D font;
+
+					void main()
+					{
+						color = texture(font, TexCoords).r * LetterColour;
+					}
+				)"}
 			}
-		)" },
+		},
 		std::make_shared<BufferFormat>(std::vector<std::pair<std::string, BufferElementType>> {
 			{ "transform", BufferElementType::MAT4},
 			{ "meshBounds", BufferElementType::FLOAT_VEC4 },

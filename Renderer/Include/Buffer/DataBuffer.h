@@ -1,14 +1,11 @@
 #pragma once
 #include <vector>
 
-#include <glm\glm.hpp>
-
-#include <Buffer/BufferFormat.h>
 #include <Buffer/DataBufferView.h>
 
-//typedef uint16_t DataBufferOffset;
-
 namespace Renderer {
+	class BufferFormat;
+
 	class DataBuffer : public DataBufferView {
 
 	private:

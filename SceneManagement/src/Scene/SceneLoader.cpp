@@ -17,6 +17,8 @@
 #include <Util/FileUtils.h>
 #include <Util/StringUtils.h>
 
+#include <glm/gtc/matrix_transform.hpp>
+
 using namespace Renderer;
 
 namespace {
@@ -96,6 +98,18 @@ std::shared_ptr<const BufferFormat> readFormat(rapidjson::Value& json, BufferPac
 	}
 
 	return std::make_shared<BufferFormat>(format, nestedBufferFormats);
+}
+
+void scaleModelInstance(std::shared_ptr<ModelInstance> instance, glm::vec3 scale) {
+	instance->instanceData().set("transform", glm::scale(instance->instanceData().getMat4("transform"), scale));
+}
+
+void rotateModelInstance(std::shared_ptr<ModelInstance> instance, glm::vec3 axis, float angle) {
+	instance->instanceData().set("transform", glm::rotate(instance->instanceData().getMat4("transform"), angle, axis));
+}
+
+void translateModelInstance(std::shared_ptr<ModelInstance> instance, glm::vec3 offset) {
+	instance->instanceData().set("transform", glm::translate(instance->instanceData().getMat4("transform"), offset));
 }
 
 std::unordered_map<std::string, std::shared_ptr<Mesh>> loadMeshes(rapidjson::Document& json)
@@ -188,13 +202,13 @@ std::unordered_map<std::string, std::vector<std::shared_ptr<ModelInstance>>> loa
         for (auto& instance : modelGroup.value.GetArray()) {
             std::shared_ptr<ModelInstance> i(std::make_shared<ModelInstance>(models[instance["model"].GetString()]));
             if (instance.HasMember("scale")) {
-                i->scale(objectToVec3(instance["scale"]));
+                scaleModelInstance(i,objectToVec3(instance["scale"]));
             }
             if (instance.HasMember("rotation")) {
-                i->rotate(objectToVec3(instance["rotation"]["axis"]), instance["rotation"]["degrees"].GetFloat());
+                rotateModelInstance(i, objectToVec3(instance["rotation"]["axis"]), instance["rotation"]["degrees"].GetFloat());
             }
             if (instance.HasMember("position")) {
-                i->translate(objectToVec3(instance["position"]));
+                translateModelInstance(i, objectToVec3(instance["position"]));
             }
             modelGroups[name].push_back(i);
         }
@@ -215,7 +229,9 @@ std::unordered_map<std::string, std::vector<PointLight>> loadLightGroups(rapidjs
     return lightGroups;
 }
 
-std::unordered_map<std::string, std::shared_ptr<Scene::RenderPass>> loadPasses(rapidjson::Value& json,
+std::unordered_map<std::string, std::shared_ptr<Scene::RenderPass>> loadPasses(
+	std::shared_ptr<IRenderer> renderer,
+	rapidjson::Value& json,
     std::unordered_map<std::string, std::vector<std::shared_ptr<ModelInstance>>>          modelGroups,
     std::unordered_map<std::string, std::vector<PointLight>>                              lightGroups,
     std::unordered_map<std::string, std::shared_ptr<Scene::Cameras::Camera>>                              cameras,
@@ -224,7 +240,7 @@ std::unordered_map<std::string, std::shared_ptr<Scene::RenderPass>> loadPasses(r
     std::unordered_map<std::string, std::shared_ptr<Scene::RenderPass>> passes;
     for (auto& pass : json["passes"].GetObject()) {
         std::string                 name = pass.name.GetString();
-        std::shared_ptr<Scene::RenderPass> p    = std::make_shared<Scene::RenderPass>();
+        std::shared_ptr<Scene::RenderPass> p    = std::make_shared<Scene::RenderPass>(renderer);
 
         for (auto& modelGroup : pass.value["models"].GetArray()) {
             for (auto& model : modelGroups[modelGroup.GetString()]) {
@@ -341,7 +357,10 @@ std::unordered_map<std::string, std::shared_ptr<Shader>> loadShaders(
 			}
 		}
 
-		shaders[shader.name.GetString()] = std::make_shared<Shader>(vertexSources, fragmentSources, instanceDataFormat, materialConstantBufferFormats, systemConstantBufferNames);
+		shaders[shader.name.GetString()] = std::make_shared<Shader>(std::unordered_map<ShaderSourceType, std::vector<std::string>> {
+			{ShaderSourceType::VERTEX, vertexSources},
+			{ShaderSourceType::FRAGMENT, fragmentSources }
+		}, instanceDataFormat, materialConstantBufferFormats, systemConstantBufferNames);
     }
     return shaders;
 }
@@ -371,7 +390,7 @@ std::unordered_map<std::string, std::shared_ptr<Material>> loadMaterials(rapidjs
 }
 
 namespace Scene {
-	World SceneLoader::loadWorld(std::string filename)
+	World SceneLoader::loadWorld(std::shared_ptr<Renderer::IRenderer> renderer, std::string filename)
 	{
 		std::string             file = Util::File::ReadWholeFile(filename);
 		rapidjson::StringStream s(file.c_str());
@@ -408,7 +427,7 @@ namespace Scene {
 		std::unordered_map<std::string, std::shared_ptr<Scene::Cameras::Camera>> cameras(loadCameras(scene));
 		std::unordered_map<std::string, std::vector<PointLight>> lightInstances(loadLightGroups(scene, lights));
 		std::unordered_map<std::string, std::vector<std::shared_ptr<ModelInstance>>> modelInstances(loadModelGroups(scene, models));
-		std::unordered_map<std::string, std::shared_ptr<RenderPass>> passes(loadPasses(scene, modelInstances, lightInstances, cameras, textures));
+		std::unordered_map<std::string, std::shared_ptr<RenderPass>> passes(loadPasses(renderer, scene, modelInstances, lightInstances, cameras, textures));
 		std::unordered_map<std::string, std::vector<std::string>> passDependencies(loadPassDepencencies(scene));
 
 		return World(passes, passDependencies, cameras, modelInstances);

@@ -2,7 +2,8 @@
 #include <memory>
 #include <unordered_map>
 
-#include <Resources\RenderResource.h>
+#include <Resources/RenderResource.h>
+
 namespace Renderer {
 
 	class Mesh;
@@ -12,17 +13,15 @@ namespace Renderer {
 	class Model : public RenderResource
 	{
 	protected:
-		std::shared_ptr<const Mesh> m_mesh;
-		std::shared_ptr<const Material> m_material;
-		std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> m_textures;
+		std::shared_ptr<Mesh> m_mesh;
+		std::shared_ptr<Material> m_material;
 
 	public:
-		Model(std::shared_ptr<const Mesh> mesh, std::shared_ptr<const Material> material, std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures);
+		Model(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material, std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures);
 		~Model();
 
-		std::shared_ptr<const Mesh> mesh() const;
-		std::shared_ptr<const Material> material() const;
-		const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>>& textures() const;
+		std::shared_ptr<Mesh> mesh() const;
+		std::shared_ptr<Material> material() const;
 
 		uint64_t triangleCount() const;
 	};

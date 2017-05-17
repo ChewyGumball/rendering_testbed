@@ -1,6 +1,9 @@
 #pragma warning(disable:4996) //MSVC does not like std::copy with bare pointers
 #include "Buffer/DataBufferArrayView.h"
 
+#include <Buffer/BufferFormat.h>
+#include <Buffer/DataBufferView.h>
+
 #include <glm/gtc/type_ptr.hpp>
 
 using namespace Renderer;
@@ -188,4 +191,19 @@ const uint8_t * DataBufferArrayView::begin() const
 const uint8_t * DataBufferArrayView::end() const
 {
 	return data + m_count * m_elementFormat->size();
+}
+
+void Renderer::DataBufferArrayView::markDirty()
+{
+	*end() = true;
+}
+
+bool Renderer::DataBufferArrayView::isDirty() const
+{
+	return *end();
+}
+
+void Renderer::DataBufferArrayView::clean()
+{
+	*end() = false;
 }

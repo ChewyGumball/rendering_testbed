@@ -16,21 +16,17 @@ namespace {
 }
 
 namespace Renderer::OpenGL {
-	OpenGLFrameBuffer::OpenGLFrameBuffer() : buffer(0)
+	OpenGLFrameBuffer::OpenGLFrameBuffer(std::unordered_map<FrameBufferTarget, std::shared_ptr<TextureBuffer>>& targets, std::unordered_map<RenderResourceID, OpenGLTextureBuffer>& textures) : buffer(0)
 	{
-	}
-
-	OpenGLFrameBuffer::OpenGLFrameBuffer(std::shared_ptr<const FrameBuffer> frameBuffer, std::unordered_map<RenderResourceID, std::shared_ptr<OpenGLTextureBuffer>>& textures) : buffer(0)
-	{
-		if (frameBuffer->targets().size() > 0) {
+		if (targets.size() > 0) {
 			glGenFramebuffers(1, &buffer);
 
 			std::vector<GLenum> colourBuffers;
 
 			glBindFramebuffer(GL_FRAMEBUFFER, buffer);
-			for (auto& target : frameBuffer->targets())
+			for (auto& target : targets)
 			{
-				glFramebufferTexture(GL_FRAMEBUFFER, attachments[target.first], textures[target.second->id()]->handle(), 0);
+				glFramebufferTexture(GL_FRAMEBUFFER, attachments[target.first], textures[target.second->id()].handle(), 0);
 				if (target.first != FrameBufferTarget::DEPTH) {
 					colourBuffers.push_back(attachments[target.first]);
 				}

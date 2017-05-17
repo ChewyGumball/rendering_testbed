@@ -1,25 +1,20 @@
 #include "Resources/Shader.h"
 
-namespace Renderer {
-	Shader::Shader(std::vector<std::string> vertexSources, std::vector<std::string> fragmentSources, std::shared_ptr<const BufferFormat> instanceStateFormat)
-		: m_instanceStateFormat(instanceStateFormat)
-	{
-		m_sources[ShaderSourceType::VERTEX] = vertexSources;
-		m_sources[ShaderSourceType::FRAGMENT] = fragmentSources;
-	}
+#include <Resources/RenderResourceManagement.h>
 
-	Shader::Shader(std::vector<std::string> vertexSources, std::vector<std::string> fragmentSources, std::shared_ptr<const BufferFormat> instanceStateFormat, std::unordered_map<std::string, std::shared_ptr<const BufferFormat>> materialConstantBufferFormats, std::vector<std::string> systemConstantBufferNames)
+namespace Renderer {
+	Shader::Shader(std::unordered_map<ShaderSourceType, std::vector<std::string>> sources, std::shared_ptr<const BufferFormat> instanceStateFormat, std::unordered_map<std::string, std::shared_ptr<const BufferFormat>> materialConstantBufferFormats, std::vector<std::string> systemConstantBufferNames)
 		: m_instanceStateFormat(instanceStateFormat), m_materialConstantBufferFormats(materialConstantBufferFormats), m_systemConstantBufferNames(systemConstantBufferNames)
 	{
-		m_sources[ShaderSourceType::VERTEX] = vertexSources;
-		m_sources[ShaderSourceType::FRAGMENT] = fragmentSources;
+		RenderResourceManagement::createShader(m_id, sources);
 	}
-
-
-	const std::unordered_map<ShaderSourceType, std::vector<std::string>>& Shader::sources() const
+	Shader::Shader(std::unordered_map<ShaderSourceType, std::vector<uint8_t>> byteCode, std::shared_ptr<const BufferFormat> instanceStateFormat, std::unordered_map<std::string, std::shared_ptr<const BufferFormat>> materialConstantBufferFormats, std::vector<std::string> systemConstantBufferNames)
+		: m_instanceStateFormat(instanceStateFormat), m_materialConstantBufferFormats(materialConstantBufferFormats), m_systemConstantBufferNames(systemConstantBufferNames)
 	{
-		return m_sources;
+		RenderResourceManagement::createShader(m_id, byteCode);
 	}
+
+	Shader::~Shader() {}
 
 	std::shared_ptr<const BufferFormat> Shader::instanceStateFormat() const
 	{
@@ -35,6 +30,4 @@ namespace Renderer {
 	{
 		return m_systemConstantBufferNames;
 	}
-
-	Shader::~Shader() {}
 }

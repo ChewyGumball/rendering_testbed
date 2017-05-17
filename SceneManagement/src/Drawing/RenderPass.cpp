@@ -5,6 +5,7 @@
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "Cameras/Camera.h"
 #include "Resources/Model.h"
+#include "Resources/Mesh.h"
 #include "Resources/ModelInstance.h"
 #include "Resources/Material.h"
 #include "Resources/ShaderConstantBuffer.h"
@@ -12,10 +13,17 @@
 #include "Culling/Frustum.h"
 #include "Culling/BoundingSphere.h"
 #include <Buffer/DataBufferArrayView.h>
+#include <Buffer/BufferFormat.h>
 
 using namespace Renderer;
 
 namespace {
+	Culling::BoundingSphere modelInstanceBounds(std::shared_ptr<const ModelInstance> instance) {
+		Culling::BoundingSphere meshBounds = instance->model()->mesh()->bounds();
+		return Culling::BoundingSphere(glm::vec3(instance->instanceData().getMat4("transform") * glm::vec4(meshBounds.center(), 1)), meshBounds.radius());
+	}
+
+
 	std::unordered_map<std::string, std::shared_ptr<BufferFormat>> systemBufferFormats;
 
 	std::unordered_map<std::shared_ptr<const Model>, std::vector<std::shared_ptr<const ModelInstance>>> cullAgainstCameraFrustum(const std::shared_ptr<Scene::Cameras::Camera> camera, std::vector<std::shared_ptr<const ModelInstance>> instances) {
@@ -25,7 +33,7 @@ namespace {
 		std::vector<float>     radii(instances.size());
 
 		for (size_t i = 0; i < instances.size(); ++i) {
-			Culling::BoundingSphere s = instances[i]->bounds();
+			Culling::BoundingSphere s = modelInstanceBounds(instances[i]);
 			centers[i] = s.center();
 			radii[i] = s.radius();
 		}
@@ -102,19 +110,16 @@ namespace {
 }
 
 namespace Scene {
-	RenderPass::RenderPass() : renderer(new OpenGL::OpenGLRenderer()), m_camera(std::make_shared<Scene::Cameras::Camera>()), options(RenderOptions()), cullingEnabled(false)
+	RenderPass::RenderPass(std::shared_ptr<Renderer::IRenderer> renderer) : renderer(renderer), m_camera(std::make_shared<Scene::Cameras::Camera>()), options(RenderOptions()), cullingEnabled(false)
 	{
 		initialize();
-		passConstants;
 		for (auto& constant : systemBufferFormats) {
-			passConstants[constant.first] = std::make_shared<ShaderConstantBuffer>(constant.first, constant.second);
+			passConstants.emplace(constant.first, std::make_shared<ShaderConstantBuffer>(constant.second));
 		}
 	}
 
 	RenderPass::~RenderPass()
-	{
-		delete renderer;
-	}
+	{}
 
 	uint64_t RenderPass::draw()
 	{

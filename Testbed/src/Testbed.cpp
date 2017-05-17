@@ -7,8 +7,11 @@
 #include <cstdio>
 #include <string>
 #include <cmath>
+#include <memory>
 
 #include <fstream>
+
+#include <Renderer/OpenGL/OpenGLRenderer.h>
 
 #include <Drawing\RenderPass.h>
 #include <Resources\ModelInstance.h>
@@ -34,12 +37,12 @@ Test1* test;
 
 void convert(int argc, char* argv[])
 {
+	/*
 	std::string filename(argv[2]);
 	std::string path = filename.substr(0, filename.find_last_of("/\\") + 1);
 
 	std::shared_ptr<Mesh> mesh = ModelLoader::loadOBJFile(filename);
 	std::ofstream convertedFile(argv[3], std::ios::out | std::ios::binary);
-
 	std::vector<float> vertices = mesh->vertexData();
 	std::vector<int> indices = mesh->indexData();
 
@@ -53,8 +56,8 @@ void convert(int argc, char* argv[])
 	convertedFile.write(reinterpret_cast<char*>(vertices.data()), vertexCount * sizeof(float));
 	convertedFile.write(reinterpret_cast<char*>(&indexCount), sizeof(int64_t));
 	convertedFile.write(reinterpret_cast<char*>(indices.data()), indexCount * sizeof(int));
-
 	convertedFile.close();
+	*/
 }
 
 void printGLFWError(int error, const char* description)
@@ -96,7 +99,7 @@ void renderScene(std::string sceneFile)
 
 			GLenum error = glewInit();
 			if (error == GLEW_OK) {
-				test = new Test1(window, width, height, sceneFile);
+				test = new Test1(window, std::make_shared<Renderer::OpenGL::OpenGLRenderer>(), width, height, sceneFile);
 				test->draw();
 				delete test;
 			}

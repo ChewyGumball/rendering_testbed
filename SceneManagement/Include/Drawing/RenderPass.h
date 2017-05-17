@@ -19,7 +19,7 @@ namespace Scene {
 	class RenderPass
 	{
 	private:
-		Renderer::IRenderer *renderer;
+		std::shared_ptr<Renderer::IRenderer> renderer;
 		std::shared_ptr<Cameras::Camera> m_camera;
 		Renderer::RenderOptions options;
 		bool cullingEnabled;
@@ -29,7 +29,7 @@ namespace Scene {
 		std::vector<PointLight> lights;
 
 	public:
-		RenderPass();
+		RenderPass(std::shared_ptr<Renderer::IRenderer> renderer);
 		~RenderPass();
 
 		//Returns how many triangles were drawn (after culling if culling is enabled)

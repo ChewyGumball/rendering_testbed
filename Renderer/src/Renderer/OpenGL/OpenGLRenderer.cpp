@@ -9,6 +9,7 @@
 
 #include <Buffer/DataBufferView.h>
 #include <Buffer/DataBufferArrayView.h>
+#include <Buffer/BufferFormat.h>
 
 #include "Resources/Mesh.h"
 #include "Resources/Model.h"
@@ -18,6 +19,8 @@
 #include "Renderer/RenderOptions.h"
 #include "Resources/Material.h"
 #include "Resources/ShaderConstantBuffer.h"
+
+#include <Resources/RenderResourceManagement.h>
 
 #include "Renderer/OpenGL/OpenGLRenderMesh.h"
 #include "Renderer/OpenGL/OpenGLRenderModel.h"
@@ -36,23 +39,23 @@ namespace {
 
 	std::vector<GLenum> textureUnits{ GL_TEXTURE0, GL_TEXTURE1, GL_TEXTURE2, GL_TEXTURE3, GL_TEXTURE4, GL_TEXTURE5, GL_TEXTURE6, GL_TEXTURE7, GL_TEXTURE8 };
 
-	std::unordered_map<RenderResourceID, std::shared_ptr<OpenGLRenderMesh>>    meshes;
-	std::unordered_map<RenderResourceID, std::shared_ptr<OpenGLShader>>        shaders;
-	std::unordered_map<RenderResourceID, std::shared_ptr<OpenGLRenderModel>>   models;
-	std::unordered_map<RenderResourceID, std::shared_ptr<OpenGLTextureBuffer>> textures;
-	std::unordered_map<RenderResourceID, std::shared_ptr<OpenGLFrameBuffer>>   frameBuffers;
-	std::unordered_map<RenderResourceID, std::shared_ptr<OpenGLShaderConstantBuffer>>   shaderConstantBuffers;
+	std::unordered_map<RenderResourceID, OpenGLRenderMesh>    meshes;
+	std::unordered_map<RenderResourceID, OpenGLShader>        shaders;
+	std::unordered_map<RenderResourceID, OpenGLRenderModel>   models;
+	std::unordered_map<RenderResourceID, OpenGLTextureBuffer> textures;
+	std::unordered_map<RenderResourceID, OpenGLFrameBuffer>   frameBuffers;
+	std::unordered_map<RenderResourceID, OpenGLShaderConstantBuffer>   shaderConstantBuffers;
 
 	std::unordered_map<RenderResourceID, int> boundShaderConstantBuffers;
 	std::vector<RenderResourceID> shaderConstantBufferBindings;
 	
-	void bindTextures(std::shared_ptr<OpenGLShader> shader, std::unordered_map<std::string, RenderResourceID> modelTextures)
+	void bindTextures(OpenGLShader& shader, const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>>& modelTextures)
 	{
 		int textureUnit = 0;
 		for (auto& texture : modelTextures) {
 			glActiveTexture(textureUnits[textureUnit]);
-			glBindTexture(GL_TEXTURE_2D, textures[texture.second]->handle());
-			shader->setUniform1i(texture.first, textureUnit);
+			glBindTexture(GL_TEXTURE_2D, textures[texture.second->id()].handle());
+			shader.setUniform1i(texture.first, textureUnit);
 
 			if (textureUnit++ >= textureUnits.size()) {
 				break;
@@ -60,16 +63,16 @@ namespace {
 		}
 	}
 
-	void bindShaderConstants(std::shared_ptr<OpenGLShader> shader, std::shared_ptr<OpenGLRenderModel> model, const std::unordered_map<std::string, std::shared_ptr<ShaderConstantBuffer>>& renderPassConstantBuffers)
+	void bindShaderConstants(OpenGLShader& shader, const std::shared_ptr<const Material> material, const std::unordered_map<std::string, std::shared_ptr<ShaderConstantBuffer>>& renderPassConstantBuffers)
 	{
 		std::vector<std::pair<std::string, RenderResourceID>> buffersToBind;
-		for (auto& buffer : model->material()->constants()) {
+		for (auto& buffer : material->constants()) {
 			buffersToBind.push_back(std::make_pair(buffer.first, buffer.second->id()));
 		}
-		for (auto& buffer : model->material()->shader()->systemConstantBufferNames()) {
+		for (auto& buffer : material->shader()->systemConstantBufferNames()) {
 			buffersToBind.push_back(std::make_pair(buffer, renderPassConstantBuffers.at(buffer)->id()));
 		}
-
+		
 		std::unordered_set<GLint> requiredSlots;
 		std::vector<std::pair<std::string, RenderResourceID>> unboundBuffers;
 		for(auto& buffer : buffersToBind) {
@@ -80,7 +83,7 @@ namespace {
 			else {
 				requiredSlots.insert(bindPoint);
 				//Make sure the shader has the correct bind point just in case the buffer is still bound but has moved
-				shader->bindUniformBufferToBindPoint(buffer.first, bindPoint);
+				shader.bindUniformBufferToBindPoint(buffer.first, bindPoint);
 			}
 		}
 
@@ -96,90 +99,12 @@ namespace {
 			boundShaderConstantBuffers[shaderConstantBufferBindings[bindPoint]] = -1;
 			boundShaderConstantBuffers[buffer.second] = bindPoint;
 			shaderConstantBufferBindings[bindPoint] = buffer.second;
-			shaderConstantBuffers[buffer.second]->bindTo(bindPoint);
+			shaderConstantBuffers.at(buffer.second).bindTo(bindPoint);
 
-			shader->bindUniformBufferToBindPoint(buffer.first, bindPoint);
+			shader.bindUniformBufferToBindPoint(buffer.first, bindPoint);
 		}
 	}
-
-	void reloadTexture(std::shared_ptr<TextureBuffer> texture) {
-		textures[texture->id()] = std::make_shared<OpenGLTextureBuffer>(texture);
-	}
-
-	void createTextureIfRequired(std::shared_ptr<TextureBuffer> texture)
-	{
-		if (textures.count(texture->id()) == 0) {
-			textures.emplace(texture->id(), std::make_shared<OpenGLTextureBuffer>(texture));
-
-			if (texture->isFileTexture()) {
-				Util::File::WatchForChanges(texture->filename(), [=]() { reloadTexture(texture); });
-			}
-		}
-	}
-
-	void createFrameBufferIfRequired(std::shared_ptr<const FrameBuffer> frameBuffer)
-	{
-		for (auto target : frameBuffer->targets()) {
-			createTextureIfRequired(target.second);
-		}
-		if (frameBuffers.count(frameBuffer->id()) == 0) {
-			frameBuffers.emplace(frameBuffer->id(), std::make_shared<OpenGLFrameBuffer>(frameBuffer, textures));
-		}
-	}
-
-	void createMeshIfRequired(std::shared_ptr<const Mesh> mesh)
-	{
-		if (meshes.count(mesh->id()) == 0) {
-			meshes.emplace(mesh->id(), std::make_shared<OpenGLRenderMesh>(mesh));
-		}
-	}
-
-	void createConstantBufferIfRequired(std::shared_ptr<const ShaderConstantBuffer> shaderConstantBuffer) 
-	{
-		if (shaderConstantBuffers.count(shaderConstantBuffer->id()) == 0) {
-			shaderConstantBuffers.emplace(shaderConstantBuffer->id(), std::make_shared<OpenGLShaderConstantBuffer>(shaderConstantBuffer));
-			boundShaderConstantBuffers[shaderConstantBuffer->id()] = -1;
-		}
-	}
-
-	void reloadShader(std::shared_ptr<const Shader> shader) {
-		shaders[shader->id()] = std::make_shared<OpenGLShader>(shader);
-	}
-
-	void createShaderIfRequired(std::shared_ptr<const Shader> shader)
-	{
-		if (shaders.count(shader->id()) == 0) {
-			shaders.emplace(shader->id(), std::make_shared<OpenGLShader>(shader));
-		}
-	}
-
-	void createMaterialIfRequired(std::shared_ptr<const Material> material) {
-		createShaderIfRequired(material->shader());
-		for (auto& constant : material->constants()) {
-			createConstantBufferIfRequired(constant.second);
-		}
-	}
-
-	void createModelIfRequired(std::shared_ptr<const Model> model)
-	{
-		if (models.count(model->id()) == 0) {
-			createMeshIfRequired(model->mesh());
-			createMaterialIfRequired(model->material());
-
-			OpenGLRenderer::checkGLError();
-			for (auto texture : model->textures()) {
-				createTextureIfRequired(texture.second);
-			}
-
-			std::unordered_map<std::string, RenderResourceID> modelTextures;
-			for (auto texture : model->textures()) {
-				modelTextures[texture.first] = texture.second->id();
-			}
-
-			models.emplace(model->id(), std::make_shared<OpenGLRenderModel>(meshes[model->mesh()->id()], shaders[model->material()->shader()->id()], modelTextures, model->material()));
-		}
-	}
-
+	
 	void uploadInstanceData(GLuint buffer, const std::vector<std::shared_ptr<const ModelInstance>>& instances) {
 		std::vector<uint8_t> instanceData;
 		instanceData.reserve(instances.size() * instances[0]->instanceData().format()->size());
@@ -235,9 +160,12 @@ OpenGLRenderer::~OpenGLRenderer() {}
 
 void OpenGLRenderer::processRenderingOptions(RenderOptions & options)
 {
-	createFrameBufferIfRequired(options.frameBuffer);
-
-	frameBuffers[options.frameBuffer->id()]->bind();
+	if (options.frameBuffer) {
+		frameBuffers.at(options.frameBuffer->id()).bind();
+	}
+	else {
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
 
 	if (options.clearBuffers) {
 		glClearColor(options.clearColour.r, options.clearColour.g, options.clearColour.b, options.clearColour.a);
@@ -262,8 +190,7 @@ void OpenGLRenderer::updateConstantBuffers(std::unordered_set<std::shared_ptr<Sh
 {
 	for (std::shared_ptr<ShaderConstantBuffer> constantBuffer : constantBuffers)
 	{
-		createConstantBufferIfRequired(constantBuffer);
-		shaderConstantBuffers[constantBuffer->id()]->uploadIfDirty();
+		shaderConstantBuffers.at(constantBuffer->id()).uploadIfDirty();
 	}
 }
 
@@ -271,16 +198,48 @@ void OpenGLRenderer::draw(const std::vector<std::shared_ptr<const ModelInstance>
 {
 	//checkGLError();
 	std::shared_ptr<const ModelInstance> firstInstance = modelInstances[0];
-	createModelIfRequired(firstInstance->model());
 
-	std::shared_ptr<OpenGLRenderModel> model = models[firstInstance->model()->id()];
-	uploadInstanceData(model->transformVBO(), modelInstances);
+	OpenGLRenderModel& model = models.at(firstInstance->model()->id());
+	uploadInstanceData(model.transformVBO(), modelInstances);
 
-	std::shared_ptr<OpenGLShader> shader = model->shader();
-	shader->bind();
-	bindTextures(shader, model->textures());
-	bindShaderConstants(shader, model, globalShaderConstantBuffers);
+	OpenGLShader& shader = shaders.at(model.material()->shader()->id());
+	shader.bind();
+	bindTextures(shader, model.textures());
+	bindShaderConstants(shader, model.material(), globalShaderConstantBuffers);
 
-    model->draw(static_cast<int>(modelInstances.size()));
+    model.draw(static_cast<int>(modelInstances.size()));
 	//checkGLError();
 }
+
+void Renderer::OpenGL::OpenGLRenderer::createPendingResources()
+{
+	for (RenderResourceManagement::MeshData& m : RenderResourceManagement::drainPendingMeshes()) {
+		meshes.emplace(std::piecewise_construct, std::forward_as_tuple(m.id), std::forward_as_tuple(m.format, m.vertexData, m.indices));
+	}
+
+	for (RenderResourceManagement::TextureData& t : RenderResourceManagement::drainPendingTextures()) {
+		textures.emplace(std::piecewise_construct, std::forward_as_tuple(t.id), std::forward_as_tuple(t.dimensions, t.format, t.data));
+	}
+
+	for (RenderResourceManagement::ShaderConstantBufferData& s : RenderResourceManagement::drainPendingShaderConstantBuffers()) {
+		shaderConstantBuffers.emplace(std::piecewise_construct, std::forward_as_tuple(s.id), std::forward_as_tuple(s.buffer));
+		boundShaderConstantBuffers[s.id] = -1;
+	}
+	
+	for (RenderResourceManagement::FrameBufferData& f : RenderResourceManagement::drainPendinFrameBuffers()) {
+		frameBuffers.emplace(std::piecewise_construct, std::forward_as_tuple(f.id), std::forward_as_tuple(f.targets, textures));
+	}
+
+	for (RenderResourceManagement::UncompiledShaderData& s : RenderResourceManagement::drainPendingUncompiledShaders()) {
+		shaders.emplace(std::piecewise_construct, std::forward_as_tuple(s.id), std::forward_as_tuple(s.id, s.sources));
+	}
+
+	for (RenderResourceManagement::ModelData& m : RenderResourceManagement::drainPendingModels()) {
+		models.emplace(std::piecewise_construct, std::forward_as_tuple(m.id), std::forward_as_tuple(meshes.at(m.mesh->id()), shaders.at(m.material->shader()->id()), m.textures, m.material));
+	}
+}
+
+void Renderer::OpenGL::OpenGLRenderer::destroyPendingResources()
+{
+}
+

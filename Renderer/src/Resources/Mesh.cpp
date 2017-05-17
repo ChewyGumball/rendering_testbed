@@ -3,6 +3,7 @@
 #include <limits>
 
 #include <glm/common.hpp>
+#include <Resources/RenderResourceManagement.h>
 
 namespace {
 	Renderer::Culling::BoundingSphere calculateBoundingSphere(Renderer::VertexFormat& format, std::vector<float>& verts)
@@ -23,28 +24,17 @@ namespace {
 }
 
 namespace Renderer {
-	Mesh::Mesh(VertexFormat format, std::vector<float> vertices, std::vector<int> indices) : format(format), m_vertices(vertices), indices(indices), boundingSphere(calculateBoundingSphere(format, vertices))
+	Mesh::Mesh(VertexFormat format, std::vector<float>& vertexData, std::vector<uint32_t>& indices)
+		: m_triangleCount(indices.size() / 3), boundingSphere(calculateBoundingSphere(format, vertexData))
 	{
+		RenderResourceManagement::createMesh(m_id, format, vertexData, indices);
 	}
 
 	Mesh::~Mesh()
 	{
+		RenderResourceManagement::destroyMesh();
 	}
 
-	const std::vector<float>& Mesh::vertexData() const
-	{
-		return m_vertices;
-	}
-
-	const std::vector<int>& Mesh::indexData() const
-	{
-		return indices;
-	}
-
-	const VertexFormat Mesh::vertexFormat() const
-	{
-		return format;
-	}
 
 	Culling::BoundingSphere Mesh::bounds() const
 	{
@@ -53,6 +43,6 @@ namespace Renderer {
 
 	uint64_t Mesh::triangleCount() const
 	{
-		return indices.size() / 3;
+		return m_triangleCount;
 	}
 }

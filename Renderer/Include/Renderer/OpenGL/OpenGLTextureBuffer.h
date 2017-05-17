@@ -10,7 +10,7 @@ namespace Renderer::OpenGL {
 		GLuint m_handle;
 	public:
 		OpenGLTextureBuffer();
-		OpenGLTextureBuffer(std::shared_ptr<TextureBuffer> texture);
+		OpenGLTextureBuffer(glm::ivec2 dimensions, TextureFormat format, std::vector<uint8_t> data);
 		~OpenGLTextureBuffer();
 
 		GLuint handle();

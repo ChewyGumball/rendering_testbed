@@ -24,10 +24,8 @@ OpenGLTextureBuffer::OpenGLTextureBuffer() : m_handle(0)
 {
 }
 
-OpenGLTextureBuffer::OpenGLTextureBuffer(std::shared_ptr<TextureBuffer> texture)
+OpenGLTextureBuffer::OpenGLTextureBuffer(glm::ivec2 dimensions, TextureFormat format, std::vector<uint8_t> data)
 {
-	glm::ivec2 dimensions = texture->dimensions();
-
 	glGenTextures(1, &m_handle);
 	glBindTexture(GL_TEXTURE_2D, m_handle);
 
@@ -36,7 +34,7 @@ OpenGLTextureBuffer::OpenGLTextureBuffer(std::shared_ptr<TextureBuffer> texture)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, internalFormats[texture->format()], dimensions.x, dimensions.y, 0, formats[texture->format()], GL_UNSIGNED_BYTE, texture->data()); 
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormats[format], dimensions.x, dimensions.y, 0, formats[format], GL_UNSIGNED_BYTE, data.data());
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 }

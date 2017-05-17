@@ -9,25 +9,23 @@
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 
+#include <Resources/RenderResource.h>
+
 namespace Renderer {
-	class Shader;
 	class BufferFormat;
+	enum struct ShaderSourceType;
 }
 
 namespace Renderer::OpenGL {
-	class OpenGLShader
+	class OpenGLShader : public RenderResource
 	{
 	private:
 		uint32_t programHandle;
 		std::unordered_map<std::string, uint32_t> boundUniformBufferBindPoints;
-		std::shared_ptr<const BufferFormat> m_instanceStateFormat;
 
 	public:
-		OpenGLShader();
-		OpenGLShader(std::shared_ptr<const Shader> shader);
+		OpenGLShader(RenderResourceID id, std::unordered_map<ShaderSourceType, std::vector<std::string>>& sources);
 		~OpenGLShader();
-
-		std::shared_ptr<const BufferFormat> instanceStateFormat() const;
 
 		void bind();
 

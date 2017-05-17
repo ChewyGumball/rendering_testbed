@@ -5,6 +5,8 @@
 #include <GL\glew.h>
 #include <GLFW\glfw3.h>
 
+#include <Renderer/IRenderer.h>
+
 #include <Cameras/Camera.h>
 #include <Text/Font.h>
 
@@ -35,7 +37,7 @@ private:
 	void doCameraMovement();
 
 public:
-	Test1(GLFWwindow* window, int windowWidth, int windowHeight, std::string sceneFileName);
+	Test1(GLFWwindow* window, std::shared_ptr<Renderer::IRenderer> renderer, int windowWidth, int windowHeight, std::string sceneFileName);
 	~Test1();
 	void handleKeyboardInput(int key, int scancode, int action, int mods);
 	void handleMouseInput(double xPos, double yPos);

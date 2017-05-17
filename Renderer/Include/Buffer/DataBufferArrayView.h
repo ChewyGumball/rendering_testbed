@@ -1,10 +1,12 @@
 #pragma once
+#include <memory>
 #include <glm\glm.hpp>
 
-#include <Buffer/BufferFormat.h>
-#include <Buffer/DataBufferView.h>
-
 namespace Renderer {
+	class DataBufferView;
+	class BufferFormat;
+	enum class BufferElementType;
+
 	class DataBufferArrayView
 	{
 	protected:
@@ -51,5 +53,9 @@ namespace Renderer {
 		uint8_t* end();
 		const uint8_t* begin() const;
 		const uint8_t* end() const;
+
+		void markDirty();
+		bool isDirty() const;
+		void clean();
 	};
 }

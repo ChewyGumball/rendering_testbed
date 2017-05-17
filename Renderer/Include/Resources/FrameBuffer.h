@@ -20,7 +20,6 @@ namespace Renderer {
 	private:
 		std::unordered_map<FrameBufferTarget, std::shared_ptr<TextureBuffer>> m_targets;
 	public:
-		FrameBuffer();
 		FrameBuffer(std::unordered_map<FrameBufferTarget, std::shared_ptr<TextureBuffer>> targets);
 		~FrameBuffer();
 

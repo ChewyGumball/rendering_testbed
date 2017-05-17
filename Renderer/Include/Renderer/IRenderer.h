@@ -7,12 +7,23 @@
 namespace Renderer {
 	class ShaderConstantBuffer;
 	class ModelInstance;
+	class VertexFormat;
+	class BufferFormat;
+	class Mesh;
+	class Shader;
+	class Model;
+	class Material;
+
+	enum struct ShaderSourceType;
 
 	class IRenderer
 	{
 	public:
 		IRenderer() {};
 		virtual ~IRenderer() {};
+
+		virtual void createPendingResources() = 0;
+		virtual void destroyPendingResources() = 0;
 
 		virtual void processRenderingOptions(RenderOptions& options) = 0;
 		virtual void updateConstantBuffers(std::unordered_set<std::shared_ptr<ShaderConstantBuffer>>& constantBuffers) = 0;

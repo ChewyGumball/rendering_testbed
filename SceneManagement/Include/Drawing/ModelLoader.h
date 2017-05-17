@@ -3,6 +3,7 @@
 #include <string>
 
 #include "Resources/Mesh.h"
+#include <Renderer/IRenderer.h>
 
 namespace ModelLoader
 {

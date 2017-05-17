@@ -1,4 +1,5 @@
 #include "Buffer/DataBufferArray.h"
+#include <Buffer/BufferFormat.h>
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -8,7 +9,8 @@ namespace {
 
 	std::vector<uint8_t> initialData(std::shared_ptr<const BufferFormat> format)
 	{
-		std::vector<uint8_t> data(format->size());
+		//Save one extra byte for the dirty flag
+		std::vector<uint8_t> data(format->size() + 1);
 
 		for (auto& field : format->offsets()) {
 			switch (field.second.second) {

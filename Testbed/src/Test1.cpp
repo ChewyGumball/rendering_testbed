@@ -6,6 +6,12 @@
 #include <Scene/SceneLoader.h>
 #include <Resources/ModelInstance.h>
 
+namespace {
+	void rotateModelInstance(std::shared_ptr<Renderer::ModelInstance> instance, glm::vec3 axis, float angle) {
+		instance->instanceData().set("transform", glm::rotate(instance->instanceData().getMat4("transform"), angle, axis));
+	}
+}
+
 void Test1::handleKeyboardInput(int key, int scancode, int action, int mods) {
 
 	if (action == GLFW_PRESS) {
@@ -68,7 +74,7 @@ void Test1::draw()
 		if (rotateInstances) {
 			for (auto instance : instances)
 			{
-				instance->rotate(glm::vec3(0.0f, 1.0f, 0.0f), 0.7f * static_cast<float>(currentTime - lastTime));
+				rotateModelInstance(instance, glm::vec3(0.0f, 1.0f, 0.0f), 0.7f * static_cast<float>(currentTime - lastTime));
 			}
 		}
 		
@@ -123,15 +129,15 @@ void Test1::doCameraMovement()
 	}
 }
 
-Test1::Test1(GLFWwindow* window, int windowWidth, int windowHeight, std::string sceneFileName)
+Test1::Test1(GLFWwindow* window, std::shared_ptr<Renderer::IRenderer> renderer, int windowWidth, int windowHeight, std::string sceneFileName)
 	: window(window),
-	scene(Scene::SceneLoader::loadWorld(sceneFileName)),
+	scene(Scene::SceneLoader::loadWorld(renderer, sceneFileName)),
 	cameras({ scene.camera("layer1Camera"), scene.camera("layer1CameraQuaternion") }),
 	instances(scene.modelInstances("layer1Models")),
 	rotateInstances(false),
 	wireframe(false),
 	guiCamera(std::make_shared<Scene::Cameras::Camera>(glm::vec3(0, 0, 5), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec4(0, windowWidth, 0, windowHeight))),
-	gui(std::make_shared<Scene::RenderPass>()),
+	gui(std::make_shared<Scene::RenderPass>(renderer)),
 	f(std::make_shared<Scene::Text::Font>("F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/consola.ttf", 16)),
 	formatString("%4.4fms per frame\r\n%d frames, %5.4f fps, %I64d triangles\nVSYNC: %s"),
 	fpsCounter(Util::String::Format(formatString, 0, 0, 0.f, 0ull, "off"), f, glm::vec3(5, windowHeight, 0), glm::vec4(0.4, 0.7, 1, 1))
@@ -142,6 +148,8 @@ Test1::Test1(GLFWwindow* window, int windowWidth, int windowHeight, std::string 
 	gui->wireframe(wireframe);
 	
 	fpsCounter.addToRenderPass(gui);
+
+	renderer->createPendingResources();
 
 	glfwGetCursorPos(window, &mouseX, &mouseY);
 }

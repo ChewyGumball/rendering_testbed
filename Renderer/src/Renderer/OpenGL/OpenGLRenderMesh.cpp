@@ -1,5 +1,7 @@
 #include "Renderer/OpenGL/OpenGLRenderMesh.h"
 
+#include <GL/glew.h>
+
 using namespace Renderer;
 using namespace Renderer::OpenGL;
 
@@ -7,16 +9,15 @@ OpenGLRenderMesh::OpenGLRenderMesh(): m_vbo(0), m_ebo(0), m_indexCount(0), m_for
 {
 }
 
-OpenGLRenderMesh::OpenGLRenderMesh(std::shared_ptr<const Mesh> mesh) : m_indexCount(static_cast<uint32_t>(mesh->indexData().size())), m_format(mesh->vertexFormat())
+OpenGLRenderMesh::OpenGLRenderMesh(VertexFormat format, std::vector<float>& vertexData, std::vector<uint32_t>& indices) 
+	: m_indexCount(static_cast<uint32_t>(indices.size())), m_format(format)
 {
-	const std::vector<float>& vertexData = mesh->vertexData();
-	const std::vector<int>& indexData = mesh->indexData();
 
 	glCreateBuffers(1, &m_vbo);
 	glCreateBuffers(1, &m_ebo);
 
 	glNamedBufferData(m_vbo, vertexData.size() * sizeof(float), vertexData.data(), GL_STATIC_DRAW);
-	glNamedBufferData(m_ebo, indexData.size() * sizeof(int), indexData.data(), GL_STATIC_DRAW);
+	glNamedBufferData(m_ebo, indices.size() * sizeof(uint32_t), indices.data(), GL_STATIC_DRAW);
 }
 
 OpenGLRenderMesh::~OpenGLRenderMesh()

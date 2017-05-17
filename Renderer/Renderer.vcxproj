@@ -251,6 +251,7 @@
     <ClCompile Include="src\Renderer\DirectX10\DirectX10Renderer.cpp" />
     <ClCompile Include="src\Resources\Material.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\OpenGLShaderConstantBuffer.cpp" />
+    <ClCompile Include="src\Resources\RenderResourceManagement.cpp" />
     <ClCompile Include="src\Resources\ShaderConstantBuffer.cpp" />
     <ClCompile Include="src\Buffer\DataBufferArray.cpp" />
     <ClCompile Include="src\Buffer\DataBufferArrayView.cpp" />
@@ -329,6 +330,7 @@
     <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcher.h" />
     <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcherImpl.h" />
     <ClInclude Include="Include\lib\SimpleFileWatcher\FileWatcher\FileWatcherWin32.h" />
+    <ClInclude Include="Include\Resources\RenderResourceManagement.h" />
     <ClInclude Include="Include\Util\FileUtils.h" />
     <ClInclude Include="Include\Resources\Mesh.h" />
     <ClInclude Include="Include\Resources\Model.h" />

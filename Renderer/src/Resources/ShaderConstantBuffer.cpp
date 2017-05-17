@@ -1,11 +1,14 @@
 #include "Resources/ShaderConstantBuffer.h"
 
+#include <Buffer/DataBufferArrayView.h>
+
+#include <Resources/RenderResourceManagement.h>
 
 namespace Renderer {
 
-	ShaderConstantBuffer::ShaderConstantBuffer(std::string name, std::shared_ptr<BufferFormat> format) : m_name(name), m_buffer(format)
+	ShaderConstantBuffer::ShaderConstantBuffer(std::shared_ptr<BufferFormat> format) : m_buffer(DataBuffer(format))
 	{
-		assert(format->packingType() == BufferPackingType::OPENGL_STD140);
+		RenderResourceManagement::createShaderConstantBuffer(m_id, m_buffer);
 	}
 
 
@@ -13,85 +16,80 @@ namespace Renderer {
 	{
 	}
 
-	void ShaderConstantBuffer::set(std::string name, const glm::vec2 & value)
+	void ShaderConstantBuffer::set(const std::string& name, const glm::vec2 & value)
 	{
-		m_dirty = true;
+		makeDirty();
 		m_buffer.set(name, value);
 	}
 
-	void ShaderConstantBuffer::set(std::string name, const glm::vec3 & value)
+	void ShaderConstantBuffer::set(const std::string& name, const glm::vec3 & value)
 	{
-		m_dirty = true;
+		makeDirty();
 		m_buffer.set(name, value);
 	}
 
-	void ShaderConstantBuffer::set(std::string name, const glm::vec4 & value)
+	void ShaderConstantBuffer::set(const std::string& name, const glm::vec4 & value)
 	{
-		m_dirty = true;
+		makeDirty();
 		m_buffer.set(name, value);
 	}
 
-	void ShaderConstantBuffer::set(std::string name, const uint32_t & value)
+	void ShaderConstantBuffer::set(const std::string& name, const uint32_t & value)
 	{
-		m_dirty = true;
+		makeDirty();
 		m_buffer.set(name, value);
 	}
 
-	void ShaderConstantBuffer::set(std::string name, const int32_t & value)
+	void ShaderConstantBuffer::set(const std::string& name, const int32_t & value)
 	{
-		m_dirty = true;
+		makeDirty();
 		m_buffer.set(name, value);
 	}
 
-	void ShaderConstantBuffer::set(std::string name, const bool & value)
+	void ShaderConstantBuffer::set(const std::string& name, const bool & value)
 	{
-		m_dirty = true;
+		makeDirty();
 		m_buffer.set(name, value);
 	}
 
-	void ShaderConstantBuffer::set(std::string name, const float & value)
+	void ShaderConstantBuffer::set(const std::string& name, const float & value)
 	{
-		m_dirty = true;
+		makeDirty();
 		m_buffer.set(name, value);
 	}
 
-	void ShaderConstantBuffer::set(std::string name, const glm::mat3 & value)
+	void ShaderConstantBuffer::set(const std::string& name, const glm::mat3 & value)
 	{
-		m_dirty = true;
+		makeDirty();
 		m_buffer.set(name, value);
 	}
 
-	void ShaderConstantBuffer::set(std::string name, const glm::mat4 & value)
+	void ShaderConstantBuffer::set(const std::string& name, const glm::mat4 & value)
 	{
-		m_dirty = true;
+		makeDirty();
 		m_buffer.set(name, value);
 	}
 
-	DataBufferView ShaderConstantBuffer::getBuffer(std::string name)
+	DataBufferView ShaderConstantBuffer::getBuffer(const std::string& name)
 	{
 		return m_buffer.getBuffer(name);
 	}
 
-	DataBufferArrayView ShaderConstantBuffer::getArray(std::string name)
+	DataBufferArrayView ShaderConstantBuffer::getArray(const std::string& name)
 	{
 		return m_buffer.getArray(name);
 	}
 
-	void ShaderConstantBuffer::set(std::string name, const DataBufferView & value)
+	void ShaderConstantBuffer::set(const std::string& name, const DataBufferView & value)
 	{
-		m_dirty = true;
+		makeDirty();
 		m_buffer.set(name, value);
 	}
 
-	void ShaderConstantBuffer::set(std::string name, const DataBufferArrayView & value)
+	void ShaderConstantBuffer::set(const std::string& name, const DataBufferArrayView & value)
 	{
-		m_dirty = true;
+		makeDirty();
 		m_buffer.set(name, value);
-	}
-
-	const std::string & ShaderConstantBuffer::name() const
-	{
-		return m_name;
 	}
 
 	const DataBufferView & ShaderConstantBuffer::buffer() const
@@ -99,28 +97,18 @@ namespace Renderer {
 		return m_buffer;
 	}
 
-	void ShaderConstantBuffer::addUpdater(std::string tag, std::function<void(ShaderConstantBuffer&)> updater)
-	{
-		updateFunctions[tag] = updater;
-	}
-
-	void ShaderConstantBuffer::removeUpdated(std::string tag)
-	{
-		updateFunctions.erase(tag);
-	}
-
 	void ShaderConstantBuffer::makeDirty()
 	{
-		m_dirty = true;
+		m_buffer.markDirty();
 	}
 
 	bool ShaderConstantBuffer::isDirty() const
 	{
-		return m_dirty;
+		return m_buffer.isDirty();
 	}
 
 	void ShaderConstantBuffer::clean()
 	{
-		m_dirty = false;
+		m_buffer.clean();
 	}
 }

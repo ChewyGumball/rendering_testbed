@@ -87,13 +87,13 @@ void loadFBXMeshFromNode(FbxNode* node, std::vector<int>& indices, std::vector<V
 }
 
 namespace ModelLoader {
-std::shared_ptr<Mesh> loadOBJFile(std::string filename, VertexFormat loadedFormat)
+	std::shared_ptr<Renderer::Mesh> loadOBJFile(std::string filename, VertexFormat loadedFormat)
 {
     std::vector<glm::vec3> positions;
     std::vector<glm::vec3> normals;
     std::vector<glm::vec2> textureCoordinates;
 
-    std::vector<int>    indices;
+    std::vector<uint32_t>    indices;
     std::vector<Vertex> vertices;
     int                 vertexCount = 0;
     VertexFormat        format(0);
@@ -157,7 +157,7 @@ std::shared_ptr<Mesh> loadOBJFile(std::string filename, VertexFormat loadedForma
 
     return std::make_shared<Mesh>(format, Vertex::flatten(format, vertices), indices);
 }
-std::shared_ptr<Mesh> loadBinFile(std::string filename)
+std::shared_ptr<Renderer::Mesh> loadBinFile(std::string filename)
 {
     std::ifstream file(filename, std::ios::in | std::ios::binary);
 
@@ -172,9 +172,9 @@ std::shared_ptr<Mesh> loadBinFile(std::string filename)
 
     int64_t indexCount;
     file.read(reinterpret_cast<char*>(&indexCount), sizeof(int64_t));
-    std::vector<int32_t> indices(indexCount);
+    std::vector<uint32_t> indices(indexCount);
 
-    file.read(reinterpret_cast<char*>(indices.data()), indexCount * sizeof(int32_t));
+    file.read(reinterpret_cast<char*>(indices.data()), indexCount * sizeof(uint32_t));
     file.close();
     return std::make_shared<Mesh>(format, vertices, indices);
 }

@@ -3,7 +3,7 @@
 
 namespace Renderer {
 
-	RenderOptions::RenderOptions() :frameBuffer(std::make_shared<FrameBuffer>()), viewportOrigin(0, 0), viewportDimensions(800, 800), clearColour(glm::vec4(0, 0, 0, 1)), clearBuffers(true), wireframe(false), depthTest(true)
+	RenderOptions::RenderOptions() :frameBuffer(nullptr), viewportOrigin(0, 0), viewportDimensions(800, 800), clearColour(glm::vec4(0, 0, 0, 1)), clearBuffers(true), wireframe(false), depthTest(true)
 	{
 	}
 

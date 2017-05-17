@@ -8,8 +8,10 @@
 #include <Resources/RenderResource.h>
 
 namespace Renderer {
-
+	class BufferFormat;
 	class Material;
+	class TextureBuffer;
+
 	namespace OpenGL {
 		class OpenGLRenderMesh;
 		class OpenGLShader;
@@ -19,21 +21,17 @@ namespace Renderer {
 		private:
 			GLuint vao, m_transformVBO;
 			uint32_t m_indexCount;
-			const std::shared_ptr<OpenGLShader> m_shader;
-			const std::unordered_map<std::string, RenderResourceID> m_textures;
+			const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> m_textures;
 			const std::shared_ptr<const Material> m_material;
 
 		public:
-
-			OpenGLRenderModel();
-			OpenGLRenderModel(std::shared_ptr<OpenGLRenderMesh> mesh, std::shared_ptr<OpenGLShader> shader, const std::unordered_map<std::string, RenderResourceID> textures, std::shared_ptr<const Material> material);
+			OpenGLRenderModel(OpenGLRenderMesh& mesh, OpenGLShader& shader, const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures, std::shared_ptr<const Material> material);
 			~OpenGLRenderModel();
 
 			void draw(int instanceCount) const;
 
-			const std::unordered_map<std::string, RenderResourceID>& textures() const;
+			const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>>& textures() const;
 			const std::shared_ptr<const Material> material() const;
-			const std::shared_ptr<OpenGLShader> shader() const;
 			uint32_t indexCount() const;
 
 			GLuint transformVBO() const;

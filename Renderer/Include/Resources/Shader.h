@@ -17,21 +17,17 @@ namespace Renderer {
 	class Shader : public RenderResource
 	{
 	private:
-		std::unordered_map<ShaderSourceType, std::vector<std::string>> m_sources;
 		std::shared_ptr<const BufferFormat> m_instanceStateFormat;
 		std::unordered_map<std::string, std::shared_ptr<const BufferFormat>> m_materialConstantBufferFormats;
 		std::vector<std::string> m_systemConstantBufferNames;
-		bool m_isfileShader;
 
 	public:
-		Shader(std::vector<std::string> vertexSources, std::vector<std::string> fragmentSources, std::shared_ptr<const BufferFormat> instanceStateFormat);
-		Shader(std::vector<std::string> vertexSources, std::vector<std::string> fragmentSources, std::shared_ptr<const BufferFormat> instanceStateFormat, std::unordered_map<std::string, std::shared_ptr<const BufferFormat>> materialConstantBufferFormats, std::vector<std::string> systemConstantBufferNames);
+		Shader(std::unordered_map<ShaderSourceType, std::vector<std::string>> sources, std::shared_ptr<const BufferFormat> instanceStateFormat, std::unordered_map<std::string, std::shared_ptr<const BufferFormat>> materialConstantBufferFormats, std::vector<std::string> systemConstantBufferNames);
+		Shader(std::unordered_map<ShaderSourceType, std::vector<uint8_t>> byteCode, std::shared_ptr<const BufferFormat> instanceStateFormat, std::unordered_map<std::string, std::shared_ptr<const BufferFormat>> materialConstantBufferFormats, std::vector<std::string> systemConstantBufferNames);
+		~Shader();
 
-		const std::unordered_map<ShaderSourceType, std::vector<std::string>>& sources() const;
 		std::shared_ptr<const BufferFormat> instanceStateFormat() const;
 		const std::unordered_map<std::string, std::shared_ptr<const BufferFormat>>& materialConstantBufferFormats() const;
 		const std::vector<std::string>& systemConstantBufferNames() const;
-
-		~Shader();
 	};
 }

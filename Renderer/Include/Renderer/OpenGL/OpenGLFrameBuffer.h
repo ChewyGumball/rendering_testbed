@@ -14,8 +14,7 @@ namespace Renderer::OpenGL {
 		GLuint buffer;
 
 	public:
-		OpenGLFrameBuffer();
-		OpenGLFrameBuffer(std::shared_ptr<const FrameBuffer> frameBuffer, std::unordered_map<RenderResourceID, std::shared_ptr<OpenGLTextureBuffer>>& textures);
+		OpenGLFrameBuffer(std::unordered_map<FrameBufferTarget, std::shared_ptr<TextureBuffer>>& targets, std::unordered_map<RenderResourceID, OpenGLTextureBuffer>& textures);
 		~OpenGLFrameBuffer();
 
 		void bind();
