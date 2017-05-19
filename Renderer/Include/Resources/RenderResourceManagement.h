@@ -35,6 +35,9 @@ namespace Renderer {
 			glm::ivec2 dimensions;
 			TextureFormat format;
 			std::vector<uint8_t> data;
+
+			TextureData(RenderResourceID id, glm::ivec2 dimensions, TextureFormat format, std::vector<uint8_t>& data);
+			TextureData(RenderResourceID id, glm::ivec2 dimensions, TextureFormat format, std::vector<uint8_t>&& data);
 		};
 		struct FrameBufferData {
 			RenderResourceID id;
@@ -60,7 +63,8 @@ namespace Renderer {
 		};
 
 		void createMesh(RenderResourceID id, VertexFormat format, std::vector<float> vertexData, std::vector<uint32_t> indices);
-		void createTexture(RenderResourceID id, glm::ivec2 dimensions, TextureFormat format, std::vector<uint8_t> data);
+		void createTexture(RenderResourceID id, glm::ivec2 dimensions, TextureFormat format, std::vector<uint8_t>& data);
+		void createTexture(RenderResourceID id, glm::ivec2 dimensions, TextureFormat format, std::vector<uint8_t>&& data);
 		void createFrameBuffer(RenderResourceID id, std::unordered_map<FrameBufferTarget, std::shared_ptr<TextureBuffer>> targets);
 		void createShader(RenderResourceID id, std::unordered_map<ShaderSourceType, std::vector<std::string>> sources);
 		void createShader(RenderResourceID id, std::unordered_map<ShaderSourceType, std::vector<uint8_t>> byteCode);

@@ -24,9 +24,14 @@ void Renderer::RenderResourceManagement::createMesh(RenderResourceID id, VertexF
 	pendingMeshes.push_back({ id, format, vertexData, indices });
 }
 
-void Renderer::RenderResourceManagement::createTexture(RenderResourceID id, glm::ivec2 dimensions, TextureFormat format, std::vector<uint8_t> data)
+void Renderer::RenderResourceManagement::createTexture(RenderResourceID id, glm::ivec2 dimensions, TextureFormat format, std::vector<uint8_t>& data)
 {
-	pendingTextures.push_back({ id, dimensions, format, data });
+	pendingTextures.emplace_back(id, dimensions, format, data);
+}
+
+void Renderer::RenderResourceManagement::createTexture(RenderResourceID id, glm::ivec2 dimensions, TextureFormat format, std::vector<uint8_t>&& data)
+{
+	pendingTextures.emplace_back(id, dimensions, format, std::move(data));
 }
 
 void Renderer::RenderResourceManagement::createFrameBuffer(RenderResourceID id, std::unordered_map<FrameBufferTarget, std::shared_ptr<TextureBuffer>> targets)
@@ -90,5 +95,15 @@ std::vector<Renderer::RenderResourceManagement::ModelData> Renderer::RenderResou
 
 
 void Renderer::RenderResourceManagement::destroyMesh()
+{
+}
+
+Renderer::RenderResourceManagement::TextureData::TextureData(RenderResourceID id, glm::ivec2 dimensions, TextureFormat format, std::vector<uint8_t>& data)
+	:id(id), dimensions(dimensions), format(format), data(data)
+{
+}
+
+Renderer::RenderResourceManagement::TextureData::TextureData(RenderResourceID id, glm::ivec2 dimensions, TextureFormat format, std::vector<uint8_t>&& data)
+	: id(id), dimensions(dimensions), format(format), data(std::move(data))
 {
 }

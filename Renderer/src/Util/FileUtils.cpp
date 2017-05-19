@@ -61,7 +61,7 @@ namespace {
 
 namespace Util::File
 {
-	std::string ReadWholeFile(std::string filename)
+	std::string ReadWholeFile(const std::string& filename)
 	{
 		std::ifstream file(filename, std::ios::in | std::ios::binary);
 		if (!file) {
@@ -74,12 +74,12 @@ namespace Util::File
 		return fileContents.str();
 	}
 
-	std::vector<std::string> ReadLines(std::string filename)
+	std::vector<std::string> ReadLines(const std::string& filename)
 	{
 		return Util::String::Split(ReadWholeFile(filename), '\n');
 	}
 
-	std::vector<uint8_t> ReadBinary(std::string filename)
+	std::vector<uint8_t> ReadBinary(const std::string& filename)
 	{
 		std::ifstream file(filename, std::ios::in | std::ios::binary);
 		if (!file) {
@@ -96,7 +96,7 @@ namespace Util::File
 		return data;
 	}
 
-	void ProcessLines(std::string filename, std::function<void(const std::string&)> processor)
+	void ProcessLines(const std::string& filename, std::function<void(const std::string&)> processor)
 	{
 		std::string file = ReadWholeFile(filename);
 		auto start = file.begin();
@@ -115,7 +115,12 @@ namespace Util::File
 		}
 	}
 
-	void WatchForChanges(std::string filename, std::function<void()> observer)
+	std::vector<uint8_t> ReadPNG(const std::string & filename)
+	{
+		return std::vector<uint8_t>();
+	}
+
+	void WatchForChanges(const std::string& filename, std::function<void()> observer)
 	{
 		FileUpdateListener.add(filename, observer);
 	}

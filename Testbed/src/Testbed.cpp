@@ -139,6 +139,8 @@ void directx(std::string sceneFile)
 
 int main(int argc, char *argv[])
 {
+	//Renderer::TextureBuffer b("F:/Users/Ben/Desktop/eagle_PNG1210.png");
+	Renderer::TextureBuffer b("F:/Users/Ben/Desktop/pnggrad16rgb.png"); 
 	if (argc >= 3 && std::string(argv[1]) == "convert")
 	{
 		convert(argc, argv);

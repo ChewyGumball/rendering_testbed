@@ -143,29 +143,31 @@ std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> loadTextures(rap
     std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures;
 	if (json.HasMember("textures")) {
 		for (auto& texture : json["textures"].GetObject()) {
-			int width, height;
-
-			if (texture.value["width"].IsInt()) {
-				width = texture.value["width"].GetInt();
-			}
-			else {
-				std::string widthString(texture.value["width"].GetString());
-				width = getIntFromPath(&json, widthString.substr(1, widthString.size() - 2));
-			}
-			if (texture.value["height"].IsInt()) {
-				height = texture.value["height"].GetInt();
-			}
-			else {
-				std::string heightString(texture.value["height"].GetString());
-				height = getIntFromPath(&json, heightString.substr(1, heightString.size() - 2));
-			}
-
 			std::string name(texture.name.GetString());
-			std::string format(texture.value["format"].GetString());
-			if (texture.value.HasMember("filename")) {
-			}
-			else {
+			if (texture.value.IsObject()) {
+				int width, height;
+
+				if (texture.value["width"].IsInt()) {
+					width = texture.value["width"].GetInt();
+				}
+				else {
+					std::string widthString(texture.value["width"].GetString());
+					width = getIntFromPath(&json, widthString.substr(1, widthString.size() - 2));
+				}
+				if (texture.value["height"].IsInt()) {
+					height = texture.value["height"].GetInt();
+				}
+				else {
+					std::string heightString(texture.value["height"].GetString());
+					height = getIntFromPath(&json, heightString.substr(1, heightString.size() - 2));
+				}
+
+				std::string format(texture.value["format"].GetString());
+
 				textures[name] = std::make_shared<TextureBuffer>(glm::vec2(width, height), textureFormats[format]);
+			} 
+			else if (texture.value.IsString()) {
+				textures[name] = std::make_shared<TextureBuffer>(texture.value.GetString());
 			}
 		}
 	}

@@ -64,7 +64,9 @@
       "width": "{screen.width}",
       "height": "{screen.height}",
       "format": "depth"
-    }
+    },
+    "randobird": "F:/Users/Ben/Desktop/eagle_PNG1210.png",
+    "colours": "F:/Users/Ben/Desktop/pnggrad16rgb.png"
   },
   "constantBuffers": {
     "camera1": {
@@ -104,6 +106,20 @@
       "material": "renderTexture",
       "textures": {
         "screenTexture": "screenColourBufferB"
+      }
+    },
+    "textureTestA": {
+      "mesh": "plane",
+      "material": "renderTexture",
+      "textures": {
+        "screenTexture": "randobird"
+      }
+    },
+    "textureTestB": {
+      "mesh": "plane",
+      "material": "renderTexture",
+      "textures": {
+        "screenTexture": "colours"
       }
     }
   },
@@ -247,6 +263,34 @@
             "z": 1
           }
         }
+      ],
+      "textureTest": [
+        {
+          "model": "textureTestA",
+          "position": {
+            "x": -1,
+            "y": 0,
+            "z": 0
+          },
+          "scale": {
+            "x": 0.5,
+            "y": 1,
+            "z": 1
+          }
+        },
+        {
+          "model": "textureTestB",
+          "position": {
+            "x": 1,
+            "y": 0,
+            "z": 0
+          },
+          "scale": {
+            "x": 0.5,
+            "y": 1,
+            "z": 1
+          }
+        }
       ]
     },
     "passes": {
@@ -278,7 +322,7 @@
       "display": {
         "dependencies": [ "cameraTestB", "cameraTestA" ],
         "lights": [ "layer1Lights" ],
-        "models": [ "cameraTest" ],
+        "models": [ "textureTest" ],
         "cull": false,
         "camera": "screenSpaceCamera",
         "viewport": {
