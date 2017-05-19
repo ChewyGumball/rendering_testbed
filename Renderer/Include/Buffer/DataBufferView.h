@@ -42,6 +42,16 @@ namespace Renderer {
 		const glm::mat3& getMat3(const std::string& name) const;
 		const glm::mat4& getMat4(const std::string& name) const;
 
+		glm::vec2& getVec2(const std::string& name);
+		glm::vec3& getVec3(const std::string& name);
+		glm::vec4& getVec4(const std::string& name);
+		uint32_t& getUInt(const std::string& name);
+		int32_t& getInt(const std::string& name);
+		bool& getBool(const std::string& name);
+		float& getFloat(const std::string& name);
+		glm::mat3& getMat3(const std::string& name);
+		glm::mat4& getMat4(const std::string& name);
+
 		const DataBufferView getBuffer(const std::string& name) const;
 		DataBufferView getBuffer(const std::string& name);
 
@@ -56,5 +66,12 @@ namespace Renderer {
 		void markDirty();
 		bool isDirty() const;
 		void clean();
+
+		void translate(const std::string& name, const glm::vec3& offset);
+		void rotate(const std::string& name, const glm::vec3& axis, float angle);
+		void scale(const std::string& name, const glm::vec3& amount);
+
+		void postMultiply(const std::string& name, const glm::mat4& matrix);
+		void preMultiply(const std::string& name, const glm::mat4& matrix);
 	};
 }

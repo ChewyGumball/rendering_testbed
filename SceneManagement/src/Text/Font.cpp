@@ -17,6 +17,8 @@
 #include <Resources/Material.h>
 #include <Buffer/BufferFormat.h>
 
+#include <Drawing/ModelGroup.h>
+
 using namespace Renderer;
 
 namespace {
@@ -146,23 +148,25 @@ namespace Scene::Text {
 		return m_height;
 	}
 
-	std::vector<std::shared_ptr<ModelInstance>> Font::createString(std::string string, glm::vec4 colour) const
+	ModelGroup Font::createString(std::string string, glm::vec4 colour) const
 	{
-		std::vector<std::shared_ptr<ModelInstance>> instances = createInstances(drawableCharacters(string));
-		modifyString(instances, string, colour);
-		return instances;
+		ModelGroup characters = createCharacters(drawableCharacters(string));
+		modifyString(characters, string, colour);
+		return characters;
 	}
 
-	void Font::modifyColour(std::vector<std::shared_ptr<ModelInstance>>& text, int startInclusive, int endExclusive, glm::vec4 newColour) const
+	void Font::modifyColour(const ModelGroup& text, int startInclusive, int endExclusive, glm::vec4 newColour) const
 	{
+		auto& instances = text.instances();
 		for (size_t i = startInclusive; i < endExclusive; ++i) {
-			text[i]->instanceData().set("letterColour", newColour);
+			instances[i]->instanceData().set("letterColour", newColour);
 		}
 	}
 
-	void Font::modifyString(const std::vector<std::shared_ptr<ModelInstance>>& currentText, std::string newString, glm::vec4 colour) const
+	void Font::modifyString(const ModelGroup& currentText, std::string newString, glm::vec4 colour) const
 	{
-		assert(currentText.size() == drawableCharacters(newString));
+		auto& instances = currentText.instances();
+		assert(instances.size() == drawableCharacters(newString));
 
 		stbtt_fontinfo& fontInfo = fontInfos[fontFile];
 
@@ -194,7 +198,7 @@ namespace Scene::Text {
 				offset = stbtt_GetCodepointKernAdvance(&fontInfo, currentChar, previousChar) * scale;
 			}
 
-			std::shared_ptr<ModelInstance> letter = currentText[nextModelInstance++];
+			std::shared_ptr<ModelInstance> letter = instances[nextModelInstance++];
 
 			stbtt_aligned_quad q;
 			stbtt_GetPackedQuad(packedCharData.get(), atlasWidth, atlasHeight, currentChar - 32, &xPosition, &yPosition, &q, true);
@@ -208,16 +212,15 @@ namespace Scene::Text {
 		}
 	}
 
-	std::vector<std::shared_ptr<ModelInstance>> Font::createInstances(size_t instanceCount) const
+	ModelGroup Font::createCharacters(size_t instanceCount) const
 	{
-		std::vector<std::shared_ptr<ModelInstance>> instances;
-		instances.reserve(instanceCount);
+		ModelGroup newGroup(instanceCount);
 
 		for (int i = 0; i < instanceCount; ++i) {
-			instances.push_back(std::make_shared<ModelInstance>(m_model));
+			newGroup.addInstance(m_model);
 		}
 
-		return instances;
+		return newGroup;
 	}
 
 	uint32_t Font::drawableCharacters(std::string & string) const

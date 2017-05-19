@@ -9,7 +9,7 @@
 
 namespace Scene::Text {
 	RenderableText::RenderableText(std::string text, std::shared_ptr<Scene::Text::Font> font, glm::vec3 position, glm::vec4 colour)
-		: m_position(glm::vec3()), m_text(text), m_colour(colour), m_font(font), instances(font->createString(text, colour))
+		: m_position(glm::vec3()), m_text(text), m_colour(colour), m_font(font), characters(font->createString(text, colour))
 	{
 		translate(position);
 	}
@@ -20,21 +20,19 @@ namespace Scene::Text {
 
 	void RenderableText::addToRenderPass(std::shared_ptr<RenderPass> pass)
 	{
-		pass->addModelInstances(instances);
+		pass->addModelInstances(characters.instances());
 		passesContainingThisText.push_back(pass);
 	}
 
 	void RenderableText::removeFromRenderPass(std::shared_ptr<RenderPass> pass)
 	{
-		pass->removeModelInstances(instances);
+		pass->removeModelInstances(characters.instances());
 		passesContainingThisText.erase(std::remove(passesContainingThisText.begin(), passesContainingThisText.end(), pass), passesContainingThisText.end());
 	}
 
 	void RenderableText::translate(glm::vec3 offset)
 	{
-		for (auto instance : instances) {
-			instance->instanceData().set("transform", glm::translate(instance->instanceData().getMat4("transform"), offset));
-		}
+		characters.translate(ShaderAttribute::Transform, offset);
 		m_position += offset;
 	}
 
@@ -47,29 +45,27 @@ namespace Scene::Text {
 
 		//Instances need to be created and added to render passes
 		if (newSize > oldSize) {
-			std::vector<std::shared_ptr<Renderer::ModelInstance>> instancesToAdd = m_font->createInstances(newSize - oldSize);
+			ModelGroup newCharacters = m_font->createCharacters(newSize - oldSize);
 			//the new instances need to be positioned properly
-			for (auto instance : instancesToAdd) {
-				instance->instanceData().set("transform", glm::translate(instance->instanceData().getMat4("transform"), m_position));
-			}
+			newCharacters.translate(ShaderAttribute::Transform, m_position);
 
 			for (auto pass : passesContainingThisText) {
-				pass->addModelInstances(instancesToAdd);
+				pass->addModelInstances(newCharacters.instances());
 			}
-			instances.reserve(newSize);
-			instances.insert(instances.end(), instancesToAdd.begin(), instancesToAdd.end());
+
+			characters.addModelGroup(newCharacters);
 		}
 		//Instances need to be removed from render passes
 		else if (newSize < oldSize) {
-			std::vector<std::shared_ptr<Renderer::ModelInstance>> instancesToErase(instances.begin() + newSize, instances.end());
-			instances.erase(instances.begin() + newSize, instances.end());
+			std::vector<std::shared_ptr<Renderer::ModelInstance>> instancesToErase(characters.instances().begin() + newSize, characters.instances().end());
+			characters.removeInstances(instancesToErase);
 
 			for (auto pass : passesContainingThisText) {
 				pass->removeModelInstances(instancesToErase);
 			}
 		}
 
-		m_font->modifyString(instances, m_text, m_colour);
+		m_font->modifyString(characters, m_text, m_colour);
 	}
 
 	const std::string RenderableText::text() const
@@ -80,7 +76,7 @@ namespace Scene::Text {
 	void RenderableText::font(std::shared_ptr<Scene::Text::Font> newFont)
 	{
 		m_font = newFont;
-		newFont->modifyString(instances, m_text, m_colour);
+		newFont->modifyString(characters, m_text, m_colour);
 	}
 
 	std::shared_ptr<Scene::Text::Font> RenderableText::font() const

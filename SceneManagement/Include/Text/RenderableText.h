@@ -4,6 +4,8 @@
 #include <Text/Font.h>
 #include <glm/vec3.hpp>
 
+#include <Drawing/ModelGroup.h>
+
 namespace Scene {
 	class RenderPass;
 }
@@ -16,7 +18,7 @@ namespace Scene::Text {
 		std::string m_text;
 		glm::vec4 m_colour;
 		std::shared_ptr<Scene::Text::Font> m_font;
-		std::vector<std::shared_ptr<Renderer::ModelInstance>> instances;
+		ModelGroup characters;
 		std::vector<std::shared_ptr<RenderPass>> passesContainingThisText;
 
 	public:

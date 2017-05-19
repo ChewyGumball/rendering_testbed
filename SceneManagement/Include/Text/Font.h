@@ -13,6 +13,10 @@ namespace Renderer {
 
 struct stbtt_packedchar_DIDNT_NAME_THIS_STRUCT;
 
+namespace Scene {
+	class ModelGroup;
+}
+
 namespace Scene::Text {
 	class Font
 	{
@@ -31,11 +35,11 @@ namespace Scene::Text {
 		const std::shared_ptr<Renderer::TextureBuffer> bitmap();
 		uint16_t height();
 
-		std::vector<std::shared_ptr<Renderer::ModelInstance>> createString(std::string string, glm::vec4 colour = glm::vec4(1, 1, 1, 1)) const;
+		ModelGroup createString(std::string string, glm::vec4 colour = glm::vec4(1, 1, 1, 1)) const;
 
-		void modifyColour(std::vector<std::shared_ptr<Renderer::ModelInstance>>& text, int startInclusive, int endExclusive, glm::vec4 newColour) const;
-		void modifyString(const std::vector<std::shared_ptr<Renderer::ModelInstance>>& currentText, std::string newString, glm::vec4 colour = glm::vec4(1, 1, 1, 1)) const;
-		std::vector<std::shared_ptr<Renderer::ModelInstance>> createInstances(size_t instanceCount) const;
+		void modifyColour(const ModelGroup& text, int startInclusive, int endExclusive, glm::vec4 newColour) const;
+		void modifyString(const ModelGroup& currentText, std::string newString, glm::vec4 colour = glm::vec4(1, 1, 1, 1)) const;
+		ModelGroup createCharacters(size_t instanceCount) const;
 
 		uint32_t drawableCharacters(std::string& string) const;
 	};
