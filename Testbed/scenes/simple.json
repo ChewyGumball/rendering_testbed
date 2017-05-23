@@ -4,42 +4,120 @@
     "height": 800
   },
   "meshes": {
+    "cube": {
+      "filename": "F:/Users/Ben/Desktop/cube.obj",
+      "format": "Position_Normal"
+    },
     "plane": {
       "filename": "F:/Users/Ben/Desktop/plane.obj",
       "format": "Position_Texture"
     }
   },
   "shaders": {
-    "simple": {
-      "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/simple.vert" ],
-      "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/simple.frag" ],
+    "phong": {
+      "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/normal.vert" ],
+      "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/normal.frag" ],
+      "instanceDataFormat": { "transform": "mat4" },
+      "systemConstantBuffers": [
+        "camera",
+        "lights"
+      ]
+    },
+    "texture": {
+      "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/texture.vert" ],
+      "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/texture.frag" ],
       "instanceDataFormat": { "transform": "mat4" },
       "systemConstantBuffers": [
         "camera"
       ]
+    },
+    "finalShader": {
+      "vertexFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/final.vert" ],
+      "fragmentFiles": [ "F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/shaders/final.frag" ],
+      "instanceDataFormat": { "transform": "mat4" },
+      "constantBufferFormats": {}
     }
   },
   "materials": {
-    "simple": {
-      "shader": "simple"
+    "phong": {
+      "shader": "phong"
+    },
+    "renderTexture": {
+      "shader": "texture"
+    }
+  },
+  "textures": {
+    "screenColourBufferA": {
+      "width": "{screen.width}",
+      "height": "{screen.height}",
+      "format": "rgb"
+    },
+    "screenColourBufferB": {
+      "width": "{screen.width}",
+      "height": "{screen.height}",
+      "format": "rgb"
+    },
+    "screenDepthBuffer": {
+      "width": "{screen.width}",
+      "height": "{screen.height}",
+      "format": "depth"
+    },
+    "randobird": "F:/Users/Ben/Desktop/eagle_PNG1210.png",
+    "colours": "F:/Users/Ben/Desktop/pnggrad16rgb.png"
+  },
+  "constantBuffers": {
+    "camera1": {
+      "format": "{phong.Camera}"
+    },
+    "camera2": {
+      "format": "{phong.Camera}"
+    },
+    "camera3": {
+      "format": "{phong.Camera}"
+    },
+    "orthoCamera": {
+      "format": "{phong.Camera}"
+    },
+    "lights": {
+      "format": "{phong.Lights}"
     }
   },
   "models": {
-    "plane": {
+    "textureTestA": {
       "mesh": "plane",
-      "material": "simple"
+      "material": "renderTexture",
+      "textures": {
+        "screenTexture": "randobird"
+      }
+    },
+    "textureTestB": {
+      "mesh": "plane",
+      "material": "renderTexture",
+      "textures": {
+        "screenTexture": "colours"
+      }
+    }
+  },
+  "lights": {
+    "light_name": {
+      "type": "point",
+      "colour": {
+        "r": 0.4,
+        "g": 0.9,
+        "b": 0.2
+      },
+      "power": 1
     }
   },
   "scene": {
     "cameras": {
-      "layer1CameraQuaternion": {
-        "type": "quaternion",
+      "screenSpaceCamera": {
         "fov": 45,
-        "aspectRatio": 0.5,
+        "aspectRatio":  1.0,
         "position": {
-          "x": 5,
+          "x": 0,
           "y": 0,
-          "z": 0
+          "z": 2
         },
         "target": {
           "x": 0,
@@ -53,28 +131,114 @@
         }
       }
     },
-    "lights": { },
-    "models": {
-      "layer1Models": [
+    "lights": {
+      "layer1Lights": [
         {
-          "model": "plane",
+          "light": "light_name",
           "position": {
-            "x": 0,
+            "x": 1,
+            "y": 1,
+            "z": -1
+          }
+        },
+        {
+          "light": "light_name",
+          "position": {
+            "x": -1,
+            "y": -1,
+            "z": -1
+          }
+        }
+      ]
+    },
+    "models": {
+      "textureTest": [
+        {
+          "model": "textureTestA",
+          "position": {
+            "x": -1,
+            "y": 0,
+            "z": 0.1
+          },
+          "scale": {
+            "x": 0.5,
+            "y": 1,
+            "z": 1
+          }
+        },
+        {
+          "model": "textureTestB",
+          "position": {
+            "x": 1,
             "y": 0,
             "z": 0
+          },
+          "scale": {
+            "x": 0.5,
+            "y": 1,
+            "z": 1
+          }
+        },
+        {
+          "model": "textureTestA",
+          "position": {
+            "x": 1.6,
+            "y": 0,
+            "z": 0
+          },
+          "scale": {
+            "x": 0.5,
+            "y": 1,
+            "z": 1
+          }
+        },
+        {
+          "model": "textureTestA",
+          "position": {
+            "x": 1.3,
+            "y": 0,
+            "z": 0
+          },
+          "scale": {
+            "x": 0.5,
+            "y": 1,
+            "z": 1
+          }
+        },
+        {
+          "model": "textureTestA",
+          "position": {
+            "x": 1.9,
+            "y": 0,
+            "z": 0
+          },
+          "scale": {
+            "x": 0.5,
+            "y": 1,
+            "z": 1
           }
         }
       ]
     },
     "passes": {
-      "cameraTestB": {
+      "display": {
         "dependencies": [ ],
-        "lights": [],
-        "models": [ "layer1Models" ],
-        "camera": "layer1CameraQuaternion",
-        "cull": false,
-        "wireframe": false,
-        "clearColour": { "r":  0.2, "g": 0.2, "b": 0.2, "a": 1}
+        "lights": [ "layer1Lights" ],
+        "models": [ "textureTest" ],
+        "cull": true,
+        "camera": "screenSpaceCamera",
+        "clearColour": {
+          "r": 0.2,
+          "g": 0.2,
+          "b": 0.2,
+          "a": 1
+        },
+        "viewport": {
+          "x": 0,
+          "y": 0,
+          "width": 800,
+          "height": 800
+        }
       }
     }
   }

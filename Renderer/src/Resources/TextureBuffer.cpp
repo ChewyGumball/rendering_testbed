@@ -18,9 +18,14 @@ namespace {
 }
 
 namespace Renderer {
-	TextureBuffer::TextureBuffer(glm::ivec2 dimensions, TextureFormat format, std::vector<uint8_t> data)
+	TextureBuffer::TextureBuffer(glm::ivec2 dimensions, TextureFormat format, const std::vector<uint8_t>& data)
 	{
 		RenderResourceManagement::createTexture(m_id, dimensions, format, data);
+	}
+
+	TextureBuffer::TextureBuffer(glm::ivec2 dimensions, TextureFormat format, std::vector<uint8_t>&& data)
+	{
+		RenderResourceManagement::createTexture(m_id, dimensions, format, std::move(data));
 	}
 
 	TextureBuffer::TextureBuffer(const std::string & filename)
@@ -31,13 +36,18 @@ namespace Renderer {
 		uint8_t* image = stbi_load_from_memory(data.data(), static_cast<int>(data.size()), &x, &y, &channels, 0);
 
 		std::vector<uint8_t> imageAsVector(x * y * channels);
-
 		std::copy(image, image + x * y * channels, imageAsVector.data());
+
+		stbi_image_free(image);
 
 		RenderResourceManagement::createTexture(m_id, glm::ivec2(x, y), stbTextureFormats[channels], std::move(imageAsVector));
 	}
 
 	TextureBuffer::~TextureBuffer()
 	{
+	}
+	TextureFormat TextureBuffer::format()
+	{
+		return m_format;
 	}
 }

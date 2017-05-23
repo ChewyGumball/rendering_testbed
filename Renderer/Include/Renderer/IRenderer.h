@@ -16,6 +16,12 @@ namespace Renderer {
 
 	enum struct ShaderSourceType;
 
+	enum struct SortType {
+		FrontToBack,
+		BackToFront,
+		None
+	};
+
 	class IRenderer
 	{
 	public:
@@ -27,6 +33,6 @@ namespace Renderer {
 
 		virtual void processRenderingOptions(RenderOptions& options) = 0;
 		virtual void updateConstantBuffers(std::unordered_set<std::shared_ptr<ShaderConstantBuffer>>& constantBuffers) = 0;
-		virtual void draw(const std::vector<std::shared_ptr<const ModelInstance>>& instances, const std::unordered_map<std::string, std::shared_ptr<ShaderConstantBuffer>>& renderPassConstants) = 0;
+		virtual void draw(const std::vector<std::shared_ptr<const ModelInstance>>& instances, SortType sortType, const std::unordered_map<std::string, std::shared_ptr<ShaderConstantBuffer>>& renderPassConstants) = 0;
 	};
 }

@@ -6,7 +6,7 @@
 #include <Resources/RenderResourceManagement.h>
 
 namespace {
-	Renderer::Culling::BoundingSphere calculateBoundingSphere(Renderer::VertexFormat& format, std::vector<float>& verts)
+	Renderer::Culling::BoundingSphere calculateBoundingSphere(Renderer::VertexFormat& format, const std::vector<float>& verts)
 	{
 		float infinity = std::numeric_limits<float>::infinity();
 		glm::vec3 max(std::numeric_limits<float>::min(), std::numeric_limits<float>::min(), std::numeric_limits<float>::min());
@@ -24,10 +24,16 @@ namespace {
 }
 
 namespace Renderer {
-	Mesh::Mesh(VertexFormat format, std::vector<float>& vertexData, std::vector<uint32_t>& indices)
+	Mesh::Mesh(VertexFormat format, const std::vector<float>& vertexData, const std::vector<uint32_t>& indices)
 		: m_triangleCount(indices.size() / 3), boundingSphere(calculateBoundingSphere(format, vertexData))
 	{
 		RenderResourceManagement::createMesh(m_id, format, vertexData, indices);
+	}
+
+	Mesh::Mesh(VertexFormat format, std::vector<float>&& vertexData, std::vector<uint32_t>&& indices)
+		: m_triangleCount(indices.size() / 3), boundingSphere(calculateBoundingSphere(format, vertexData))
+	{
+		RenderResourceManagement::createMesh(m_id, format, std::move(vertexData), std::move(indices));
 	}
 
 	Mesh::~Mesh()

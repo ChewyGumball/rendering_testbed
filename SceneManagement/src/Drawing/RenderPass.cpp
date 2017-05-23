@@ -121,32 +121,20 @@ namespace Scene {
 	RenderPass::~RenderPass()
 	{}
 
-	uint64_t RenderPass::draw()
+	uint64_t RenderPass::drawInstances(const std::vector<std::shared_ptr<const Renderer::ModelInstance>>& instances, Renderer::SortType sortType)
 	{
-		uint64_t trianglesDrawn = 0;
-
 		std::unordered_map<std::shared_ptr<const Model>, std::vector<std::shared_ptr<const ModelInstance>>> culledInstances;
-
 		//Cull (or not) instances against the camera
 		if (cullingEnabled) {
-			culledInstances = cullAgainstCameraFrustum(m_camera, m_modelInstances);
+			culledInstances = cullAgainstCameraFrustum(m_camera, instances);
 		}
 		else {
-			for (auto instance : m_modelInstances) {
+			for (auto instance : instances) {
 				culledInstances[instance->model()].push_back(instance);
 			}
 		}
-
-		//Set up renderer with rendering options
-		renderer->processRenderingOptions(options);
-
-		updatePassConstantBuffers(passConstants, m_camera, lights);
+		
 		std::unordered_set<std::shared_ptr<ShaderConstantBuffer>> constantBuffersToUpdate;
-		//update system constant buffer data
-		for (auto s : passConstants) {
-			//insert camera and shit into the buffers
-			constantBuffersToUpdate.insert(s.second);
-		}
 
 		//Update shader constant buffers
 		for (auto& instanceList : culledInstances) {
@@ -163,11 +151,37 @@ namespace Scene {
 			shaderConstantBuffer->clean();
 		}
 
+		uint64_t trianglesDrawn = 0;
 		//Draw instances
 		for (auto& instanceList : culledInstances) {
-			renderer->draw(instanceList.second, passConstants);
+			renderer->draw(instanceList.second, sortType, passConstants);
 			trianglesDrawn += instanceList.second.size() * instanceList.second[0]->model()->triangleCount();
 		}
+
+		return trianglesDrawn;
+	}
+
+	uint64_t RenderPass::draw()
+	{
+		//Set up renderer with rendering options
+		renderer->processRenderingOptions(options);
+
+		updatePassConstantBuffers(passConstants, m_camera, lights);
+
+		std::unordered_set<std::shared_ptr<ShaderConstantBuffer>> constantBuffersToUpdate;
+		//update system constant buffer data
+		for (auto s : passConstants) {
+			//insert camera and shit into the buffers
+			constantBuffersToUpdate.insert(s.second);
+		}
+		renderer->updateConstantBuffers(constantBuffersToUpdate);
+
+		for (auto shaderConstantBuffer : constantBuffersToUpdate) {
+			shaderConstantBuffer->clean();
+		}
+
+		uint64_t trianglesDrawn = drawInstances(m_opaqueInstances, Renderer::SortType::FrontToBack);
+		trianglesDrawn += drawInstances(m_transparentInsances, Renderer::SortType::BackToFront);	
 
 		return trianglesDrawn;
 	}
@@ -210,7 +224,12 @@ namespace Scene {
 	void RenderPass::addModelInstances(std::vector<std::shared_ptr<ModelInstance>> modelInstances)
 	{
 		for (auto modelInstance : modelInstances) {
-			m_modelInstances.push_back(modelInstance);
+			if (modelInstance->model()->isOpaque()) {
+				m_opaqueInstances.push_back(modelInstance);
+			}
+			else {
+				m_transparentInsances.push_back(modelInstance);
+			}
 		}
 	}
 
@@ -225,7 +244,12 @@ namespace Scene {
 	void RenderPass::removeModelInstances(std::vector<std::shared_ptr<ModelInstance>> modelInstances)
 	{
 		for (auto modelInstance : modelInstances) {
-			m_modelInstances.erase(std::remove(m_modelInstances.begin(), m_modelInstances.end(), modelInstance), m_modelInstances.end());
+			if (modelInstance->model()->isOpaque()) {
+				m_opaqueInstances.erase(std::remove(m_opaqueInstances.begin(), m_opaqueInstances.end(), modelInstance), m_opaqueInstances.end());
+			}
+			else {
+				m_transparentInsances.erase(std::remove(m_transparentInsances.begin(), m_transparentInsances.end(), modelInstance), m_transparentInsances.end());
+			}
 		}
 	}
 

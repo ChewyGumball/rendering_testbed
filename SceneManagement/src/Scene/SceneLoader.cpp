@@ -405,11 +405,11 @@ namespace Scene {
 			std::cout << "ERROR: " << errorCode << " , " << errorOffset << std::endl;
 		}
 
-		std::unordered_map<std::string, std::shared_ptr<Mesh>> meshes(loadMeshes(json));
-		std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures(loadTextures(json));
-		std::unordered_map<std::string, std::shared_ptr<Shader>> shaders(loadShaders(json, textures));
-		std::unordered_map<std::string, PointLight> lights(loadLights(json));
-		std::unordered_map<std::string, std::shared_ptr<Material>> materials(loadMaterials(json, shaders));
+		std::unordered_map<std::string, std::shared_ptr<Mesh>> meshes = loadMeshes(json);
+		std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures = loadTextures(json);
+		std::unordered_map<std::string, std::shared_ptr<Shader>> shaders = loadShaders(json, textures);
+		std::unordered_map<std::string, PointLight> lights = loadLights(json);
+		std::unordered_map<std::string, std::shared_ptr<Material>> materials = loadMaterials(json, shaders);
 
 		std::unordered_map<std::string, std::shared_ptr<Model>> models;
 

@@ -101,7 +101,7 @@ namespace Scene::Text {
 	{
 		packedCharData = std::make_unique<stbtt_packedchar_DIDNT_NAME_THIS_STRUCT[]>(94);
 		if (fontData.count(fontFile) == 0) {
-			fontData[fontFile].swap(Util::File::ReadBinary(fontFile));
+			fontData[fontFile] = Util::File::ReadBinary(fontFile);
 		}
 		std::vector<uint8_t>& fontFileData = fontData[fontFile];
 

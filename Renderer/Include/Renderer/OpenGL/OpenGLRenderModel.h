@@ -25,7 +25,7 @@ namespace Renderer {
 			const std::shared_ptr<const Material> m_material;
 
 		public:
-			OpenGLRenderModel(OpenGLRenderMesh& mesh, OpenGLShader& shader, const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures, std::shared_ptr<const Material> material);
+			OpenGLRenderModel(OpenGLRenderMesh& mesh, OpenGLShader& shader, const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>>&& textures, std::shared_ptr<const Material> material);
 			~OpenGLRenderModel();
 
 			void draw(int instanceCount) const;

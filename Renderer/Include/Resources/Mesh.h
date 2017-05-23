@@ -12,7 +12,8 @@ namespace Renderer {
 
 		Culling::BoundingSphere boundingSphere;
 	public:
-		Mesh(VertexFormat format, std::vector<float>& vertexData, std::vector<uint32_t>& indices);
+		Mesh(VertexFormat format, const std::vector<float>& vertexData, const std::vector<uint32_t>& indices);
+		Mesh(VertexFormat format, std::vector<float>&& vertexData, std::vector<uint32_t>&& indices);
 		~Mesh();
 
 		Culling::BoundingSphere bounds() const;

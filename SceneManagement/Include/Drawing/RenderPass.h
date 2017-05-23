@@ -25,8 +25,11 @@ namespace Scene {
 		bool cullingEnabled;
 
 		std::unordered_map<std::string, std::shared_ptr<Renderer::ShaderConstantBuffer>> passConstants;
-		std::vector<std::shared_ptr<const Renderer::ModelInstance>> m_modelInstances;
+		std::vector<std::shared_ptr<const Renderer::ModelInstance>> m_opaqueInstances;
+		std::vector<std::shared_ptr<const Renderer::ModelInstance>> m_transparentInsances;
 		std::vector<PointLight> lights;
+
+		uint64_t drawInstances(const std::vector<std::shared_ptr<const Renderer::ModelInstance>>& instances, Renderer::SortType sortType);
 
 	public:
 		RenderPass(std::shared_ptr<Renderer::IRenderer> renderer);

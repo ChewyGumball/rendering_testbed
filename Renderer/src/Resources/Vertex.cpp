@@ -60,6 +60,19 @@ namespace Renderer {
 		return flattened;
 	}
 
+	bool Vertex::operator==(const Vertex & other) const
+	{
+		return position == other.position &&
+			colour == other.colour &&
+			normal == other.normal &&
+			textureCoodinate == other.textureCoodinate;
+	}
+
+	bool Vertex::operator!=(const Vertex & other) const
+	{
+		return !(*this == other);
+	}
+
 	bool operator==(const VertexFormat& a, const VertexFormat& b) { return a.formatData() == b.formatData(); }
 
 	bool operator!=(const VertexFormat& a, const VertexFormat& b) { return !(a == b); }

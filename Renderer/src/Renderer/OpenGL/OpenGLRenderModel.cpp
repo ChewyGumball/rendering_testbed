@@ -109,8 +109,8 @@ void setupInstanceStateAttributes(GLuint vao, GLuint vbo, OpenGLShader& shader, 
 
 }
 
-OpenGLRenderModel::OpenGLRenderModel(OpenGLRenderMesh& mesh, OpenGLShader& shader, const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures, std::shared_ptr<const Material> material)
-    : m_indexCount(mesh.indexCount()), m_textures(textures), m_material(material)
+OpenGLRenderModel::OpenGLRenderModel(OpenGLRenderMesh& mesh, OpenGLShader& shader, const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>>&& textures, std::shared_ptr<const Material> material)
+    : m_indexCount(mesh.indexCount()), m_textures(std::move(textures)), m_material(material)
 {
     glCreateVertexArrays(1, &vao);
     glCreateBuffers(1, &m_transformVBO);

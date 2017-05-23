@@ -37,7 +37,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{14BC9B44-5DB4-4202-9227-4AD0E2377633}</ProjectGuid>
     <RootNamespace>RenderingTestbed</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
     <ProjectName>Renderer</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -354,9 +354,6 @@
     <ClInclude Include="Include\Resources\ShaderConstantBuffer.h" />
     <ClInclude Include="Include\Renderer\OpenGL\OpenGLShaderConstantBuffer.h" />
     <ClInclude Include="Include\Resources\Material.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="sample_render_graph.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

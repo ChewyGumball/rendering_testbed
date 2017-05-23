@@ -12,6 +12,7 @@
 #include <fstream>
 
 #include <Renderer/OpenGL/OpenGLRenderer.h>
+#include <Resources/RenderResourceManagement.h>
 
 #include <Drawing\RenderPass.h>
 #include <Resources\ModelInstance.h>
@@ -37,19 +38,21 @@ Test1* test;
 
 void convert(int argc, char* argv[])
 {
-	/*
+	
 	std::string filename(argv[2]);
 	std::string path = filename.substr(0, filename.find_last_of("/\\") + 1);
 
 	std::shared_ptr<Mesh> mesh = ModelLoader::loadOBJFile(filename);
 	std::ofstream convertedFile(argv[3], std::ios::out | std::ios::binary);
-	std::vector<float> vertices = mesh->vertexData();
-	std::vector<int> indices = mesh->indexData();
+
+	auto meshData = RenderResourceManagement::drainPendingMeshes();
+	std::vector<float> vertices = meshData[1].vertexData;
+	std::vector<uint32_t> indices = meshData[1].indexData;
 
 	int64_t vertexCount = vertices.size();
 	int64_t indexCount = indices.size();
 
-	VertexAttribute format = mesh->vertexFormat().formatData();
+	VertexAttribute format = meshData[1].format.formatData();
 
 	convertedFile.write(&(format), sizeof(VertexAttribute));
 	convertedFile.write(reinterpret_cast<char*>(&vertexCount), sizeof(int64_t));
@@ -57,7 +60,7 @@ void convert(int argc, char* argv[])
 	convertedFile.write(reinterpret_cast<char*>(&indexCount), sizeof(int64_t));
 	convertedFile.write(reinterpret_cast<char*>(indices.data()), indexCount * sizeof(int));
 	convertedFile.close();
-	*/
+	
 }
 
 void printGLFWError(int error, const char* description)
@@ -139,8 +142,6 @@ void directx(std::string sceneFile)
 
 int main(int argc, char *argv[])
 {
-	//Renderer::TextureBuffer b("F:/Users/Ben/Desktop/eagle_PNG1210.png");
-	Renderer::TextureBuffer b("F:/Users/Ben/Desktop/pnggrad16rgb.png"); 
 	if (argc >= 3 && std::string(argv[1]) == "convert")
 	{
 		convert(argc, argv);

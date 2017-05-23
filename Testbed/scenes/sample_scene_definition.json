@@ -181,7 +181,7 @@
         "position": {
           "x": 0,
           "y": 0,
-          "z": -2
+          "z": 2
         },
         "target": {
           "x": 0,
@@ -266,9 +266,9 @@
       ],
       "textureTest": [
         {
-          "model": "textureTestA",
+          "model": "textureTestB",
           "position": {
-            "x": -1,
+            "x": 1,
             "y": 0,
             "z": 0
           },
@@ -279,11 +279,11 @@
           }
         },
         {
-          "model": "textureTestB",
+          "model": "textureTestA",
           "position": {
-            "x": 1,
+            "x": -1,
             "y": 0,
-            "z": 0
+            "z": 0.1
           },
           "scale": {
             "x": 0.5,
@@ -323,8 +323,14 @@
         "dependencies": [ "cameraTestB", "cameraTestA" ],
         "lights": [ "layer1Lights" ],
         "models": [ "textureTest" ],
-        "cull": false,
+        "cull": true,
         "camera": "screenSpaceCamera",
+        "clearColour": {
+          "r": 0.2,
+          "g": 0.2,
+          "b": 0.2,
+          "a": 1
+        },
         "viewport": {
           "x": 0,
           "y": 0,

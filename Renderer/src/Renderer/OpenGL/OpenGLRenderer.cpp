@@ -105,7 +105,12 @@ namespace {
 		}
 	}
 	
-	void uploadInstanceData(GLuint buffer, const std::vector<std::shared_ptr<const ModelInstance>>& instances) {
+	std::vector<uint64_t> sortInstances(const std::vector<std::shared_ptr<const ModelInstance>>& instances) {
+		std::vector<uint64_t> indices;
+		return indices;
+	}
+
+	void uploadInstanceData(GLuint buffer, const std::vector<std::shared_ptr<const ModelInstance>>& instances, SortType sortType) {
 		std::vector<uint8_t> instanceData;
 		instanceData.reserve(instances.size() * instances[0]->instanceData().format()->size());
 		for (auto instance : instances) {
@@ -194,13 +199,13 @@ void OpenGLRenderer::updateConstantBuffers(std::unordered_set<std::shared_ptr<Sh
 	}
 }
 
-void OpenGLRenderer::draw(const std::vector<std::shared_ptr<const ModelInstance>>& modelInstances, const std::unordered_map<std::string, std::shared_ptr<ShaderConstantBuffer>>& globalShaderConstantBuffers)
+void OpenGLRenderer::draw(const std::vector<std::shared_ptr<const ModelInstance>>& modelInstances, SortType sortType, const std::unordered_map<std::string, std::shared_ptr<ShaderConstantBuffer>>& globalShaderConstantBuffers)
 {
 	//checkGLError();
 	std::shared_ptr<const ModelInstance> firstInstance = modelInstances[0];
 
 	OpenGLRenderModel& model = models.at(firstInstance->model()->id());
-	uploadInstanceData(model.transformVBO(), modelInstances);
+	uploadInstanceData(model.transformVBO(), modelInstances, sortType);
 
 	OpenGLShader& shader = shaders.at(model.material()->shader()->id());
 	shader.bind();
@@ -214,7 +219,7 @@ void OpenGLRenderer::draw(const std::vector<std::shared_ptr<const ModelInstance>
 void Renderer::OpenGL::OpenGLRenderer::createPendingResources()
 {
 	for (RenderResourceManagement::MeshData& m : RenderResourceManagement::drainPendingMeshes()) {
-		meshes.emplace(std::piecewise_construct, std::forward_as_tuple(m.id), std::forward_as_tuple(m.format, m.vertexData, m.indices));
+		meshes.emplace(std::piecewise_construct, std::forward_as_tuple(m.id), std::forward_as_tuple(m.format, m.vertexData, m.indexData));
 	}
 
 	for (RenderResourceManagement::TextureData& t : RenderResourceManagement::drainPendingTextures()) {
@@ -235,7 +240,7 @@ void Renderer::OpenGL::OpenGLRenderer::createPendingResources()
 	}
 
 	for (RenderResourceManagement::ModelData& m : RenderResourceManagement::drainPendingModels()) {
-		models.emplace(std::piecewise_construct, std::forward_as_tuple(m.id), std::forward_as_tuple(meshes.at(m.mesh->id()), shaders.at(m.material->shader()->id()), m.textures, m.material));
+		models.emplace(std::piecewise_construct, std::forward_as_tuple(m.id), std::forward_as_tuple(meshes.at(m.mesh->id()), shaders.at(m.material->shader()->id()), std::move(m.textures), m.material));
 	}
 }
 

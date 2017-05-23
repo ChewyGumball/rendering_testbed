@@ -198,10 +198,10 @@ int32_t OpenGLShader::getAttributeLocation(const std::string name) const
 
 void OpenGLShader::bindUniformBufferToBindPoint(const std::string name, uint32_t bindPoint)
 {
-	GLuint location = uniformBufferLocation(programHandle, name);
-	if (location != GL_INVALID_INDEX) {
-		auto currentBindPoint = boundUniformBufferBindPoints.find(name);
-		if (currentBindPoint == boundUniformBufferBindPoints.end() || currentBindPoint->second != bindPoint) {
+	auto currentBindPoint = boundUniformBufferBindPoints.find(name);
+	if (currentBindPoint == boundUniformBufferBindPoints.end() || currentBindPoint->second != bindPoint) {
+		GLuint location = uniformBufferLocation(programHandle, name);
+		if (location != GL_INVALID_INDEX) {
 			glUniformBlockBinding(programHandle, location, bindPoint);
 			boundUniformBufferBindPoints[name] = bindPoint;
 		}

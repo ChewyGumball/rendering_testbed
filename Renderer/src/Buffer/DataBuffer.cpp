@@ -22,12 +22,14 @@ namespace {
 		for (auto& field : format->offsets()) {
 			switch (field.second.second) {
 			case BufferElementType::MAT4: {
-				const uint8_t* matrix = reinterpret_cast<const uint8_t*>(glm::value_ptr(glm::mat4()));
+				glm::mat4 identity;
+				const uint8_t* matrix = reinterpret_cast<const uint8_t*>(glm::value_ptr(identity));
 				std::copy(matrix, matrix + format->sizeOfType(BufferElementType::MAT4), data.begin() + field.second.first);
 				break;
 			}
 			case BufferElementType::MAT3: {
-				const uint8_t* matrix = reinterpret_cast<const uint8_t*>(glm::value_ptr(glm::mat3()));
+				glm::mat3 identity;
+				const uint8_t* matrix = reinterpret_cast<const uint8_t*>(glm::value_ptr(identity));
 				std::copy(matrix, matrix + format->sizeOfType(BufferElementType::MAT3), data.begin() + field.second.first);
 				break;
 			}

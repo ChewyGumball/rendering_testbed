@@ -74,7 +74,7 @@ void Test1::draw()
 		if (rotateInstances) {
 			for (auto instance : instances)
 			{
-				rotateModelInstance(instance, glm::vec3(0.0f, 1.0f, 0.0f), 0.7f * static_cast<float>(currentTime - lastTime));
+				rotateModelInstance(instance, glm::vec3(0.0f, 0.0f, 1.0f), 0.7f * static_cast<float>(currentTime - lastTime));
 			}
 		}
 		
@@ -92,7 +92,7 @@ void Test1::draw()
 		if (cumulative >= 1)
 		{
 			Util::File::MonitorFiles();
-			fpsCounter.text(Util::String::Format(formatString, cumulative / frames, frames, frames / cumulative, tricount, vsync ? "on" : "off"));
+			fpsCounter.text(Util::String::Format(formatString, cumulative * 1000 / frames, frames, frames / cumulative, tricount, vsync ? "on" : "off"));
 			cumulative = 0;
 			frames = 0;
 		}
@@ -133,13 +133,13 @@ Test1::Test1(GLFWwindow* window, std::shared_ptr<Renderer::IRenderer> renderer, 
 	: window(window),
 	scene(Scene::SceneLoader::loadWorld(renderer, sceneFileName)),
 	cameras({ scene.camera("layer1Camera"), scene.camera("layer1CameraQuaternion") }),
-	instances(scene.modelInstances("layer1Models")),
+	instances(scene.modelInstances("textureTest")),
 	rotateInstances(false),
 	wireframe(false),
 	guiCamera(std::make_shared<Scene::Cameras::Camera>(glm::vec3(0, 0, 5), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec4(0, windowWidth, 0, windowHeight))),
 	gui(std::make_shared<Scene::RenderPass>(renderer)),
 	f(std::make_shared<Scene::Text::Font>("F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/consola.ttf", 16)),
-	formatString("%4.4fms per frame\r\n%d frames, %5.4f fps, %I64d triangles\nVSYNC: %s"),
+	formatString("%4.6fms per frame\r\n%d frames, %5.4f fps, %I64d triangles\nVSYNC: %s"),
 	fpsCounter(Util::String::Format(formatString, 0, 0, 0.f, 0ull, "off"), f, glm::vec3(5, windowHeight, 0), glm::vec4(0.4, 0.7, 1, 1))
 {
 	gui->clearBuffers(false);

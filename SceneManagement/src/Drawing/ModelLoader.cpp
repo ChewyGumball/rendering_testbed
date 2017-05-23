@@ -1,8 +1,11 @@
 #include "Drawing/ModelLoader.h"
 
+#include <utility>
+
 #include <fstream>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/hash.hpp>
 #include <iostream>
 #include <vector>
 
@@ -13,6 +16,25 @@
 
 using namespace Renderer;
 
+namespace std {
+	template<> struct hash<Vertex> {
+		size_t operator()(const Vertex& x) const {
+			size_t h = 0;
+
+			std::hash<glm::vec2> v2hasher;
+			std::hash<glm::vec3> v3hasher;
+			std::hash<glm::vec4> v4hasher;
+
+			h ^= v3hasher(x.position) + 0x9e3779b9 + (h << 6) + (h >> 2);
+			h ^= v2hasher(x.textureCoodinate) + 0x9e3779b9 + (h << 6) + (h >> 2);
+			h ^= v3hasher(x.normal) + 0x9e3779b9 + (h << 6) + (h >> 2);
+			h ^= v4hasher(x.colour) + 0x9e3779b9 + (h << 6) + (h >> 2);
+
+			return h;
+		}
+	};
+}
+
 namespace {
 // OBJ Indexes that are negative are offsets from the end of the list
 template <typename T> const T& objIndexFind(std::vector<T>& objs, int index)
@@ -22,6 +44,26 @@ template <typename T> const T& objIndexFind(std::vector<T>& objs, int index)
     } else {
         return objs[index];
     }
+}
+
+std::pair<std::vector<Vertex>, std::vector<uint32_t>> dedupeVertices(std::vector<Vertex>& vertexData, std::vector<uint32_t>& indexData) {
+	std::unordered_map<Vertex, uint32_t> deduppedVertexIndices;
+
+	std::vector<Vertex> deduppedVertices;
+	std::vector<uint32_t> deduppedIndices;
+
+	for (Vertex& v : vertexData) {
+		if (deduppedVertexIndices.count(v) == 0) {
+			deduppedVertexIndices[v] = deduppedVertices.size();
+			deduppedVertices.push_back(v);
+		}
+	}
+
+	for (uint32_t index : indexData) {
+		deduppedIndices.push_back(deduppedVertexIndices[vertexData[index]]);
+	}
+
+	return std::make_pair(deduppedVertices, deduppedIndices);
 }
 
 /*
@@ -88,75 +130,77 @@ void loadFBXMeshFromNode(FbxNode* node, std::vector<int>& indices, std::vector<V
 
 namespace ModelLoader {
 	std::shared_ptr<Renderer::Mesh> loadOBJFile(std::string filename, VertexFormat loadedFormat)
-{
-    std::vector<glm::vec3> positions;
-    std::vector<glm::vec3> normals;
-    std::vector<glm::vec2> textureCoordinates;
+	{
+		std::vector<glm::vec3> positions;
+		std::vector<glm::vec3> normals;
+		std::vector<glm::vec2> textureCoordinates;
 
-    std::vector<uint32_t>    indices;
-    std::vector<Vertex> vertices;
-    int                 vertexCount = 0;
-    VertexFormat        format(0);
-    Util::File::ProcessLines(filename, [&](const std::string& line) {
-        std::vector<std::string> elements = Util::String::Split(line, ' ');
-        if (elements[0] == "v") {
-            positions.emplace_back(std::stof(elements[1]), std::stof(elements[2]), std::stof(elements[3]));
-        } else if (elements[0] == "vt") {
-            textureCoordinates.emplace_back(std::stof(elements[1]), std::stof(elements[2]));
-        } else if (elements[0] == "vn") {
-            normals.emplace_back(std::stof(elements[1]), std::stof(elements[2]), std::stof(elements[3]));
-        } else if (elements[0] == "f") {
-            indices.push_back(vertexCount++);
-            indices.push_back(vertexCount++);
-            indices.push_back(vertexCount++);
+		std::vector<uint32_t>    indices;
+		std::vector<Vertex> vertices;
+		int                 vertexCount = 0;
+		VertexFormat        format(0);
+		Util::File::ProcessLines(filename, [&](const std::string& line) {
+			std::vector<std::string> elements = Util::String::Split(line, ' ');
+			if (elements[0] == "v") {
+				positions.emplace_back(std::stof(elements[1]), std::stof(elements[2]), std::stof(elements[3]));
+			} else if (elements[0] == "vt") {
+				textureCoordinates.emplace_back(std::stof(elements[1]), std::stof(elements[2]));
+			} else if (elements[0] == "vn") {
+				normals.emplace_back(std::stof(elements[1]), std::stof(elements[2]), std::stof(elements[3]));
+			} else if (elements[0] == "f") {
+				indices.push_back(vertexCount++);
+				indices.push_back(vertexCount++);
+				indices.push_back(vertexCount++);
 
-            for (int i = 1; i < 4; ++i) {
-                std::vector<std::string> face = Util::String::Split(elements[i], '/');
+				for (int i = 1; i < 4; ++i) {
+					std::vector<std::string> face = Util::String::Split(elements[i], '/');
 
-                int  vertexIndex           = std::stoi(face[0]);
-                bool hasTextureCoordinates = false;
-                bool hasNormals            = false;
-                int  textureIndex          = -1;
-                int  normalIndex           = -1;
+					int  vertexIndex           = std::stoi(face[0]);
+					bool hasTextureCoordinates = false;
+					bool hasNormals            = false;
+					int  textureIndex          = -1;
+					int  normalIndex           = -1;
 
-                if (face.size() > 1 && face[1] != "") {
-                    hasTextureCoordinates = true;
-                    textureIndex          = std::stoi(face[1]);
-                }
+					if (face.size() > 1 && face[1] != "") {
+						hasTextureCoordinates = true;
+						textureIndex          = std::stoi(face[1]);
+					}
 
-                if (face.size() > 2 && face[2] != "") {
-                    hasNormals  = true;
-                    normalIndex = std::stoi(face[2]);
-                }
+					if (face.size() > 2 && face[2] != "") {
+						hasNormals  = true;
+						normalIndex = std::stoi(face[2]);
+					}
 
-                if (hasTextureCoordinates) {
-                    if (hasNormals) {
-                        format = VertexFormats::Position_Normal_Texture;
-                        vertices.emplace_back(
-                            objIndexFind(positions, vertexIndex), objIndexFind(normals, normalIndex), objIndexFind(textureCoordinates, textureIndex));
-                    } else {
-                        format = VertexFormats::Position_Texture;
-                        vertices.emplace_back(objIndexFind(positions, vertexIndex), objIndexFind(textureCoordinates, textureIndex));
-                    }
-                } else if (hasNormals) {
-                    format             = VertexFormats::Position_Normal;
-                    const glm::vec3& p = objIndexFind(positions, vertexIndex);
-                    const glm::vec3& n = objIndexFind(normals, normalIndex);
-                    vertices.emplace_back(p, n);
-                } else {
-                    format = VertexFormats::Position;
-                    vertices.emplace_back(objIndexFind(positions, vertexIndex));
-                }
-            }
-        }
-    });
+					if (hasTextureCoordinates) {
+						if (hasNormals) {
+							format = VertexFormats::Position_Normal_Texture;
+							vertices.emplace_back(
+								objIndexFind(positions, vertexIndex), objIndexFind(normals, normalIndex), objIndexFind(textureCoordinates, textureIndex));
+						} else {
+							format = VertexFormats::Position_Texture;
+							vertices.emplace_back(objIndexFind(positions, vertexIndex), objIndexFind(textureCoordinates, textureIndex));
+						}
+					} else if (hasNormals) {
+						format             = VertexFormats::Position_Normal;
+						const glm::vec3& p = objIndexFind(positions, vertexIndex);
+						const glm::vec3& n = objIndexFind(normals, normalIndex);
+						vertices.emplace_back(p, n);
+					} else {
+						format = VertexFormats::Position;
+						vertices.emplace_back(objIndexFind(positions, vertexIndex));
+					}
+				}
+			}
+		});
 
-    if (loadedFormat != VertexFormats::Unknown) {
-        format = loadedFormat;
-    }
+		if (loadedFormat != VertexFormats::Unknown) {
+			format = loadedFormat;
+		}
 
-    return std::make_shared<Mesh>(format, Vertex::flatten(format, vertices), indices);
-}
+		std::pair<std::vector<Vertex>, std::vector<uint32_t>> deduppedData = dedupeVertices(vertices, indices);
+
+		return std::make_shared<Mesh>(format, Vertex::flatten(format, deduppedData.first), std::move(deduppedData.second));
+	}
 std::shared_ptr<Renderer::Mesh> loadBinFile(std::string filename)
 {
     std::ifstream file(filename, std::ios::in | std::ios::binary);
@@ -176,7 +220,7 @@ std::shared_ptr<Renderer::Mesh> loadBinFile(std::string filename)
 
     file.read(reinterpret_cast<char*>(indices.data()), indexCount * sizeof(uint32_t));
     file.close();
-    return std::make_shared<Mesh>(format, vertices, indices);
+    return std::make_shared<Mesh>(format, std::move(vertices), std::move(indices));
 }
 
 /*

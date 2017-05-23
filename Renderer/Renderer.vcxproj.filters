@@ -339,7 +339,4 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="sample_render_graph.json" />
-  </ItemGroup>
 </Project>

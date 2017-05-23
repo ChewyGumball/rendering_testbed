@@ -5,8 +5,8 @@
 #include <Resources/Mesh.h>
 
 namespace Renderer {
-	Model::Model(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material, std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures)
-		: m_mesh(mesh), m_material(material)
+	Model::Model(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material, std::unordered_map<std::string, std::shared_ptr<TextureBuffer>> textures, bool isOpaque)
+		: m_opaque(isOpaque), m_mesh(mesh), m_material(material)
 	{
 		RenderResourceManagement::createModel(m_id, mesh, material, textures);
 	}
@@ -23,6 +23,11 @@ namespace Renderer {
 	std::shared_ptr<Material> Model::material() const
 	{
 		return m_material;
+	}
+
+	bool Model::isOpaque() const
+	{
+		return m_opaque;
 	}
 
 	uint64_t Model::triangleCount() const

@@ -18,7 +18,7 @@ namespace Renderer {
 
 			void processRenderingOptions(RenderOptions& options) override;
 			void updateConstantBuffers(std::unordered_set<std::shared_ptr<ShaderConstantBuffer>>& constantBuffers) override;
-			void draw(const std::vector<std::shared_ptr<const ModelInstance>>& modelInstances, const std::unordered_map<std::string, std::shared_ptr<ShaderConstantBuffer>>& globalShaderConstantBuffers) override;
+			void draw(const std::vector<std::shared_ptr<const ModelInstance>>& modelInstances, SortType sortType, const std::unordered_map<std::string, std::shared_ptr<ShaderConstantBuffer>>& globalShaderConstantBuffers) override;
 
 		};
 	}

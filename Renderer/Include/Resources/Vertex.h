@@ -51,13 +51,12 @@ namespace Renderer {
 		extern const VertexFormat Position_Normal_Texture_Colour;
 	};
 
-	class Vertex {
-		glm::vec3 position;
-		glm::vec4 colour;
-		glm::vec3 normal;
-		glm::vec2 textureCoodinate;
+	struct Vertex {
+		const glm::vec3 position;
+		const glm::vec4 colour;
+		const glm::vec3 normal;
+		const glm::vec2 textureCoodinate;
 
-	public:
 		Vertex(const glm::vec3& position);
 		Vertex(const glm::vec3& position, const glm::vec3& normal);
 		Vertex(const glm::vec3& position, const glm::vec2& textureCoodinate);
@@ -71,6 +70,9 @@ namespace Renderer {
 		void append(VertexFormat format, std::vector<float>& data) const;
 
 		static std::vector<float> flatten(VertexFormat format, std::vector<Vertex>& vertices);
+
+		bool operator==(const Vertex& other) const;
+		bool operator!=(const Vertex& other) const;
 
 		friend std::ostream& operator<<(std::ostream& stream, const Vertex& obj);
 	};
