@@ -7,6 +7,7 @@
 
 namespace ModelLoader
 {
+	std::unordered_map<Renderer::RenderResourceID, std::pair<std::string, std::shared_ptr<Renderer::Mesh>>> loadMultiPartOBJFile(std::string filename);
 	std::shared_ptr<Renderer::Mesh> loadOBJFile(std::string filename, Renderer::VertexFormat loadedFormat = Renderer::VertexFormats::Unknown);
 	std::shared_ptr<Renderer::Mesh> loadBinFile(std::string filename);
 

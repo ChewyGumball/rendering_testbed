@@ -42,9 +42,16 @@ template <typename T> const T& objIndexFind(std::vector<T>& objs, int index)
     if (index < 0) {
         return objs[objs.size() + index];
     } else {
-        return objs[index];
+		//indicies start at 1
+        return objs[index - 1];
     }
 }
+
+struct MeshPart {
+	std::vector<uint32_t> indicies;
+	std::vector<Vertex> vertices;
+	VertexFormat format;
+};
 
 std::pair<std::vector<Vertex>, std::vector<uint32_t>> dedupeVertices(std::vector<Vertex>& vertexData, std::vector<uint32_t>& indexData) {
 	std::unordered_map<Vertex, uint32_t> deduppedVertexIndices;
@@ -129,6 +136,96 @@ void loadFBXMeshFromNode(FbxNode* node, std::vector<int>& indices, std::vector<V
 }
 
 namespace ModelLoader {
+	std::unordered_map<Renderer::RenderResourceID, std::pair<std::string, std::shared_ptr<Renderer::Mesh>>> loadMultiPartOBJFile(std::string filename)
+	{
+		std::unordered_map<std::string, MeshPart> meshParts;
+
+		std::vector<glm::vec3> positions;
+		std::vector<glm::vec3> normals;
+		std::vector<glm::vec2> textureCoordinates;
+
+		MeshPart* currentMeshPart;
+
+		std::string materialName = "unknown";
+
+		bool first = true;
+
+		Util::File::ProcessLines(filename, [&](const std::string& line) {
+			std::vector<std::string> elements = Util::String::Split(line, ' ');
+			if (elements[0] == "v") {
+				positions.emplace_back(std::stof(elements[1]), std::stof(elements[2]), std::stof(elements[3]));
+			}
+			else if (elements[0] == "vt") {
+				textureCoordinates.emplace_back(std::stof(elements[1]), std::stof(elements[2]));
+			}
+			else if (elements[0] == "vn") {
+				normals.emplace_back(std::stof(elements[1]), std::stof(elements[2]), std::stof(elements[3]));
+			}
+			else if (elements[0] == "usemtl") {
+				materialName = elements[1];
+				currentMeshPart = &meshParts[materialName];
+			}
+			else if (elements[0] == "f") {
+				uint32_t vertexCount = currentMeshPart->vertices.size();
+
+				currentMeshPart->indicies.push_back(vertexCount);
+				currentMeshPart->indicies.push_back(vertexCount + 1);
+				currentMeshPart->indicies.push_back(vertexCount + 2);
+
+				for (int i = 1; i < 4; ++i) {
+					std::vector<std::string> face = Util::String::Split(elements[i], '/');
+
+					int  vertexIndex = std::stoi(face[0]);
+					bool hasTextureCoordinates = false;
+					bool hasNormals = false;
+					int  textureIndex = -1;
+					int  normalIndex = -1;
+
+					if (face.size() > 1 && face[1] != "") {
+						hasTextureCoordinates = true;
+						textureIndex = std::stoi(face[1]);
+					}
+
+					if (face.size() > 2 && face[2] != "") {
+						hasNormals = true;
+						normalIndex = std::stoi(face[2]);
+					}
+
+					if (hasTextureCoordinates) {
+						if (hasNormals) {
+							currentMeshPart->format = VertexFormats::Position_Normal_Texture;
+							currentMeshPart->vertices.emplace_back(
+								objIndexFind(positions, vertexIndex), objIndexFind(normals, normalIndex), objIndexFind(textureCoordinates, textureIndex));
+						}
+						else {
+							currentMeshPart->format = VertexFormats::Position_Texture;
+							currentMeshPart->vertices.emplace_back(objIndexFind(positions, vertexIndex), objIndexFind(textureCoordinates, textureIndex));
+						}
+					}
+					else if (hasNormals) {
+						currentMeshPart->format = VertexFormats::Position_Normal;
+						const glm::vec3& p = objIndexFind(positions, vertexIndex);
+						const glm::vec3& n = objIndexFind(normals, normalIndex);
+						currentMeshPart->vertices.emplace_back(p, n);
+					}
+					else {
+						currentMeshPart->format = VertexFormats::Position;
+						currentMeshPart->vertices.emplace_back(objIndexFind(positions, vertexIndex));
+					}
+				}
+			}
+		});
+
+		std::unordered_map<Renderer::RenderResourceID, std::pair<std::string, std::shared_ptr<Renderer::Mesh>>> meshes;
+
+		for (auto& meshPart : meshParts) {
+			std::pair<std::vector<Vertex>, std::vector<uint32_t>> deduppedData = dedupeVertices(meshPart.second.vertices, meshPart.second.indicies);
+			std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(meshPart.second.format, Vertex::flatten(meshPart.second.format, deduppedData.first), std::move(deduppedData.second));
+			meshes[mesh->id()] = std::make_pair(meshPart.first, mesh);
+		}
+
+		return meshes;
+	}
 	std::shared_ptr<Renderer::Mesh> loadOBJFile(std::string filename, VertexFormat loadedFormat)
 	{
 		std::vector<glm::vec3> positions;

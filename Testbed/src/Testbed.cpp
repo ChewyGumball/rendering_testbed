@@ -37,30 +37,37 @@ int height = 800;
 Test1* test;
 
 void convert(int argc, char* argv[])
-{
-	
+{	
 	std::string filename(argv[2]);
 	std::string path = filename.substr(0, filename.find_last_of("/\\") + 1);
 
-	std::shared_ptr<Mesh> mesh = ModelLoader::loadOBJFile(filename);
-	std::ofstream convertedFile(argv[3], std::ios::out | std::ios::binary);
+	std::unordered_map<Renderer::RenderResourceID, std::pair<std::string, std::shared_ptr<Renderer::Mesh>>> meshes = ModelLoader::loadMultiPartOBJFile(filename);
 
-	auto meshData = RenderResourceManagement::drainPendingMeshes();
-	std::vector<float> vertices = meshData[1].vertexData;
-	std::vector<uint32_t> indices = meshData[1].indexData;
+	for (auto& meshData : RenderResourceManagement::drainPendingMeshes())
+	{
+		if (meshes.count(meshData.id) != 0)
+		{
+			std::pair<std::string, std::shared_ptr<Renderer::Mesh>>& mesh = meshes[meshData.id];
 
-	int64_t vertexCount = vertices.size();
-	int64_t indexCount = indices.size();
+			std::ofstream convertedFile(argv[3] + std::string("_") + mesh.first + std::string(".mbin"), std::ios::out | std::ios::binary);
 
-	VertexAttribute format = meshData[1].format.formatData();
 
-	convertedFile.write(&(format), sizeof(VertexAttribute));
-	convertedFile.write(reinterpret_cast<char*>(&vertexCount), sizeof(int64_t));
-	convertedFile.write(reinterpret_cast<char*>(vertices.data()), vertexCount * sizeof(float));
-	convertedFile.write(reinterpret_cast<char*>(&indexCount), sizeof(int64_t));
-	convertedFile.write(reinterpret_cast<char*>(indices.data()), indexCount * sizeof(int));
-	convertedFile.close();
-	
+			std::vector<float> vertices = meshData.vertexData;
+			std::vector<uint32_t> indices = meshData.indexData;
+
+			int64_t vertexCount = vertices.size();
+			int64_t indexCount = indices.size();
+
+			VertexAttribute format = meshData.format.formatData();
+
+			convertedFile.write(&(format), sizeof(VertexAttribute));
+			convertedFile.write(reinterpret_cast<char*>(&vertexCount), sizeof(int64_t));
+			convertedFile.write(reinterpret_cast<char*>(vertices.data()), vertexCount * sizeof(float));
+			convertedFile.write(reinterpret_cast<char*>(&indexCount), sizeof(int64_t));
+			convertedFile.write(reinterpret_cast<char*>(indices.data()), indexCount * sizeof(int));
+			convertedFile.close();
+		}
+	}	
 }
 
 void printGLFWError(int error, const char* description)

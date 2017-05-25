@@ -23,8 +23,11 @@ using namespace Renderer;
 
 namespace {
 std::unordered_map<std::string, TextureFormat> textureFormats{ { "rgb", TextureFormat::RGB8 }, { "depth", TextureFormat::DEPTH } };
-std::unordered_map<std::string, VertexFormat>  vertexFormats{ { "Position_Normal", VertexFormats::Position_Normal },
-    { "Position_Texture", VertexFormats::Position_Texture } };
+std::unordered_map<std::string, VertexFormat>  vertexFormats{ 
+	{ "Position_Normal", VertexFormats::Position_Normal },
+	{ "Position_Texture", VertexFormats::Position_Texture },
+	{ "Position_Normal_Texture", VertexFormats::Position_Normal_Texture}
+};
 std::unordered_map<std::string, BufferElementType> elementTypes{
 	{ "buffer", BufferElementType::BUFFER},
 	{ "array", BufferElementType::ARRAY},

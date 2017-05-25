@@ -105,7 +105,14 @@ namespace Util::File
 
 		while (end != actualEnd)
 		{
-			if (*end == '\n')
+			if (*end == '\r' && end + 1 != actualEnd && *(end + 1) == '\n')
+			{
+				std::string line(start, end);
+				processor(line);
+				start = end + 2;
+				end += 1;
+			}
+			else if (*end == '\n')
 			{
 				std::string line(start, end);
 				processor(line);

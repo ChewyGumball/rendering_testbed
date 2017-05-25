@@ -6,12 +6,21 @@
 
 namespace Scene::Cameras {
 
-	Camera::Camera() :m_position(glm::vec3(0, 0, 0)), m_forward(glm::vec3(1, 0, 0)), m_up(glm::vec3(0, 0, 1)), m_right(glm::vec3(0, 1, 0)), m_projection(glm::perspective(45.0f, 1.0f, 0.1f, 10000.0f))
+	Camera::Camera() 
+		: m_fov(45), 
+		m_aspectRatio(1), 
+		m_position(glm::vec3(0, 0, 0)), 
+		m_forward(glm::vec3(1, 0, 0)), 
+		m_up(glm::vec3(0, 0, 1)), 
+		m_right(glm::vec3(0, 1, 0)), 
+		m_projection(glm::perspective(45.0f, 1.0f, 0.1f, 10000.0f))
 	{
 	}
 
 	Camera::Camera(glm::vec3 position, glm::vec3 target, glm::vec3 up, glm::vec4 clippingPlanes)
-		: m_position(position),
+		: m_fov(45),
+		m_aspectRatio(1),
+		m_position(position),
 		m_forward(glm::normalize(target - position)),
 		m_up(up),
 		m_right(glm::normalize(glm::cross(m_forward, m_up))),
@@ -20,7 +29,9 @@ namespace Scene::Cameras {
 	}
 
 	Camera::Camera(glm::vec3 position, glm::vec3 target, glm::vec3 up, float fov, float aspectRatio)
-		: m_position(position),
+		: m_fov(fov),
+		m_aspectRatio(aspectRatio),
+		m_position(position),
 		m_forward(glm::normalize(target - position)),
 		m_up(up),
 		m_right(glm::normalize(glm::cross(m_forward, m_up))),
@@ -31,6 +42,16 @@ namespace Scene::Cameras {
 
 	Camera::~Camera()
 	{
+	}
+
+	float Camera::fov() const
+	{
+		return m_fov;
+	}
+
+	float Camera::aspectRatio() const
+	{
+		return m_aspectRatio;
 	}
 
 	void Camera::move(glm::vec3 displacement)
@@ -55,13 +76,24 @@ namespace Scene::Cameras {
 
 	void Camera::rotateLocal(glm::vec3 axis, float degrees)
 	{
-		m_forward = glm::normalize(glm::vec3(glm::rotate(degrees, axis) * glm::vec4(m_forward, 1)));
-		m_right = glm::normalize(glm::cross(m_up, m_forward));
+		if (axis == m_forward) {
+			m_right = glm::normalize(glm::vec3(glm::rotate(degrees, axis) * glm::vec4(m_right, 1)));
+			m_forward = glm::normalize(glm::cross(m_up, m_right));
+		}
+		else {
+			m_forward = glm::normalize(glm::vec3(glm::rotate(degrees, axis) * glm::vec4(m_forward, 1)));
+			m_right = glm::normalize(glm::cross(m_up, m_forward));
+		}
 	}
 
 	glm::vec3 Camera::position() const
 	{
 		return m_position;
+	}
+
+	glm::vec3 Camera::pickWorldRay(glm::vec2 normalizedScreenCoordinates)
+	{
+		return glm::normalize(glm::inverse(m_projection * this->transform()) * glm::vec4(normalizedScreenCoordinates, 1, 1));
 	}
 
 	glm::mat4 Camera::transform() const
@@ -71,12 +103,17 @@ namespace Scene::Cameras {
 
 	glm::mat4 Camera::inverseTransform() const
 	{
-		return glm::transpose(transform());
+		return glm::transpose(this->transform());
 	}
 
 	const glm::mat4& Camera::projection() const
 	{
 		return m_projection;
+	}
+
+	glm::vec3 Camera::pickViewRay(glm::vec2 normalizedScreenCoordinates)
+	{
+		return glm::normalize(glm::inverse(m_projection) * glm::vec4(normalizedScreenCoordinates, 1, 1));
 	}
 
 	const glm::vec3 Camera::right() const
