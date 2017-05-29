@@ -4,13 +4,7 @@
 #include <Util/StringUtils.h>
 
 #include <Scene/SceneLoader.h>
-#include <Resources/ModelInstance.h>
-
-namespace {
-	void rotateModelInstance(std::shared_ptr<Renderer::ModelInstance> instance, glm::vec3 axis, float angle) {
-		instance->instanceData().set("transform", glm::rotate(instance->instanceData().getMat4("transform"), angle, axis));
-	}
-}
+#include <Drawing/ModelGroup.h>
 
 void Test1::handleKeyboardInput(int key, int scancode, int action, int mods) {
 
@@ -45,7 +39,6 @@ void Test1::handleMouseInput(double xPos, double yPos)
 
 		glm::vec2 previousPosition(mouseX / (width * 0.5) - 1, mouseY / (height * 0.5) - 1);
 		glm::vec2 currentPosition(xPos / (width * 0.5) - 1, yPos / (height * 0.5) - 1);
-
 
 		for (auto camera : cameras) {
 
@@ -95,10 +88,7 @@ void Test1::draw()
 
 		double currentTime = glfwGetTime();
 		if (rotateInstances) {
-			for (auto instance : instances)
-			{
-				rotateModelInstance(instance, glm::vec3(0.0f, 0.0f, 1.0f), 0.7f * static_cast<float>(currentTime - lastTime));
-			}
+			instances->rotate(Scene::ShaderAttribute::Transform, glm::vec3(0.0f, 0.0f, 1.0f), 0.7f * static_cast<float>(currentTime - lastTime));
 		}
 		
 		uint64_t tricount = 0;
@@ -119,6 +109,11 @@ void Test1::draw()
 			cumulative = 0;
 			frames = 0;
 		}
+
+		cameraDisplay.text(Util::String::Format(cameraFormatString, 
+			cameras[0]->forward().x, cameras[0]->forward().y, cameras[0]->forward().z,
+			cameras[0]->position().x, cameras[0]->position().y, cameras[0]->position().z)
+		);
 	}
 }
 
@@ -171,7 +166,9 @@ Test1::Test1(GLFWwindow* window, std::shared_ptr<Renderer::IRenderer> renderer, 
 	gui(std::make_shared<Scene::RenderPass>(renderer)),
 	f(std::make_shared<Scene::Text::Font>("F:/Users/Ben/Documents/Projects/RenderingTestbed/Testbed/consola.ttf", 16)),
 	formatString("%4.6fms per frame\r\n%d frames, %5.4f fps, %I64d triangles\nVSYNC: %s"),
-	fpsCounter(Util::String::Format(formatString, 0, 0, 0.f, 0ull, "off"), f, glm::vec3(5, windowHeight, 0), glm::vec4(0.4, 0.7, 1, 1))
+	cameraFormatString("Forward: [%4.3f,%4.3f,%4.3f]\nPosition: [%4.3f,%4.3f,%4.3f]"),
+	fpsCounter(Util::String::Format(formatString, 0, 0, 0.f, 0ull, "off"), f, glm::vec3(5, windowHeight, 0), glm::vec4(0.4, 0.7, 1, 1)),
+	cameraDisplay(Util::String::Format(cameraFormatString, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f), f, glm::vec3(5, 45, 0), glm::vec4(0.4, 0.7, 1, 1))
 {
 	gui->cull(false);
 	gui->clearBuffers(false);
@@ -180,6 +177,7 @@ Test1::Test1(GLFWwindow* window, std::shared_ptr<Renderer::IRenderer> renderer, 
 	gui->wireframe(wireframe);
 	
 	fpsCounter.addToRenderPass(gui);
+	cameraDisplay.addToRenderPass(gui);
 
 	renderer->createPendingResources();
 

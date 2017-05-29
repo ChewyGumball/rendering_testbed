@@ -8,6 +8,7 @@
 #include <Cameras/QuaternionCamera.h>
 #include <Resources/Model.h>
 #include <Resources/ModelInstance.h>
+#include <Drawing/ModelGroup.h>
 
 #include <Buffer/BufferFormat.h>
 
@@ -198,14 +199,16 @@ std::unordered_map<std::string, std::shared_ptr<Scene::Cameras::Camera>> loadCam
     return cameras;
 }
 
-std::unordered_map<std::string, std::vector<std::shared_ptr<ModelInstance>>> loadModelGroups(
+std::unordered_map<std::string, std::shared_ptr<Scene::ModelGroup>> loadModelGroups(
     rapidjson::Value& json, std::unordered_map<std::string, std::shared_ptr<Model>> models)
 {
-    std::unordered_map<std::string, std::vector<std::shared_ptr<ModelInstance>>> modelGroups;
+    std::unordered_map<std::string, std::shared_ptr<Scene::ModelGroup>> modelGroups;
     for (auto& modelGroup : json["models"].GetObject()) {
         std::string name = modelGroup.name.GetString();
+		
+		std::shared_ptr<Scene::ModelGroup> group = std::make_shared <Scene::ModelGroup>();
         for (auto& instance : modelGroup.value.GetArray()) {
-            std::shared_ptr<ModelInstance> i(std::make_shared<ModelInstance>(models[instance["model"].GetString()]));
+            std::shared_ptr<ModelInstance> i(group->addInstance(models[instance["model"].GetString()]));
             if (instance.HasMember("scale")) {
                 scaleModelInstance(i,objectToVec3(instance["scale"]));
             }
@@ -215,8 +218,9 @@ std::unordered_map<std::string, std::vector<std::shared_ptr<ModelInstance>>> loa
             if (instance.HasMember("position")) {
                 translateModelInstance(i, objectToVec3(instance["position"]));
             }
-            modelGroups[name].push_back(i);
         }
+
+		modelGroups[name] = group;
     }
     return modelGroups;
 }
@@ -237,7 +241,7 @@ std::unordered_map<std::string, std::vector<PointLight>> loadLightGroups(rapidjs
 std::unordered_map<std::string, std::shared_ptr<Scene::RenderPass>> loadPasses(
 	std::shared_ptr<IRenderer> renderer,
 	rapidjson::Value& json,
-    std::unordered_map<std::string, std::vector<std::shared_ptr<ModelInstance>>>          modelGroups,
+    std::unordered_map<std::string, std::shared_ptr<Scene::ModelGroup>>          modelGroups,
     std::unordered_map<std::string, std::vector<PointLight>>                              lightGroups,
     std::unordered_map<std::string, std::shared_ptr<Scene::Cameras::Camera>>                              cameras,
     std::unordered_map<std::string, std::shared_ptr<TextureBuffer>>                       textures)
@@ -248,9 +252,8 @@ std::unordered_map<std::string, std::shared_ptr<Scene::RenderPass>> loadPasses(
         std::shared_ptr<Scene::RenderPass> p    = std::make_shared<Scene::RenderPass>(renderer);
 
         for (auto& modelGroup : pass.value["models"].GetArray()) {
-            for (auto& model : modelGroups[modelGroup.GetString()]) {
-                p->addModelInstance(model);
-            }
+			std::string s = modelGroup.GetString();
+			p->addModelInstances(modelGroups[s]->instances());
         }
 
         if (pass.value.HasMember("clearColour")) {
@@ -431,7 +434,7 @@ namespace Scene {
 
 		std::unordered_map<std::string, std::shared_ptr<Scene::Cameras::Camera>> cameras(loadCameras(scene));
 		std::unordered_map<std::string, std::vector<PointLight>> lightInstances(loadLightGroups(scene, lights));
-		std::unordered_map<std::string, std::vector<std::shared_ptr<ModelInstance>>> modelInstances(loadModelGroups(scene, models));
+		std::unordered_map<std::string, std::shared_ptr<ModelGroup>> modelInstances(loadModelGroups(scene, models));
 		std::unordered_map<std::string, std::shared_ptr<RenderPass>> passes(loadPasses(renderer, scene, modelInstances, lightInstances, cameras, textures));
 		std::unordered_map<std::string, std::vector<std::string>> passDependencies(loadPassDepencencies(scene));
 

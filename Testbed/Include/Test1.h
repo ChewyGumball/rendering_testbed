@@ -26,13 +26,15 @@ private:
 
 	std::shared_ptr<Scene::Text::Font> f;
 	std::string formatString;
+	std::string cameraFormatString;
 	Scene::Text::RenderableText fpsCounter;
+	Scene::Text::RenderableText cameraDisplay;
 
 	std::shared_ptr<Scene::Cameras::Camera> guiCamera;
 	std::shared_ptr<Scene::RenderPass> gui;
 
 	std::vector<std::shared_ptr<Scene::Cameras::Camera>> cameras;
-	std::vector<std::shared_ptr<Renderer::ModelInstance>> instances;
+	std::shared_ptr<Scene::ModelGroup> instances;
 	
 	void doCameraMovement();
 

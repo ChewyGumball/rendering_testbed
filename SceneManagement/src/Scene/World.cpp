@@ -29,7 +29,7 @@ namespace Scene {
 	World::World(std::unordered_map<std::string, std::shared_ptr<RenderPass>>        passes,
 		std::unordered_map<std::string, std::vector<std::string>>                    passDependencies,
 		std::unordered_map<std::string, std::shared_ptr<Cameras::Camera>>                     cameras,
-		std::unordered_map<std::string, std::vector<std::shared_ptr<Renderer::ModelInstance>>> modelInstances)
+		std::unordered_map<std::string, std::shared_ptr<Scene::ModelGroup>> modelInstances)
 		: m_Passes(passes), m_Cameras(cameras), m_modelInstanceGroups(modelInstances)
 	{
 		std::vector<std::string> linearizedPasses = linearizeDependencies(passDependencies);
@@ -50,7 +50,7 @@ namespace Scene {
 
 	std::shared_ptr<RenderPass> World::pass(std::string name) { return m_Passes[name]; }
 
-	std::vector<std::shared_ptr<Renderer::ModelInstance>>& World::modelInstances(std::string name) { return m_modelInstanceGroups[name]; }
+	std::shared_ptr<Scene::ModelGroup> World::modelInstances(std::string name) { return m_modelInstanceGroups[name]; }
 
 	const std::vector<std::shared_ptr<RenderPass>>& World::passes() { return orderedPasses; }
 }
