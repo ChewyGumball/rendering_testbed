@@ -291,22 +291,153 @@
     <None Include="scenes\sample_scene_definition.json" />
     <None Include="scenes\simple.json" />
     <None Include="scenes\ssao.json" />
-    <None Include="shaders\colour.frag" />
-    <None Include="shaders\colour.vert" />
-    <None Include="shaders\final.frag" />
-    <None Include="shaders\final.vert" />
-    <None Include="shaders\normal - Copy.frag" />
-    <None Include="shaders\normal.frag" />
-    <None Include="shaders\normal.vert" />
-    <None Include="shaders\simple.frag" />
-    <None Include="shaders\simple.vert" />
-    <None Include="shaders\texture.frag" />
-    <None Include="shaders\texture.vert" />
-    <None Include="shaders\texture_normal.frag" />
-    <None Include="shaders\texture_normal.vert" />
+    <None Include="scenes\Trees\OC26_1.json">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="scenes\Trees\Tree1_BARK1.mbin">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="scenes\Trees\Tree1_BARK2.mbin">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="scenes\Trees\Tree1_CENTRE2.mbin">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="scenes\Trees\Tree1_LEAF1.mbin">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="scenes\Trees\Tree1_LEAF2.mbin">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="scenes\Trees\Tree1_LEAF3.mbin">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="scenes\Trees\Tree1_PETAL2.mbin">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="scenes\Trees\Tree1_ROOTS1.mbin">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="scenes\Trees\Tree1_TRUNK1.mbin">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="scenes\Trees\Tree1_TWIG2.mbin">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="shaders\colour.frag">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="shaders\colour.vert">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="shaders\final.frag">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="shaders\final.vert">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="shaders\normal - Copy.frag">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="shaders\normal.frag">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="shaders\normal.vert">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="shaders\simple.frag">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="shaders\simple.vert">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="shaders\texture.frag">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="shaders\texture.vert">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="shaders\texture_normal.frag">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="shaders\texture_normal.vert">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Test1.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="scenes\Trees\OC26_1.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="scenes\Trees\OC26brk1.png">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="scenes\Trees\OC26brk2.png">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="scenes\Trees\OC26cnt2.png">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="scenes\Trees\OC26lef1.png">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="scenes\Trees\OC26lef2.png">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="scenes\Trees\OC26lef3.png">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
+    <None Include="scenes\Trees\OC26pet2.png">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug OpenGL|x64'">true</DeploymentContent>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

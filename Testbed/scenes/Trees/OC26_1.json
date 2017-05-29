@@ -1,0 +1,369 @@
+{
+  "screen": {
+    "width": 800,
+    "height": 800
+  },
+  "meshes": {
+    "plane": {
+      "filename": "F:/Users/Ben/Desktop/plane.obj",
+      "format": "Position_Texture"
+    },
+    "bark1": {
+      "filename": "scenes/Trees/Tree1_BARK1.mbin",
+      "format": "Position_Normal_Texture"
+    },
+    "bark2": {
+      "filename": "scenes/Trees/Tree1_BARK2.mbin",
+      "format": "Position_Normal_Texture"
+    },
+    "center2": {
+      "filename": "scenes/Trees/Tree1_CENTRE2.mbin",
+      "format": "Position_Normal_Texture"
+    },
+    "leaf1": {
+      "filename": "scenes/Trees/Tree1_LEAF1.mbin",
+      "format": "Position_Normal_Texture"
+    },
+    "leaf2": {
+      "filename": "scenes/Trees/Tree1_LEAF2.mbin",
+      "format": "Position_Normal_Texture"
+    },
+    "leaf3": {
+      "filename": "scenes/Trees/Tree1_LEAF3.mbin",
+      "format": "Position_Normal_Texture"
+    },
+    "petal2": {
+      "filename": "scenes/Trees/Tree1_PETAL2.mbin",
+      "format": "Position_Normal_Texture"
+    },
+    "roots1": {
+      "filename": "scenes/Trees/Tree1_ROOTS1.mbin",
+      "format": "Position_Normal_Texture"
+    },
+    "trunk1": {
+      "filename": "scenes/Trees/Tree1_TRUNK1.mbin",
+      "format": "Position_Normal_Texture"
+    },
+    "twigs2": {
+      "filename": "scenes/Trees/Tree1_TWIG2.mbin",
+      "format": "Position_Normal_Texture"
+    }
+  },
+  "shaders": {
+    "phong": {
+      "vertexFiles": [ "shaders/normal.vert" ],
+      "fragmentFiles": [ "shaders/normal.frag" ],
+      "instanceDataFormat": { "transform": "mat4" },
+      "systemConstantBuffers": [
+        "camera",
+        "lights"
+      ]
+    },
+    "texture": {
+      "vertexFiles": [ "shaders/texture.vert" ],
+      "fragmentFiles": [ "shaders/texture.frag" ],
+      "instanceDataFormat": { "transform": "mat4" },
+      "systemConstantBuffers": [
+        "camera"
+      ]
+    },
+    "texture_normal": {
+      "vertexFiles": [ "shaders/texture_normal.vert" ],
+      "fragmentFiles": [ "shaders/texture_normal.frag" ],
+      "instanceDataFormat": { "transform": "mat4" },
+      "systemConstantBuffers": [
+        "camera",
+        "lights"
+      ]
+    },
+    "finalShader": {
+      "vertexFiles": [ "shaders/final.vert" ],
+      "fragmentFiles": [ "shaders/final.frag" ],
+      "instanceDataFormat": { "transform": "mat4" },
+      "constantBufferFormats": {}
+    }
+  },
+  "materials": {
+    "phong": {
+      "shader": "phong"
+    },
+    "renderTexture": {
+      "shader": "texture"
+    },
+    "texture": {
+      "shader": "texture_normal"
+    }
+  },
+  "textures": {
+    "screenColourBufferA": {
+      "width": "{screen.width}",
+      "height": "{screen.height}",
+      "format": "rgb"
+    },
+    "screenDepthBuffer": {
+      "width": "{screen.width}",
+      "height": "{screen.height}",
+      "format": "depth"
+    },
+	"bark1": "scenes/Trees/OC26brk1.png",
+	"bark2": "scenes/Trees/OC26brk2.png",
+	"center2": "scenes/Trees/OC26cnt2.png",
+	"leaf1": "scenes/Trees/OC26lef1.png",
+	"leaf2": "scenes/Trees/OC26lef2.png",
+	"leaf3": "scenes/Trees/OC26lef3.png",
+	"petal2": "scenes/Trees/OC26pet2.png"
+  },
+  "constantBuffers": {
+    "camera1": {
+      "format": "{phong.Camera}"
+    },
+    "camera2": {
+      "format": "{phong.Camera}"
+    },
+    "camera3": {
+      "format": "{phong.Camera}"
+    },
+    "orthoCamera": {
+      "format": "{phong.Camera}"
+    },
+    "lights": {
+      "format": "{phong.Lights}"
+    }
+  },
+  "models": {
+    "cameraTestA": {
+      "mesh": "plane",
+      "material": "renderTexture",
+      "textures": {
+        "screenTexture": "screenColourBufferA"
+      }
+    },
+    "bark1": {
+      "mesh": "bark1",
+      "material": "texture",
+      "textures": {
+        "screenTexture": "bark1"
+      }
+    },
+    "bark2": {
+      "mesh": "bark2",
+      "material": "texture",
+      "textures": {
+        "screenTexture": "bark2"
+      }
+    },
+    "center2": {
+      "mesh": "center2",
+      "material": "texture",
+      "textures": {
+        "screenTexture": "center2"
+      }
+    },
+    "leaf1": {
+      "mesh": "leaf1",
+      "material": "texture",
+      "textures": {
+        "screenTexture": "leaf1"
+      }
+    },
+    "leaf2": {
+      "mesh": "leaf2",
+      "material": "texture",
+      "textures": {
+        "screenTexture": "leaf2"
+      }
+    },
+    "leaf3": {
+      "mesh": "leaf3",
+      "material": "texture",
+      "textures": {
+        "screenTexture": "leaf3"
+      }
+    },
+    "petal2": {
+      "mesh": "petal2",
+      "material": "texture",
+      "textures": {
+        "screenTexture": "petal2"
+      }
+    }
+  },
+  "lights": {
+    "light_name": {
+      "type": "point",
+      "colour": {
+        "r": 1,
+        "g": 1,
+        "b": 1
+      },
+      "power": 1
+    }
+  },
+  "scene": {
+    "cameras": {
+      "layer1CameraQuaternion": {
+        "type": "quaternion",
+        "fov": 45,
+        "aspectRatio": 0.5,
+        "position": {
+          "x": 5,
+          "y": 0,
+          "z": 0
+        },
+        "target": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "up": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      },
+      "screenSpaceCamera": {
+        "fov": 45,
+        "aspectRatio":  1.0,
+        "position": {
+          "x": 0,
+          "y": 0,
+          "z": 2
+        },
+        "target": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "up": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      }
+    },
+    "lights": {
+      "layer1Lights": [
+        {
+          "light": "light_name",
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -1
+          }
+        },
+        {
+          "light": "light_name",
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": 1
+          }
+        }
+      ]
+    },
+    "models": {
+      "tree": [
+        {
+          "model": "bark1",
+          "position": { "x": 0, "y": 0, "z": 0.1 },
+		  "rotation": {
+		  	  "axis": { "x": 1, "y": 0, "z": 0 },
+			  "degrees": -1.5707
+		  }
+        },        
+        {
+          "model": "bark2",
+          "position": { "x": 0, "y": 0, "z": 0.1 },
+		  "rotation": {
+		  	  "axis": { "x": 1, "y": 0, "z": 0 },
+			  "degrees": -1.5707
+		  }
+        },
+        {
+          "model": "center2",
+          "position": { "x": 0, "y": 0, "z": 0.1 },
+		  "rotation": {
+		  	  "axis": { "x": 1, "y": 0, "z": 0 },
+			  "degrees": -1.5707
+		  }
+        },
+        {
+          "model": "leaf1",
+          "position": { "x": 0, "y": 0, "z": 0.1 },
+		  "rotation": {
+		  	  "axis": { "x": 1, "y": 0, "z": 0 },
+			  "degrees": -1.5707
+		  }
+        },
+        {
+          "model": "leaf2",
+          "position": { "x": 0, "y": 0, "z": 0.1 },
+		  "rotation": {
+		  	  "axis": { "x": 1, "y": 0, "z": 0 },
+			  "degrees": -1.5707
+		  }
+        },
+        {
+          "model": "leaf3",
+          "position": { "x": 0, "y": 0, "z": 0.1 },
+		  "rotation": {
+		  	  "axis": { "x": 1, "y": 0, "z": 0 },
+			  "degrees": -1.5707
+		  }
+        },
+        {
+          "model": "petal2",
+          "position": { "x": 0, "y": 0, "z": 0.1 },
+		  "rotation": {
+		  	  "axis": { "x": 1, "y": 0, "z": 0 },
+			  "degrees": -1.5707
+		  }
+        }
+      ],
+      "textureTest": [
+        {
+          "model": "cameraTestA",
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          }
+        }
+      ]
+    },
+    "passes": {
+      "cameraTestB": {
+        "dependencies": [ ],
+        "lights": [ "layer1Lights" ],
+        "models": [ "tree" ],
+        "camera": "layer1CameraQuaternion",
+        "cull": true,
+        "wireframe": false,
+        "clearColour": { "r":  0.2, "g": 0.2, "b": 0.2, "a": 1},
+        "bufferOverrides": {
+          "colour0": "screenColourBufferA",
+          "depth": "screenDepthBuffer"
+        }
+      },
+      "display": {
+        "dependencies": [ "cameraTestB" ],
+        "lights": [ "layer1Lights" ],
+        "models": [ "textureTest" ],
+        "cull": true,
+        "camera": "screenSpaceCamera",
+        "clearColour": {
+          "r": 0.2,
+          "g": 0.2,
+          "b": 0.2,
+          "a": 1
+        },
+        "viewport": {
+          "x": 0,
+          "y": 0,
+          "width": 800,
+          "height": 800
+        }
+      }
+    }
+  }
+}
