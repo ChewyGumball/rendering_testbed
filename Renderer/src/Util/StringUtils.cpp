@@ -16,7 +16,10 @@ namespace Util::String
 			if (*end == delimiter)
 			{
 				elements.emplace_back(start, end);
+				++end;
+
 				while (end != actualEnd && *end == delimiter) {
+					elements.emplace_back("");
 					++end;
 				}
 				start = end;
