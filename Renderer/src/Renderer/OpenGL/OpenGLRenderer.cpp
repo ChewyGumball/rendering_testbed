@@ -159,6 +159,9 @@ void OpenGLRenderer::checkGLError()
 OpenGLRenderer::OpenGLRenderer()
 {
 	initialize();
+
+	glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);
+	glGetIntegerv(GL_MINOR_VERSION, &minorVersion);
 }
 
 OpenGLRenderer::~OpenGLRenderer() {}

@@ -10,6 +10,8 @@ namespace Renderer {
 		public:
 			static void checkGLError();
 
+			int32_t majorVersion, minorVersion;
+
 			OpenGLRenderer();
 			~OpenGLRenderer();
 

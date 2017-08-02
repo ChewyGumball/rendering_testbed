@@ -13,8 +13,16 @@ using namespace Renderer::OpenGL;
 
 OpenGLShaderConstantBuffer::OpenGLShaderConstantBuffer(DataBufferView buffer) : m_deviceBufferSize(0), constantBuffer(buffer)
 {
+
+	glGenBuffers(1, &m_handle);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, m_handle);
+
+	glBufferData(GL_UNIFORM_BUFFER, constantBuffer.format()->size(), nullptr, GL_DYNAMIC_DRAW);
+	/*
 	glCreateBuffers(1, &m_handle);
 	glNamedBufferData(m_handle, constantBuffer.format()->size(), nullptr, GL_DYNAMIC_DRAW);
+	*/
 }
 
 

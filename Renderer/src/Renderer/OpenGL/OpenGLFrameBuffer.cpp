@@ -26,7 +26,11 @@ namespace Renderer::OpenGL {
 			glBindFramebuffer(GL_FRAMEBUFFER, buffer);
 			for (auto& target : targets)
 			{
+				glFramebufferTexture2D(GL_FRAMEBUFFER, attachments[target.first], GL_TEXTURE_2D, textures[target.second->id()].handle(), 0);
+
+				/*
 				glFramebufferTexture(GL_FRAMEBUFFER, attachments[target.first], textures[target.second->id()].handle(), 0);
+				*/
 				if (target.first != FrameBufferTarget::DEPTH) {
 					colourBuffers.push_back(attachments[target.first]);
 				}

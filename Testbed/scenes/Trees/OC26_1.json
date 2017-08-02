@@ -5,7 +5,7 @@
   },
   "meshes": {
     "plane": {
-      "filename": "F:/Users/Ben/Desktop/plane.obj",
+      "filename": "F:/Users/Ben/Documents/3D Assets/meshes/obj/plane.obj",
       "format": "Position_Texture"
     },
     "bark1": {

@@ -53,11 +53,16 @@ const std::unordered_map<BufferElementType, AttributeDetails> glTypes {
 //	1. enabled for the vao
 //	2. bound to a specific binding point in the vao (ie which buffer is going to fill this attribute, as set by glVertexArrayVertexBuffer below)
 //	3. formatted for the type of attribute is being bound there
-void setupVertexAttribute(GLuint vao, GLuint attribute, GLint componentCount, GLuint offset)
+void setupVertexAttribute(GLuint vao, GLuint attribute, GLint componentCount, GLuint offset, GLuint stride)
 {
+	glEnableVertexAttribArray(attribute);
+	glVertexAttribPointer(attribute, componentCount, GL_FLOAT, GL_FALSE, stride, (void*)offset);
+
+	/*
     glEnableVertexArrayAttrib(vao, attribute);
     glVertexArrayAttribBinding(vao, attribute, VERTEX_DATA_BINDING_POINT_INDEX);
     glVertexArrayAttribFormat(vao, attribute, componentCount, GL_FLOAT, GL_FALSE, offset);
+	*/
 }
 
 void setupVertexAttributes(GLuint vao, GLuint vbo, VertexFormat vertexFormat)
@@ -65,22 +70,28 @@ void setupVertexAttributes(GLuint vao, GLuint vbo, VertexFormat vertexFormat)
 	int nextVertexAttribute = 0;
 
 	// Set up mesh vertex data attributes
+	glBindVertexArray(vao);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	/*
 	glVertexArrayVertexBuffer(vao, VERTEX_DATA_BINDING_POINT_INDEX, vbo, 0, vertexFormat.size());
+	*/
 	if (vertexFormat.hasPosition()) {
-		setupVertexAttribute(vao, nextVertexAttribute++, 3, vertexFormat.positionOffset());
+		setupVertexAttribute(vao, nextVertexAttribute++, 3, vertexFormat.positionOffset(), vertexFormat.size());
 	}
 
 	if (vertexFormat.hasNormal()) {
-		setupVertexAttribute(vao, nextVertexAttribute++, 3, vertexFormat.normalOffset());
+		setupVertexAttribute(vao, nextVertexAttribute++, 3, vertexFormat.normalOffset(), vertexFormat.size());
 	}
 
 	if (vertexFormat.hasTextureCoordinates()) {
-		setupVertexAttribute(vao, nextVertexAttribute++, 2, vertexFormat.textureCoordinatesOffset());
+		setupVertexAttribute(vao, nextVertexAttribute++, 2, vertexFormat.textureCoordinatesOffset(), vertexFormat.size());
 	}
 
 	if (vertexFormat.hasColour()) {
-		setupVertexAttribute(vao, nextVertexAttribute++, 4, vertexFormat.colourOffset());
+		setupVertexAttribute(vao, nextVertexAttribute++, 4, vertexFormat.colourOffset(), vertexFormat.size());
 	}
+
+	glBindVertexArray(0);
 }
 
 void setupInstanceStateAttribute(GLuint vao, GLuint attribute, BufferElementType type, GLuint offset)
@@ -112,9 +123,13 @@ void setupInstanceStateAttributes(GLuint vao, GLuint vbo, OpenGLShader& shader, 
 OpenGLRenderModel::OpenGLRenderModel(OpenGLRenderMesh& mesh, OpenGLShader& shader, const std::unordered_map<std::string, std::shared_ptr<TextureBuffer>>&& textures, std::shared_ptr<const Material> material)
     : m_indexCount(mesh.indexCount()), m_textures(std::move(textures)), m_material(material)
 {
+	glGenVertexArrays(1, &vao);
+	glGenBuffers(1, &m_transformVBO);
+
+	/*
     glCreateVertexArrays(1, &vao);
     glCreateBuffers(1, &m_transformVBO);
-
+	*/
 	setupVertexAttributes(vao, mesh.vbo(), mesh.vertexFormat());
 	setupInstanceStateAttributes(vao, m_transformVBO, shader, material->shader()->instanceStateFormat());
 

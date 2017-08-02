@@ -138,28 +138,31 @@ void loadFBXMeshFromNode(FbxNode* node, std::vector<int>& indices, std::vector<V
 namespace ModelLoader {
 	std::unordered_map<Renderer::RenderResourceID, std::pair<std::string, std::shared_ptr<Renderer::Mesh>>> loadMultiPartOBJFile(std::string filename)
 	{
+		MeshPart defaultMeshPart;
 		std::unordered_map<std::string, MeshPart> meshParts;
 
 		std::vector<glm::vec3> positions;
 		std::vector<glm::vec3> normals;
 		std::vector<glm::vec2> textureCoordinates;
 
-		MeshPart* currentMeshPart;
+		MeshPart* currentMeshPart = &defaultMeshPart;
 
 		std::string materialName = "unknown";
 
 		bool first = true;
 
-		Util::File::ProcessLines(filename, [&](const std::string& line) {
-			std::vector<std::string> elements = Util::String::Split(line, ' ');
+		Util::File::ProcessLines(filename, [&](const std::string_view& line) {
+			std::vector<std::string_view> elements = Util::String::Split(line, ' ');
+			if (elements.size() == 0) return;
+
 			if (elements[0] == "v") {
-				positions.emplace_back(std::stof(elements[1]), std::stof(elements[2]), std::stof(elements[3]));
+				positions.emplace_back(Util::String::svtof(elements[1]), Util::String::svtof(elements[2]), Util::String::svtof(elements[3]));
 			}
 			else if (elements[0] == "vt") {
-				textureCoordinates.emplace_back(std::stof(elements[1]), std::stof(elements[2]));
+				textureCoordinates.emplace_back(Util::String::svtof(elements[1]), Util::String::svtof(elements[2]));
 			}
 			else if (elements[0] == "vn") {
-				normals.emplace_back(std::stof(elements[1]), std::stof(elements[2]), std::stof(elements[3]));
+				normals.emplace_back(Util::String::svtof(elements[1]), Util::String::svtof(elements[2]), Util::String::svtof(elements[3]));
 			}
 			else if (elements[0] == "usemtl") {
 				materialName = elements[1];
@@ -173,9 +176,9 @@ namespace ModelLoader {
 				currentMeshPart->indicies.push_back(vertexCount + 2);
 
 				for (int i = 1; i < 4; ++i) {
-					std::vector<std::string> face = Util::String::Split(elements[i], '/');
+					std::vector<std::string_view> face = Util::String::Split(elements[i], '/');
 
-					int  vertexIndex = std::stoi(face[0]);
+					int  vertexIndex = Util::String::svtoi(face[0]);
 					bool hasTextureCoordinates = false;
 					bool hasNormals = false;
 					int  textureIndex = -1;
@@ -183,12 +186,12 @@ namespace ModelLoader {
 
 					if (face.size() > 1 && face[1] != "") {
 						hasTextureCoordinates = true;
-						textureIndex = std::stoi(face[1]);
+						textureIndex = Util::String::svtoi(face[1]);
 					}
 
 					if (face.size() > 2 && face[2] != "") {
 						hasNormals = true;
-						normalIndex = std::stoi(face[2]);
+						normalIndex = Util::String::svtoi(face[2]);
 					}
 
 					if (hasTextureCoordinates) {
@@ -224,6 +227,12 @@ namespace ModelLoader {
 			meshes[mesh->id()] = std::make_pair(meshPart.first, mesh);
 		}
 
+		if (defaultMeshPart.indicies.size() > 0) {
+			std::pair<std::vector<Vertex>, std::vector<uint32_t>> deduppedData = dedupeVertices(defaultMeshPart.vertices, defaultMeshPart.indicies);
+			std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(defaultMeshPart.format, Vertex::flatten(defaultMeshPart.format, deduppedData.first), std::move(deduppedData.second));
+			meshes[mesh->id()] = std::make_pair("DEFAULT", mesh);
+		}
+
 		return meshes;
 	}
 	std::shared_ptr<Renderer::Mesh> loadOBJFile(std::string filename, VertexFormat loadedFormat)
@@ -236,36 +245,36 @@ namespace ModelLoader {
 		std::vector<Vertex> vertices;
 		int                 vertexCount = 0;
 		VertexFormat        format(0);
-		Util::File::ProcessLines(filename, [&](const std::string& line) {
-			std::vector<std::string> elements = Util::String::Split(line, ' ');
+		Util::File::ProcessLines(filename, [&](const std::string_view& line) {
+			std::vector<std::string_view> elements = Util::String::Split(line, ' ');
 			if (elements[0] == "v") {
-				positions.emplace_back(std::stof(elements[1]), std::stof(elements[2]), std::stof(elements[3]));
+				positions.emplace_back(Util::String::svtof(elements[1]), Util::String::svtof(elements[2]), Util::String::svtof(elements[3]));
 			} else if (elements[0] == "vt") {
-				textureCoordinates.emplace_back(std::stof(elements[1]), std::stof(elements[2]));
+				textureCoordinates.emplace_back(Util::String::svtof(elements[1]), Util::String::svtof(elements[2]));
 			} else if (elements[0] == "vn") {
-				normals.emplace_back(std::stof(elements[1]), std::stof(elements[2]), std::stof(elements[3]));
+				normals.emplace_back(Util::String::svtof(elements[1]), Util::String::svtof(elements[2]), Util::String::svtof(elements[3]));
 			} else if (elements[0] == "f") {
 				indices.push_back(vertexCount++);
 				indices.push_back(vertexCount++);
 				indices.push_back(vertexCount++);
 
 				for (int i = 1; i < 4; ++i) {
-					std::vector<std::string> face = Util::String::Split(elements[i], '/');
+					std::vector<std::string_view> face = Util::String::Split(elements[i], '/');
 
-					int  vertexIndex           = std::stoi(face[0]);
+					int  vertexIndex = Util::String::svtoi(face[0]);
 					bool hasTextureCoordinates = false;
-					bool hasNormals            = false;
-					int  textureIndex          = -1;
-					int  normalIndex           = -1;
+					bool hasNormals = false;
+					int  textureIndex = -1;
+					int  normalIndex = -1;
 
 					if (face.size() > 1 && face[1] != "") {
 						hasTextureCoordinates = true;
-						textureIndex          = std::stoi(face[1]);
+						textureIndex = Util::String::svtoi(face[1]);
 					}
 
 					if (face.size() > 2 && face[2] != "") {
-						hasNormals  = true;
-						normalIndex = std::stoi(face[2]);
+						hasNormals = true;
+						normalIndex = Util::String::svtoi(face[2]);
 					}
 
 					if (hasTextureCoordinates) {

@@ -74,9 +74,9 @@ namespace Util::File
 		return fileContents.str();
 	}
 
-	std::vector<std::string> ReadLines(const std::string& filename)
+	std::vector<std::string_view> ReadLines(const std::string& fileContents)
 	{
-		return Util::String::Split(ReadWholeFile(filename), '\n');
+		return Util::String::Split(ReadWholeFile(fileContents), '\n');
 	}
 
 	std::vector<uint8_t> ReadBinary(const std::string& filename)
@@ -96,25 +96,25 @@ namespace Util::File
 		return data;
 	}
 
-	void ProcessLines(const std::string& filename, std::function<void(const std::string&)> processor)
+	void ProcessLines(const std::string& filename, std::function<void(const std::string_view&)> processor)
 	{
 		std::string file = ReadWholeFile(filename);
-		auto start = file.begin();
-		auto end = file.begin();
-		auto actualEnd = file.end();
+		size_t start = 0;
+		size_t end = 0;
+		size_t actualEnd = file.size();
 
 		while (end != actualEnd)
 		{
-			if (*end == '\r' && end + 1 != actualEnd && *(end + 1) == '\n')
+			if (file[end] == '\r' && end + 1 != actualEnd && file[end + 1] == '\n')
 			{
-				std::string line(start, end);
+				std::string_view line(&file[start], end - start);
 				processor(line);
 				start = end + 2;
 				end += 1;
 			}
-			else if (*end == '\n')
+			else if (file[end] == '\n')
 			{
-				std::string line(start, end);
+				std::string_view line(&file[start], end - start);
 				processor(line);
 				start = end + 1;
 			}

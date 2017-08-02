@@ -1,35 +1,71 @@
 #include "Util/StringUtils.h"
 
 #include <sstream>
+#include <string_view>
+
+namespace {
+	std::string badStringViewBuffer;
+}
 
 namespace Util::String
 {
-	std::vector<std::string> Split(const std::string& string, char delimiter)
+	std::vector<std::string_view> Split(const std::string& string, char delimiter)
 	{
-		std::vector<std::string> elements;
-		auto start = string.begin();
-		auto end = string.begin();
-		auto actualEnd = string.end();
+		return Split(std::string_view(string.data(), string.size()), delimiter);
+	}
 
-		while (end != actualEnd)
-		{
-			if (*end == delimiter)
+	std::vector<std::string_view> Split(const std::string_view & string, char delimiter)
+	{
+		std::vector<std::string_view> elements;
+
+		if (string.size() > 0) {
+			size_t start = 0;
+			size_t end = 0;
+			size_t actualEnd = string.size();
+
+			while (end != actualEnd)
 			{
-				elements.emplace_back(start, end);
-				++end;
+				if (string[end] == delimiter)
+				{
+					elements.emplace_back(&string[start], end - start);
+					++end;
 
-				while (end != actualEnd && *end == delimiter) {
-					elements.emplace_back("");
+					while (end != actualEnd && string[end] == delimiter) {
+						elements.emplace_back(&string[start], 0);
+						++end;
+					}
+					start = end;
+				}
+				else {
 					++end;
 				}
-				start = end;
 			}
-			else {
-				++end;
-			}
+
+			elements.emplace_back(&string[start], end - start);
 		}
-		elements.emplace_back(start, end);
 
 		return elements;
+	}
+
+	float svtof(std::string_view string)
+	{
+		badStringViewBuffer.reserve(string.size());
+		badStringViewBuffer.clear();
+		for (size_t i = 0; i < string.size(); i++) {
+			badStringViewBuffer.push_back(string[i]);
+		}
+
+		return std::stof(badStringViewBuffer);
+	}
+
+	int svtoi(std::string_view string)
+	{
+		badStringViewBuffer.reserve(string.size());
+		badStringViewBuffer.clear();
+		for (size_t i = 0; i < string.size(); i++) {
+			badStringViewBuffer.push_back(string[i]);
+		}
+
+		return std::stoi(badStringViewBuffer);
 	}
 }

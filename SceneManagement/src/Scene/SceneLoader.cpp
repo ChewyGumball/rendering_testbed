@@ -48,9 +48,10 @@ glm::vec4 objectToColour(rapidjson::Value& json) { return glm::vec4(json["r"].Ge
 int getIntFromPath(rapidjson::Value* json, std::string path)
 {
     rapidjson::Value* v = json;
-    for (std::string next : Util::String::Split(path, '.')) {
+    for (std::string_view next : Util::String::Split(path, '.')) {
         if (v->IsObject()) {
-            v = &((*v)[next.c_str()]);
+			std::string nextString(next.data(), next.size());
+            v = &((*v)[nextString.c_str()]);
         }
     }
 

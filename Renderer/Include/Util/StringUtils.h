@@ -3,7 +3,8 @@
 
 namespace Util::String
 {
-	std::vector<std::string> Split(const std::string& string, char delimiter);
+	std::vector<std::string_view> Split(const std::string& string, char delimiter);
+	std::vector<std::string_view> Split(const std::string_view& string, char delimiter);
 
 	template<typename ...Args>
 	std::string Format(const std::string format, Args ...args)
@@ -13,4 +14,7 @@ namespace Util::String
 		std::snprintf(buf.get(), size, format.c_str(), args ...);
 		return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
 	}
+
+	float svtof(std::string_view string);
+	int svtoi(std::string_view string);
 }
