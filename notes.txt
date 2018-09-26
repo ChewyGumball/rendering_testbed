@@ -1,0 +1,261 @@
+create glfw window with no context for any backend, have renderer create context with the window handle (even for opengl)
+opengl is by default right handed, column major, directx is by default left handed, row major -> look into how to merge (it looks like its just at the end, just projecting into the right space, needs to be different)
+ssao
+shadow maps
+
+clarify renderpass purpose
+use gpu mapped buffers
+sort out depth issue:
+	pre-render to depth buffer
+	computer shader
+	model instance stores depth computed at higher level
+add entity concept 
+
+--------------------------------------------
+
+Mesh:
+	BufferView[] VertexBuffers;
+	BufferView IndexBuffer;
+
+DepthPrePass:
+	{static} Shader shader
+	{static} RenderQueue queue
+	ShaderInputDescription inputDescription
+	Buffer* positionBuffer
+	int meshID
+	constructor(mesh, positionBuffer) {
+		this.positionBuffer = positionBuffer;
+		meshID = mesh.id;
+		inputDescription = new ShaderInputDescription {
+			shader = shader
+			vertexBuffers = [mesh.VertexBuffers[Position]]
+			indexBuffer = mesh.IndexBuffer
+		}
+	}
+
+	draw(distance) {
+		queue.add(new DrawCall {
+			sortKey = meshID << 32 | distance
+			buffers = [positionBuffer]
+			shaderInput = inputDescription
+		})
+	}
+}
+
+!!!!!!!!!!!!!!!!!!!!!!! How/When do buffers get updated? (triple buffered? sync point?)
+
+RenderQueue:
+	List drawCalls
+	process() {
+		drawCalls.sort(DrawCall.sortKey);
+	}
+
+	draw() {
+		for(int i = 0; i < drawCalls.size(); i++) {
+			int instanceCount = 1;
+			while(drawCalls[i] == drawCalls[i+instanceCount]) {
+				instanceCount++;
+			}
+
+			if(instanceCount > 1) {
+				DrawCall instancedDrawCall = createInstancedDrawCall(drawCalls, i, instanceCount);
+				draw(instancedDrawCall);
+				i += instanceCount - 1;
+			}
+			else {
+				draw(drawCalls[i]);
+			}
+		}
+	}
+
+Renderer:
+	draw(DrawCall) {
+		if(drawCall.shaderInput.shader.id != currentlyBoundShaderID) {
+			bindShader(drawCall.shaderInput.shader);
+		}
+
+		for(drawCall.buffers) {
+			if(!currentlyBoundBuffers.contains(buffer)) {
+				bindBuffer(buffer);
+			}
+		}
+		
+		for(drawCall.textures) {
+			if(!currentlyBoundTextures.contains(texture)) {
+				bindTexture(texture);
+			}
+		}
+
+		for(drawCall.shaderInput.vertexBuffers) {
+			if(!currentlyBoundBuffers.contains(buffer)) {
+				bindBuffer(buffer);
+			}
+		}
+
+		if(!currentlyBoundBuffers.contains(drawCall.shaderInput.indexBuffer)) {
+			bindBuffer(drawCall.shaderInput.indexBuffer);
+		}
+
+		draw(drawCall.instanceCount);
+	}
+
+
+
+
+--------------------------------------------
+
+Framebuffer
+Buffer:
+	uint8_t[] data
+BufferView:	
+	BufferType (index, vertex, etc)
+	uint32_t stride
+	uint32_t offset
+	uint32_t size
+	uint8_t* data
+Texture
+ShaderProgram
+ShaderInputDescription:
+	Shader shader
+	Buffer*[] vertexBuffers
+	Buffer* indexBuffer
+DrawCall:
+	int64_t sortKey
+	Buffer*[] buffers
+	Texture*[] textures
+	ShaderInputDescription* shaderInput
+Renderer
+
+
+
+--------------------------------------------
+
+Global Data:
+	Camera projection matrix
+	Light descriptions
+
+Material Data:
+	Shader constants
+	Textures
+
+Instance Data:
+	Instance transforms
+	Instanced material data
+
+
+Culling determins which entities make DrawCalls
+Entity.draw(Camera c) {
+	updateBuffers();
+	foreach renderpass {
+		renderpass.draw(entity, camera.distanceTo(entity));
+	}
+}
+
+Renderer shouldn't try to order anything
+Just create buffers, etc
+Cache current state and only change if different
+
+
+
+
+DrawCall:
+	int64 sortKey
+	Material* material
+	MeshLayout* layout
+	int64 instanceCount
+
+
+
+
+
+RenderPass should be subclassed:
+	DepthPrePass
+	DefferedGBufferPass
+	ShadowmapPass
+	etc
+
+Renderpass chooses sort key format
+
+Renderpass doesn't store entities, entities store renderpasses
+
+------------------------------------------------------------------------------------------------------------------
+
+Renderable Entity:
+
+produces RendererOperations:
+	UpdateBuffer - Update a field in a buffer
+	DrawMesh - Draw mesh with shader and shader inputs,
+	
+
+---------------
+
+BufferArray
+	ElementLayout
+	Instanced
+	ElementCount
+
+
+Buffer
+	Layout
+
+ResidentBuffer : Buffer
+	Data[]
+
+RemoteBuffer : Buffer
+	RemoteBufferID
+
+
+
+
+
+DataBufferArray : ResidentBuffer
+	BufferLayout
+	InstanceBuffer //true: on instance uses one element, false: one instance uses the whole array
+	ElementCount
+	Data[BufferLayout.size * ElementCount]
+
+ShaderContext
+	Map<ShaderContextName, DataBuffer> constantBuffers;
+	Map<ShaderContextName, DataBufferArray> constantBufferArrays;
+	Map<ShaderContextName, Texture> textures;
+	Map<ShaderContextName, TextureArray> textureArrays;
+	(static)
+	ShaderContextName registerName(string name);
+
+Shader:
+	program
+	(Texture[], TextureArray[]) getTextures(ShaderContext context);
+	(DataBuffer[], DataBufferArray[]) getBuffers(ShaderContext context);
+
+//How do you do texture arrays?
+
+draw(Model model, ShaderContext context)
+draw(InstancedModel model, ShaderContext context)
+
+Model: 
+	VertexData - DataBufferArray[] //could be interleaved or separate bufferrs
+	Shader
+
+
+----------------------------
+
+ModelPart(Material, Mesh)
+{
+	modelDescriptor = material.buildModelDescriptor(mesh);
+}
+
+InstancedModelPart(Material, Mesh, MaxInstanceCount)
+{
+	modelDescriptor = material.buildInstancedModelDescriptor(mesh);
+}
+
+Material.
+	
+
+
+
+
+
+
+
+

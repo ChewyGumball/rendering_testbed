@@ -152,6 +152,7 @@ namespace ModelLoader {
 		bool first = true;
 
 		Util::File::ProcessLines(filename, [&](const std::string_view& line) {
+			//There may be more than one space between elements, this will break in such a case :(
 			std::vector<std::string_view> elements = Util::String::Split(line, ' ');
 			if (elements.size() == 0) return;
 
